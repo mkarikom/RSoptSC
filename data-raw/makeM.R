@@ -8,7 +8,6 @@
 #' @param k The rank of \code{W}.
 #' @param nn A boolean value whether the values are integers, otherwise the round of runif is used
 #' @param savecsv A boolean value whether or not to save the matrix as a csv
-#' @param labeltime A boolean value whether or not to label the output file with the last 4 of the unix time
 #' @return \code{W}, \code{H}, and \code{A} such that \code{A} = \code{W} * \code{H}.
 #' @examples
 #' makeSymmetricM(rows = 25, sparsity = 0.7, min = 1, max = 5, k = 3)
@@ -21,7 +20,7 @@
 #'  devtools::use_data(mydata, internal = TRUE)
 makeM <- function(rows = 25, columns = 25,
                            sparsity = 0.7, min = 1, max = 5, k = 3,
-                           nn = TRUE, savecsv = FALSE, labeltime = FALSE){
+                           nn = TRUE, savecsv = FALSE){
   if(nn){
     testW <- matrix(round(runif(n = rows*k, min = min, max = max)), nrow = rows, ncol = k)
     testH <- matrix(round(runif(n = columns*k, min = min, max = max)), nrow = k, ncol = columns)
@@ -37,12 +36,8 @@ makeM <- function(rows = 25, columns = 25,
   A <- W%*%H
   output <- list(A = A, W = W, H = H)
   if(savecsv == TRUE){
-    if(labeltime){
-      newtime <- as.integer(as.POSIXct(Sys.time()))
-      newtime <- str_sub(newtime, -4)
-    }else{
-      newtime = c()
-    }
+    newtime <- as.integer(as.POSIXct(Sys.time()))
+    newtime <- str_sub(newtime, -4)
     Aname <- paste0(newtime, "_", "A_", k, "x", rows)
     Wname <- paste0(newtime, "_", "W_", k, "x", rows)
     Hname <- paste0(newtime, "_", "H_", k, "x", rows)

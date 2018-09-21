@@ -7,7 +7,6 @@
 #' @param k The rank of W.
 #' @param nn A boolean value whether the values are integers, otherwise the round of runif is used
 #' @param savecsv A boolean value whether or not to save the matrix as a csv
-#' @param labeltime A boolean value whether or not to label the output file with the last 4 of the unix time
 #' @return \code{W} and \code{A} such that \code{A} = \code{W} * \code{t(W)}.
 #' @examples
 #' makeSymmetricM(rows = 25, sparsity = 0.7, min = 1, max = 5, k = 3)
@@ -21,13 +20,9 @@
 #'  newname <- paste0("mat3x25x", newtime)
 #'  assign(newname, test)
 #'  write.csv(newname, paste0("inst/testdata/", newname, ".csv"))
-#'
-#'  Load this data for testing:
-#'  mydata <- read.csv(system.file("testdata","0152_A_3x50.csv",package="RSoptSC"))
-#'  devtools::use_data(mydata, internal = TRUE)
+#'  devtools::use_data(newname, internal = TRUE)
 makeSymmetricM <- function(rows = 25, sparsity = 0.7, min = 1,
-                           max = 5, k = 3, nn = TRUE, savecsv = FALSE,
-                           labeltime = FALSE){
+                           max = 5, k = 3, nn = TRUE, savecsv = FALSE){
   if(nn){
     testW <- matrix(round(runif(n = rows*k, min = min, max = max)), nrow = rows, ncol = k)
   }else{
@@ -38,12 +33,8 @@ makeSymmetricM <- function(rows = 25, sparsity = 0.7, min = 1,
   A <- W%*%t(W)
   output <- list(A = A, W = W)
   if(savecsv == TRUE){
-    if(labeltime){
-      newtime <- as.integer(as.POSIXct(Sys.time()))
-      newtime <- str_sub(newtime, -4)
-    }else{
-      newtime = c()
-    }
+    newtime <- as.integer(as.POSIXct(Sys.time()))
+    newtime <- str_sub(newtime, -4)
     Aname <- paste0("Sym_", newtime, "_", "A_", k, "x", rows)
     Wname <- paste0("Sym_", newtime, "_", "W_", k, "x", rows)
     write.csv(output$A, paste0("inst/testdata/", Aname, ".csv"))

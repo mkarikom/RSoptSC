@@ -6,7 +6,8 @@
 #' @examples
 #' InitSVD(A, k)
 
-SymNMF <- function(A, nC, H, gamma = 0.000001, mu = 10^(-6), maxiter = 1000000){
+SymNMF <- function(A, nC, H, gamma = 0.00001, mu = 10^(-6), maxiter = 200000){
+  #browser()
   n = nrow(H)
   k = ncol(H)
   Hnew = vec(matrix(.Machine$integer.max, n, k))
@@ -15,31 +16,23 @@ SymNMF <- function(A, nC, H, gamma = 0.000001, mu = 10^(-6), maxiter = 1000000){
   Hold = H
   H = H = nnproj(H - gamma*vgrad(A, H, n))
   iter = 1
-  olditer = 1
-  initGradNorm = norm(matrix(vgrad(A, Hinit, n),nrow=n),"F")
 
-  while(iter < maxiter && norm(matrix(vgrad(A, H, n),nrow=n),"F") > mu*norm(matrix(vgrad(A, Hinit, n), nrow=n),"F")){
+  while(iter < maxiter && norm(matrix(nnproj(vgrad(A, H, n)),nrow=n)) > mu*norm(matrix(nnproj(vgrad(A, Hinit, n)), nrow=n))){
     iter = iter + 1
     Hold = H
     H = nnproj(H - gamma*vgrad(A, H, n))
     if(objective(A, H, n) > objective(A, Hold, n)){
       return(vmat(Hold, n))
     }
-    # if(objective(A, H, n) < 0.0038){
-    #   return(vmat(Hold, n))
-    # }
-    if(iter == olditer + 1000){
-      print(objective(A, H, n))
-      print(iter)
-      olditer = iter
-    }
+    print(iter)
+    print(objective(A, H, n))
   }
-  return(list(H = vmat(H, n), obj = objective(A, H, n), iter = iter, initGradNorm = initGradNorm, GradNorm = norm(matrix(vgrad(A, H, n),nrow=n),"F")))
+  return(vmat(H, n))
 }
 
 objective <- function(A, H, n){
   H = vmat(H, n)
-  obj = norm(A, 'f')^2 - 2 * psych::tr(t(H) %*% (A %*% H)) + psych::tr(t(H) %*% H %*% t(H) %*% H )
+  obj = norm(A, 'f')^2 - 2 * tr(t(H) %*% (A %*% H)) + tr(t(H) %*% H %*% t(H) %*% H )
   H = vec(H)
   return(obj)
 }
