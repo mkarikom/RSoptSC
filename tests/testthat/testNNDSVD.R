@@ -1,20 +1,24 @@
 context("decomposition values")
 library(RSoptSC)
 
-test_that("small matrix", {
-  expect_equal(str_length("a"), 1)
-  expect_equal(str_length("ab"), 2)
-  expect_equal(str_length("abc"), 3)
-})
+# test_that("NMF precision 3", {
+#   data = RSoptSC::SymNMF(RSoptSC::symA3x25, nC = 3, H = RSoptSC::symWinit3x25)
+#   product = prod(signif(data$H, digits = 2) - signif(RSoptSC::symW3x25, digits = 2) == 0)
+#   print(product)
+#   print(data)
+#   print(RSoptSC::symW3x25)
+#   expect_equal(product, 1)
+# })
 
-test_that("str_length of factor is length of level", {
-  expect_equal(str_length(factor("a")), 1)
-  expect_equal(str_length(factor("ab")), 2)
-  expect_equal(str_length(factor("abc")), 3)
-})
 
-test_that("str_length of missing is missing", {
-  expect_equal(str_length(NA), NA_integer_)
-  expect_equal(str_length(c(NA, 1)), c(NA, 1))
-  expect_equal(str_length("NA"), 2)
+test_that("NMF grad < tol * initGrad", {
+  skip("takes too long")
+  tol = 10^(-6)
+  data = RSoptSC::SymNMF(RSoptSC::A0146, nC = 3, H = RSoptSC::Winit0146)
+  A = RSoptSC::A0146
+  Hinit = RSoptSC::Winit0146
+  initNorm = norm(4*(Hinit%*%t(Hinit)-A)%*%Hinit, "F")
+  H = data$H
+  finalNorm = norm(4*(H%*%t(H)-A)%*%H, "F")
+  expect_true(finalNorm < tol * initNorm)
 })
