@@ -20,7 +20,6 @@ test_that("root cell is detected when graph dist used", {
                             dist_flat = RSoptSC::GuoPtime$Values$low_dis,
                             cluster_labels = RSoptSC::GuoPtime$Params$cluster_label,
                             root_cluster = RSoptSC::GuoPtime$Values$root_cluster)
-  browser()
   expect_equal(root_cell, RSoptSC::GuoPtime$Values$root_cell)
 })
 

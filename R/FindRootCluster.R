@@ -32,7 +32,6 @@ FindRootCluster <- function(cluster_labels, flat_embedding, dist_graph, dist_fla
       cluster_adj_matrix[i, j] <- sum(i_j_distances)/n_i_j
     }
   }
-  browser()
   graph_cluster <- igraph::graph_from_adjacency_matrix(adjmatrix = cluster_adj_matrix,
                                                        mode = "upper",
                                                         weighted = TRUE)

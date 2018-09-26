@@ -25,12 +25,10 @@ FindRootCell <- function(use_flat_dist = TRUE,
                          cluster_labels = NULL,
                          root_cluster = NULL){
   if(use_flat_dist){
-    browser()
     xy <- which(dist_flat == max(dist_flat), arr.ind = TRUE)
     max_cells <- sort(unique(as.vector(which(dist_flat == max(dist_flat), arr.ind = TRUE))))
     return(max_cells[length(max_cells)])
   } else {
-    browser()
     n_clusters <- length(unique(cluster_labels))
     root_cluster_cells <- which(cluster_labels == root_cluster, arr.ind = TRUE)
 

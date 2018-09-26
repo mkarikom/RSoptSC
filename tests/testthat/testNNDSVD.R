@@ -10,7 +10,6 @@ library(RSoptSC)
 #   expect_equal(product, 1)
 # })
 
-
 test_that("NMF grad < tol * initGrad", {
   skip("takes too long")
   tol = 10^(-6)

@@ -21,26 +21,22 @@ GetMarkerTable <- function(counts_data,
                   gene_expression_threshold,
                   n_features)
 
-  n_clusters <- max(cluster_labels)
-  # get a table where the rows are clusters and columns are genes
-  # the elements are the sum (over all cells in the cluster) of the cell's
-  # cluster index (H value) times the expression of that gene
-  cluster_gene_table <- c()
-  for(j in 1:n_clusters){
-    cells <- which(cluster_labels == j, arr.ind = TRUE)
-    cells_weight <- H[cells,j]
-    cells_expression <- M[,cells]
-    genes <- apply(cells_expression, 1, function(x){
-      sum(x*t(cells_weight))
-    })
-    cbind(cluster_gene_table, genes)
-  }
+  # normalize the expression cell by cell
+  M$M_variable <- apply(M$M_variable, 2, function(x){
+    x / sum(x)
+  })
 
-  gene_cluster_assignment <- apply(cluster_gene_table, 1, function(x){
+  # for each gene (rows), for each cluster (columns)
+  # get cell-weighted expression score
+  gene_cluster_scores <- M$M_variable %*% H
+
+  # select max cluster score
+  gene_assignments <- apply(gene_cluster_scores, 1, function(x){
     c(which(x == max(x)), max(x))
   })
 
-  marker_table <- cbind(gene_cluster_assignment, rownames(M))
+
+  marker_table <- cbind(M$gene_use, t(gene_assignments))
   return(marker_table)
 }
 
@@ -64,18 +60,18 @@ SelectData <- function(M, gene_expression_threshold, n_features){
   if(gene_expression_threshold > 0){
     alpha_filter <- gene_expression_threshold / n_cells
     gene_nnz <- apply(M, 1, function(x){
-      nnz(x) / n_cells
+      nnzero(x) / n_cells
     })
-    gene_use <- intersect(which(gene_nnz >= alpha_filter, arr.ind = TRUE,
-                                gene_nnz <= 1 - alpha_filter, arr.ind = TRUE))
+    gene_use <- intersect(which(gene_nnz > alpha_filter, arr.ind = TRUE),
+                                which(gene_nnz < 1 - alpha_filter, arr.ind = TRUE))
   } else {
     gene_use = 1:n_genes
   }
   M_variable <- M[gene_use, ]
 
   # find top components based on max eigengap
-  genes_pca <- pca(M_variable)
-  eigengaps <- genes_pca$sdev[-(1:2)] - genes_pca$sdev[-c(1,length(eigengaps))]
+  genes_pca <- prcomp(t(M_variable))
+  eigengaps <-  abs(genes_pca$sdev[-c(1,length(genes_pca$sdev))] - genes_pca$sdev[-(1:2)])
   max_component <- which(eigengaps == max(eigengaps), arr.ind = TRUE) + 1
 
   # select most variable genes based on the max coefficient
@@ -85,7 +81,10 @@ SelectData <- function(M, gene_expression_threshold, n_features){
     max(x)
   })
   ordered_max <- max_coeffs[order(max_coeffs, decreasing = TRUE)]
-  nth_highest <- ordered_max[n_features]
-  indices <- which(max_component >= nth_highest, arr.ind = TRUE)
+
+  # if the requested feature count is too high, take all available features
+  adj_n <- min(nrow(M_variable), n_features)
+  nth_highest <- ordered_max[adj_n]
+  indices <- which(max_coeffs >= nth_highest, arr.ind = TRUE)
   return(list(gene_use = gene_use[indices], M_variable = M_variable[indices,]))
 }

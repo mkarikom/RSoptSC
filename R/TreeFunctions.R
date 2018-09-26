@@ -7,7 +7,6 @@
 #' @examples predecessors <- GetPredecessors(minspantree = RSoptSC::GuoPtimeFull$mst, root = 6)
 #'
 GetPredecessors <- function(minspantree, root){
-  #browser()
   pathdata <- igraph::get.shortest.paths(graph = minspantree, from = root)
   pathlist <- prelist <- lapply(pathdata$vpath, function(x){
     y = as.vector(x)
