@@ -60,7 +60,7 @@ SelectData <- function(M, gene_expression_threshold, n_features){
   if(gene_expression_threshold > 0){
     alpha_filter <- gene_expression_threshold / n_cells
     gene_nnz <- apply(M, 1, function(x){
-      nnzero(x) / n_cells
+      Matrix::nnzero(x) / n_cells
     })
     gene_use <- intersect(which(gene_nnz > alpha_filter, arr.ind = TRUE),
                                 which(gene_nnz < 1 - alpha_filter, arr.ind = TRUE))
