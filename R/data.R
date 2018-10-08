@@ -7,4 +7,4 @@
 #'   \item{annotation}{the type of cell (Basal IFE-DI IFE-DII IFE-KI IFE-KII)}
 #'   \item{data}{values are mRNA counts, row names are genes, column names are cells}
 #' }
-"Joost"
+"GSE67602_Joost"
