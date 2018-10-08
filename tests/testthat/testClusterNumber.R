@@ -8,6 +8,6 @@ test_that("components based on Laplacian L0 work for W", {
   expect_equal(comps$n_eigs, RSoptSC::JoostCluster$No_cluster1)
 
   # test that the eigs are close enough
-  error <- GetError(comps$eigs, RSoptSC::JoostCluster$ZZ)
+  error <- GetError(comps$val, RSoptSC::JoostCluster$ZZ)
   expect_true(error < 10^(-1))
 })
