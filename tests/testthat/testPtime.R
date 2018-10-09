@@ -1,4 +1,4 @@
-context("decomposition values")
+context("pseudotime inference and lineage trajectories")
 library(RSoptSC)
 
 

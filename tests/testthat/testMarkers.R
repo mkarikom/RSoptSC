@@ -1,4 +1,4 @@
-context("decomposition values")
+context("markers of clusters")
 library(RSoptSC)
 
 

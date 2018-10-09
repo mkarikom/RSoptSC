@@ -1,4 +1,4 @@
-#' In case the graph is not connected, joine the components
+#' In case the graph is not connected, join the components
 #' This function updates the original adjacency matrix and returns a new object.
 #' @param root_cell the root cell of the lineage tree
 #' @param adjacency_matrix the graph embedding of the cells

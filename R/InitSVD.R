@@ -2,7 +2,7 @@
 #'
 #' @param A The similarity matrix.
 #' @param k The rank of the output.
-#' @return \code{W} and \code{H} such that \code{A} = \code{W} * \code{D} * \code{H}.
+#' @return \code{W} and \code{H} such that \code{A} = \code{W} * \code{H}.
 
 InitSVD <- function(A, k){
   A_svd = svds(A, k)

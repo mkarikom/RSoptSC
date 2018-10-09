@@ -1,4 +1,4 @@
-#' Initialize non-negative factorization of the similarity matrix
+#' Factor a matrix based on an initial factor guess from SVD
 #'
 #' @param A The similarity matrix.
 #' @param k The rank of the output.
