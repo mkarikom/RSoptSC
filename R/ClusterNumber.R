@@ -25,7 +25,7 @@ CountClusters <- function(data, tol = 0.01, range = 1:20, eigengap = TRUE){
 
   # compute the largest eigengap
   gaps <- eigs$val[2:length(eigs$val)] - eigs$val[1:(length(eigs$val)-1)]
-  upper_bound <- max(gaps)
+  upper_bound <- which(gaps == max(gaps))
 
   # compute the number of zero eigenvalues
   lower_bound <- length(eigs$val[which(eigs$val <= tol)])
@@ -89,7 +89,7 @@ GetEnsemble <- function(data,
 
 
     # generate consensus matrices
-    clusterExport(cl, c("cluster_assign", "GetConsensus"), envir = environment())
+    parallel::clusterExport(cl, c("cluster_assign", "GetConsensus"), envir = environment())
     consen_list <- parallel::parLapply(cl,
                              split(cluster_assign, col(cluster_assign)),
                              function(x){

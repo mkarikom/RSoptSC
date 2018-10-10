@@ -5,7 +5,7 @@
 #' @return \code{W} and \code{H} such that \code{A} = \code{W} * \code{H}.
 
 InitSVD <- function(A, k){
-  A_svd = svds(A, k)
+  A_svd = RSpectra::svds(A, k)
   W_init = matrix(0, nrow(A), k)
   H_init = matrix(0, k, ncol(A))
 
