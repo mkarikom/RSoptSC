@@ -33,21 +33,22 @@ PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfi
 #' If an output dir and filename are provided, a plot will
 #' be saved, otherwise just return the plot
 #'
-#' @param low_dim_emdedding a 2d embedding of cells
+#' @param flat_embedding a low dim embedding of cells
 #' @param pseudotime a scalar representation of pseudotime
 #' @param outputdir the output directory, relative to getwd()
 #' @param outputfile the output file
 #'
 #' @return a ggplot2 object
 #'
-PseudotimeScatterPlot <- function(low_dim_emdedding, pseudotime, outputdir = NULL, outputfile = NULL){
-  p <- ggplot(as.data.frame(low_dim_emdedding), aes(x=V1, y=V2, color=pseudotime))
+PseudotimeScatterPlot <- function(flat_embedding, pseudotime, outputdir = NULL, outputfile = NULL){
+  p <- ggplot2::ggplot(as.data.frame(flat_embedding), aes(x=V1, y=V2, color=pseudotime))
+
   if(!is.null(outputdir) && !is.null(outputfile)){
-    file_path <- paste0(getwd(),
-                        .Platform$file.sep,
-                        outputdir,
-                        .Platform$file.sep,
-                        outputfile)
+    # check if the dir exists and if not then create it
+    if (!file.exists(outputdir)){
+      dir.create(file.path(getwd(), outputdir))
+    }
+    file_path <- file.path(getwd(), outputdir, outputfile)
     pdf(file_path)
     p + geom_point()
     dev.off()

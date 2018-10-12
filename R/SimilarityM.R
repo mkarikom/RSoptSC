@@ -56,8 +56,7 @@ SimilarityM <- function(lambda,data){
   # Currently this is not "Standardize" as in MATLAB tsne('Standardize', TRUE)
   # Currently this is not "InitialY" as in MATLAB tsne('InitialY', InitY)
 
-  #X2 = tsne::tsne(X = t(X), perplexity = 20, k = dim_init)
-  #X2 = as.matrix(X2)
+  set.seed(1)
   X2 = Rtsne::Rtsne(X = t(X), perplexity = 20, pca_center = TRUE, pca_scale = TRUE, dims = 3)
   D = matrix(1, n, n)
   if (No_Comps1>=1){

@@ -2,7 +2,7 @@
 % Please edit documentation in R/SymNMF.R
 \name{SymNMF}
 \alias{SymNMF}
-\title{Initialize non-negative factorization of the similarity matrix}
+\title{Factor a matrix based on an initial factor guess from SVD}
 \usage{
 SymNMF(A, nC, H, gamma = 1e-06, mu = 10^(-6), maxiter = 1e+06)
 }
@@ -15,5 +15,5 @@ SymNMF(A, nC, H, gamma = 1e-06, mu = 10^(-6), maxiter = 1e+06)
 \code{W} and \code{H} such that \code{A} = \code{W} * \code{D} * \code{H}.
 }
 \description{
-Initialize non-negative factorization of the similarity matrix
+Factor a matrix based on an initial factor guess from SVD
 }

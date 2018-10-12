@@ -23,7 +23,8 @@ Imports:
     tsne (>= 0.1-3),
     Rtsne (>= 0.13),
     pracma (>= 2.1.4),
-    RSpectra (>= 0.13-1)
+    RSpectra (>= 0.13-1),
+    NNLM (>= 0.4.2)
 Suggests: testthat,
     knitr,
     rmarkdown

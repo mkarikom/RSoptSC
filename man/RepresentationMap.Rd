@@ -5,11 +5,11 @@
 \title{generate convenient representations of the data
 representations of the data are necessary for subsequent lineage analysis}
 \usage{
-RepresentationMap(low_dim_embedding, similarity_matrix,
+RepresentationMap(flat_embedding = NULL, similarity_matrix,
   join_components = TRUE)
 }
 \arguments{
-\item{low_dim_embedding}{the flat embedding of the cells}
+\item{flat_embedding}{optionally provided low dim embedding, if not then 2d tsne will be used}
 
 \item{similarity_matrix}{the graphical embedding of the cells}
 
@@ -20,6 +20,7 @@ a list containing:
     \item{dist_flat}{distance matrix on flat embedding}
     \item{dist_graph}{distance matrix on graph}
     \item{adj_matrix}{unweighted adjacency matrix}
+    \item{flat_embedding}{the low dimensional embedding of the cells}
     \item{similarity_graph}{igraph object on the unweighted adjacency matrix}
     \item{components}{an igraph components object based on \code{similarity_graph}}
     \item{n_components}{number of components in \code{components}}
@@ -31,7 +32,7 @@ generate convenient representations of the data
 representations of the data are necessary for subsequent lineage analysis
 }
 \examples{
-embeddings <- RepresentationMap(low_dim_embedding = RSoptSC::GuoPtime$Params$latent,
+embeddings <- RepresentationMap(flat_embedding = RSoptSC::GuoPtime$Params$latent,
     similarity_matrix = RSoptSC::GuoPtime$Params$W,
     join_components = FALSE)
 }

@@ -12,7 +12,7 @@ InitSVD(A, k)
 \item{k}{The rank of the output.}
 }
 \value{
-\code{W} and \code{H} such that \code{A} = \code{W} * \code{D} * \code{H}.
+\code{W} and \code{H} such that \code{A} = \code{W} * \code{H}.
 }
 \description{
 Initialize non-negative factorization of the similarity matrix

@@ -43,7 +43,7 @@ test_that("added inter-component edges correctly", {
 })
 
 test_that("mapping is correct, when components have been previously joined", {
-  mapping <- RepresentationMap(low_dim_embedding = RSoptSC::GuoPtime$Params$latent,
+  mapping <- RepresentationMap(flat_embedding = RSoptSC::GuoPtime$Params$latent,
                                similarity_matrix = RSoptSC::GuoPtime$Params$W,
                                join_components = FALSE)
   mem <- RSoptSC::GuoPtime$Values$members

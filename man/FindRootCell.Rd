@@ -5,7 +5,7 @@
 \title{Infer the root cell}
 \usage{
 FindRootCell(use_flat_dist = TRUE, cluster_order_by = "distance",
-  cell_order_by = "distance", graph_cluster = NULL,
+  cell_order_by = "distance", graph_cluster_mst = NULL,
   dist_graph = NULL, dist_flat, cluster_labels = NULL,
   root_cluster = NULL)
 }
@@ -16,7 +16,7 @@ FindRootCell(use_flat_dist = TRUE, cluster_order_by = "distance",
 
 \item{cell_order_by}{cell-wise pseudotime parameter for measuring cluster/cell rank correlation}
 
-\item{graph_cluster}{the weighted adjacency matrix for a graph of clusters}
+\item{graph_cluster_mst}{igraph object representing an mst on the cluster-cluster graph}
 
 \item{dist_graph}{a distance matrix of cells embedded in a graph}
 
