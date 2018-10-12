@@ -1,10 +1,10 @@
 ---
-title: "scRNA-seq Clustering of Sking Cells"
+title: "Clustering Pseudotime Inference on Skin Cell scRNA-seq"
 author: "Matt Karikomi"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{scRNA-seq Clustering of Sking Cells}
+  %\VignetteIndexEntry{Clustering Pseudotime Inference on Skin Cell scRNA-seq}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -116,17 +116,7 @@ cluster_dtree <- GetDominatorTree(cluster_predecessors)
 set.seed(1)
 l1 <- igraph::layout.lgl(cluster_dtree)
 l1 <- igraph::layout.norm(l1, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
-plot(cluster_dtree,
-     vertex.size=20,
-     rescale = F,
-     layout = l1 * 0.5,
-     edge.arrow.width=0.1,
-     vertex.label=NA,
-     vertex.size=1,
-     vertex.label=NA,
-     edge.width=0.5,
-     edge.arrow.size=0.5,
-     edge.arrow.width=0.7)
+plot(cluster_dtree)
 ```
 
 Compute the directional minimum spanning tree on the cell-cell graph for visualization.  The network diagram uses Fruchterman-Reingold algorithm to ensure visually appealing separation of nodes.
