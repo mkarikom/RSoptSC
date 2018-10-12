@@ -24,9 +24,9 @@ Imports:
     Rtsne (>= 0.13),
     pracma (>= 2.1.4),
     RSpectra (>= 0.13-1),
-    NNLM (>= 0.4.2)
+    NNLM (>= 0.4.2),
+    knittr (>= 1.20)
 Suggests: testthat,
-    knitr,
     rmarkdown
 RoxygenNote: 6.1.0
 VignetteBuilder: knitr
