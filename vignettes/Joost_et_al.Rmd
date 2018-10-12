@@ -16,50 +16,148 @@ knitr::opts_chunk$set(
 )
 ```
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+This is an example of clustering, marker identification and pseudotime inference on a set of skin cells.
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+## Load and Preprocess Data
 
-## Vignette Info
+Load and log transform the data
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+```{r, results='asis'}
+library(RSoptSC)
+data("GSE67602_Joost")
+logdata <- log10(GSE67602_Joost$data + 1)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+Apply number of features and exclusion threshold
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```{r, results='asis'}
+gene_expression_threshold <- 0.03
+n_features <- 3000
+filtered_data <- SelectData(logdata, gene_expression_threshold, n_features)
 ```
 
-Also a quote using `>`:
+## Compute the Similarity Matrix
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+Run L2R2 on the processed data, outputting the number of iterations and value of the objective.
+
+```{r, results='asis'}
+sim <- SimilarityM(lambda = 0.05, data = filtered_data$M_variable)
+```
+
+## Cluster the Cells
+
+Infer cluster number using spectra of the ensemble Laplacian.
+
+```{r, results='asis'}
+n_clusters <- CountClusters(data = sim$W)
+```
+
+Factor the similarity matrix such that W = HxH', using the computed cluster number for the rank of H.
+
+```{r, results='asis'}
+H <- NNLM::nnmf(sim$W, n_clusters, rel.tol = 1e-6);
+```
+
+Assign cluster labels to the cells.
+
+```{r, results='asis'}
+labels <- apply(H$W, 1, function(x){
+  which(x == max(x))})
+```
+
+Find cluster marker genes.
+
+```{r, results='asis'}
+markers <- GetMarkerTable(counts_data = filtered_data$M_variable,
+                          cluster_labels = labels,
+                          H = H$W,
+                          gene_expression_threshold = gene_expression_threshold,
+                          n_features = n_features)
+```
+
+## Pseudotime Inference
+
+Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
+
+```{r, results='asis'}
+mapped <- RepresentationMap(similarity_matrix = sim$W,
+                            join_components = TRUE)
+```
+
+Compute cluster-cluster graph and find the root cluster.
+
+```{r, results='asis'}
+cluster_ptime <- FindRootCluster(cluster_labels = labels,
+                                 flat_embedding = mapped$flat_embedding,
+                                 dist_graph = mapped$dist_graph,
+                                 dist_flat = mapped$dist_flat,
+                                 reverse = FALSE)
+```
+
+Compute the cell-cell graph and find the root cell.
+
+```{r, results='asis'}
+root_cell <- FindRootCell(cluster_order_by = "distance",
+                           cell_order_by = "distance",
+                           graph_cluster_mst = cluster_ptime$cluster_mst,
+                           dist_graph  = mapped$dist_graph,
+                           dist_flat = mapped$dist_flat,
+                           cluster_labels = labels,
+                           root_cluster = cluster_ptime$root_cluster)
+```
+
+## Pseudotime Visualization
+
+Compute the directional minimum spanning tree on the cluster-cluster graph for visualization.
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+cluster_predecessors <- GetPredecessors(cluster_ptime$cluster_mst, cluster_ptime$root_cluster)
+cluster_dtree <- GetDominatorTree(cluster_predecessors)
+set.seed(1)
+l1 <- igraph::layout.lgl(cluster_dtree)
+l1 <- igraph::layout.norm(l1, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
+plot(cluster_dtree,
+     vertex.size=20,
+     rescale = F,
+     layout = l1 * 0.9,
+     edge.arrow.width=0.1,
+     vertex.label=NA,
+     vertex.size=1,
+     vertex.label=NA,
+     edge.width=0.5,
+     edge.arrow.size=0.5,
+     edge.arrow.width=0.7)
+```
+
+Compute the directional minimum spanning tree on the cell-cell graph for visualization.  The network diagram uses Fruchterman-Reingold algorithm to ensure visually appealing separation of nodes.
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+cell_mst <- igraph::mst(mapped$similarity_graph)
+cell_predecessors <- GetPredecessors(cell_mst, root_cell)
+cell_dtree <- GetDominatorTree(cell_predecessors)
+set.seed(1)
+l2 <- igraph::layout.lgl(cell_dtree)
+l2 <- igraph::layout.norm(l2, ymin = -2, ymax = 2, xmin = -2, xmax = 2)
+plot(cell_dtree, 
+     rescale = F,
+     layout = l2 * 0.9,
+     edge.arrow.width=0.1,
+     vertex.label=NA,
+     vertex.size=1,
+     vertex.label=NA,
+     edge.width=0.5,
+     edge.arrow.size=0.5,
+     edge.arrow.width=0.7)
+```
+
+Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+pseudotime <- mapped$dist_graph[root_cell,]
+
+# plot pseudotime
+p <- PseudotimeScatterPlot(flat_embedding = mapped$flat_embedding,
+                            pseudotime = pseudotime)
+plot(p + ggplot2::geom_point())
+
+```

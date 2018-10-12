@@ -41,7 +41,7 @@ PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfi
 #' @return a ggplot2 object
 #'
 PseudotimeScatterPlot <- function(flat_embedding, pseudotime, outputdir = NULL, outputfile = NULL){
-  p <- ggplot2::ggplot(as.data.frame(flat_embedding), aes(x=V1, y=V2, color=pseudotime))
+  p <- ggplot2::ggplot(as.data.frame(flat_embedding), ggplot2::aes(x=V1, y=V2, color=pseudotime))
 
   if(!is.null(outputdir) && !is.null(outputfile)){
     # check if the dir exists and if not then create it
@@ -50,7 +50,7 @@ PseudotimeScatterPlot <- function(flat_embedding, pseudotime, outputdir = NULL, 
     }
     file_path <- file.path(getwd(), outputdir, outputfile)
     pdf(file_path)
-    p + geom_point()
+    p + ggplot2::geom_point()
     dev.off()
   }
   return(p)
