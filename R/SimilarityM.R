@@ -76,7 +76,7 @@ SimilarityM <- function(lambda,data){
 }
 
 
-#' Perform ADMM on the
+#' Perform ADMM
 #'
 #' Computing cell-to-cell similarity matrix by solving the following
 #' optimization problem via ADMM

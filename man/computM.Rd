@@ -2,7 +2,7 @@
 % Please edit documentation in R/SimilarityM.R
 \name{computM}
 \alias{computM}
-\title{Perform ADMM on the}
+\title{Perform ADMM}
 \usage{
 computM(D, X, lambda)
 }

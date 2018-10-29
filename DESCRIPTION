@@ -25,7 +25,9 @@ Imports:
     pracma (>= 2.1.4),
     RSpectra (>= 0.13-1),
     NNLM (>= 0.4.2),
-    knitr (>= 1.20)
+    knitr (>= 1.20),
+    reshape2 (>= 1.4.3),
+    dplyr (>= 0.7.6)
 Suggests: testthat,
     rmarkdown
 RoxygenNote: 6.1.0
