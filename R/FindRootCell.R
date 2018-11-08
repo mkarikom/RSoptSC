@@ -16,6 +16,9 @@
 #'
 #' @return integer index of the root cell
 #' @examples root_cell <- FindRootCell(dist_flat = RSoptSC::GuoPtime$Params$latent)
+#'
+#' @export
+#'
 FindRootCell <- function(use_flat_dist = TRUE,
                          cluster_order_by = "distance",
                          cell_order_by = "distance",

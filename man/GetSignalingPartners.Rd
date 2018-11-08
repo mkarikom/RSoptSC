@@ -4,26 +4,18 @@
 \alias{GetSignalingPartners}
 \title{Compute Cell-cell interaction probability}
 \usage{
-GetSignalingPartners(counts_data, cluster_labels, H,
-  gene_expression_threshold, n_features)
+GetSignalingPartners(M = M, ids = ids, ligand = ligand, targets)
 }
 \arguments{
-\item{cluster_labels}{a vector of cluster labels}
-
-\item{H}{a nonnegative matrix such that W = H*t(H), H_{i,j} is the cells_weight
-by which cell i belongs to the jth cluster}
-
-\item{gene_expression_threshold}{for n cells, for \code{gene_expression_threshold} = m, dont consider genes
-expressed in more than n-m cells or genes expressed in less than m cells}
-
-\item{n_features}{number of marker genes per cluster to retrieve}
-
 \item{M}{a matrix of expression values for each cell (rows) and gene (columns)}
-}
-\value{
-a table of marker genes
+
+\item{ids}{a vector of gene ids}
+
+\item{ligand}{a named list:
+list(ligand1 = list(receptor1 = list(up = list(target1, target2),
+                                     down = list(target3, target4))))}
 }
 \description{
-We compute three expressions.  Here is a sample:
+We can have a situation where ligand/receptor expression is low, but target genes (repressors and activators) are highly expressed.  In this case we will get a false positive for \eqn{P_{i,j}}.  In order to correct for this, we introduce normalizing coefficients for the relationship between \eqn{\alpha_{i,j}} and \eqn{\beta / \gamma}.  When \eqn{\alpha} is low, then K and D will decrease rapidly with increasing \eqn{\beta} and \eqn{\gamma}, penalizing the resulting increase in P (which is increasingly likely to be a false positive, given the disparity between \eqn{\alpha} and \eqn{\beta},\eqn{\gamma})
 \eqn{K_{i,j} = \frac{\alpha_{i,j}}{\alpha_{i,j} + \beta_{i,j}}}
 }

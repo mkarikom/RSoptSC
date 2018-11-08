@@ -19,10 +19,9 @@ a list containing the low rank approximation of X and manifold learning error
 \description{
 Computing cell-to-cell similarity matrix by solving the following
 optimization problem via ADMM
-}
-\details{
-min_{Z,E}  ||Z||_* + lambda ||E||_{2,1}
-  s.t.       X = XZ + E;
-             Z'1 = 1;
-              Z_{i,j} = 0 for (i,j)\in Omega
+\deqn{
+  min_{Z,E}  ||Z||_* + lambda ||E||_{2,1}\\
+  s.t.       X = XZ + E\\
+             Z'1 = 1\\
+              Z_{i,j} = 0 for (i,j) \in Omega}
 }

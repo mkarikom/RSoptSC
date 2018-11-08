@@ -44,4 +44,5 @@ FindRootCluster(cluster_labels = RSoptSC::GuoPtime$Params$cluster_label,
           dist_graph = RSoptSC::GuoPtime$Values$Short_pathd,
           dist_flat = RSoptSC::GuoPtime$Values$low_dis,
           reverse = FALSE)
+
 }

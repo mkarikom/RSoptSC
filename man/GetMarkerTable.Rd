@@ -2,12 +2,14 @@
 % Please edit documentation in R/MarkerGenes.R
 \name{GetMarkerTable}
 \alias{GetMarkerTable}
-\title{Get the marker genes for each cluster}
+\title{Get the marker genes for each cluster and report their 1-normalized expression value}
 \usage{
 GetMarkerTable(counts_data, cluster_labels, H, gene_expression_threshold,
   n_features)
 }
 \arguments{
+\item{counts_data}{a matrix of expression values for each cell (rows) and gene (columns)}
+
 \item{cluster_labels}{a vector of cluster labels}
 
 \item{H}{a nonnegative matrix such that W = H*t(H), H_{i,j} is the cells_weight
@@ -17,12 +19,10 @@ by which cell i belongs to the jth cluster}
 expressed in more than n-m cells or genes expressed in less than m cells}
 
 \item{n_features}{number of marker genes per cluster to retrieve}
-
-\item{M}{a matrix of expression values for each cell (rows) and gene (columns)}
 }
 \value{
 a table of marker genes
 }
 \description{
-Get the marker genes for each cluster
+Get the marker genes for each cluster and report their 1-normalized expression value
 }

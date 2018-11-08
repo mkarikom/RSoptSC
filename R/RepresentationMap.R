@@ -19,6 +19,9 @@
 #' @examples embeddings <- RepresentationMap(flat_embedding = RSoptSC::GuoPtime$Params$latent,
 #'     similarity_matrix = RSoptSC::GuoPtime$Params$W,
 #'     join_components = FALSE)
+#'
+#' @export
+#'
 RepresentationMap <- function(flat_embedding = NULL, similarity_matrix, join_components = TRUE){
 
   if(is.null(flat_embedding)){

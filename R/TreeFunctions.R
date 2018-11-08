@@ -6,6 +6,8 @@
 #' @return a vector[] of node ids, where vector[i] is the predecessor of node i
 #' @examples predecessors <- GetPredecessors(minspantree = RSoptSC::GuoPtimeFull$mst, root = 6)
 #'
+#' @export
+#'
 GetPredecessors <- function(minspantree, root){
   pathdata <- igraph::get.shortest.paths(graph = minspantree, from = root)
   pathlist <- prelist <- lapply(pathdata$vpath, function(x){
@@ -22,6 +24,8 @@ GetPredecessors <- function(minspantree, root){
 #' @param predecessors the tree to be directionalized
 #'
 #' @return a directed igraph object
+#'
+#' @export
 #'
 GetDominatorTree <- function(predecessors){
   edges <- c()

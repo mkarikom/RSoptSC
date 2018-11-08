@@ -35,4 +35,5 @@ representations of the data are necessary for subsequent lineage analysis
 embeddings <- RepresentationMap(flat_embedding = RSoptSC::GuoPtime$Params$latent,
     similarity_matrix = RSoptSC::GuoPtime$Params$W,
     join_components = FALSE)
+
 }

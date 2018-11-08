@@ -1,6 +1,6 @@
-#' Get the marker genes for each cluster
+#' Get the marker genes for each cluster and report their 1-normalized expression value
 #'
-#' @param M a matrix of expression values for each cell (rows) and gene (columns)
+#' @param counts_data a matrix of expression values for each cell (rows) and gene (columns)
 #' @param cluster_labels a vector of cluster labels
 #' @param H a nonnegative matrix such that W = H*t(H), H_{i,j} is the cells_weight
 #'     by which cell i belongs to the jth cluster
@@ -9,6 +9,8 @@
 #' @param n_features number of marker genes per cluster to retrieve
 #'
 #' @return a table of marker genes
+#'
+#' @export
 #'
 GetMarkerTable <- function(counts_data,
                            cluster_labels,
@@ -37,5 +39,6 @@ GetMarkerTable <- function(counts_data,
 
 
   marker_table <- cbind(M$gene_use, t(gene_assignments))
+  colnames(marker_table) <- c('geneID', 'clusterId', 'geneScore')
   return(marker_table)
 }

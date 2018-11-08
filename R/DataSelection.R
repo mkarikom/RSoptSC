@@ -6,9 +6,11 @@
 #' @param M a matrix of expression values for each gene (rows) and cell (columns)
 #' @param gene_expression_threshold for n cells, for \code{gene_expression_threshold} = m, dont consider genes
 #'     expressed in more than n-m cells or genes expressed in less than m cells
-#' @param n_features number of marker genes per cluster to retrieve
+#' @param n_features number of genes to retrieve
 #'
 #' @return a table of features (rows) and samples (columns)
+#'
+#' @export
 #'
 SelectData <- function(M, gene_expression_threshold, n_features){
   n_genes <- nrow(M)
@@ -45,4 +47,26 @@ SelectData <- function(M, gene_expression_threshold, n_features){
   nth_highest <- ordered_max[adj_n]
   indices <- which(max_coeffs >= nth_highest, arr.ind = TRUE)
   return(list(gene_use = gene_use[indices], M_variable = M_variable[indices,]))
+}
+
+#' Scale and center a data matrix
+#' We want a matrix whose values are standard deviations from the mean and which are centered at zero.
+#'
+#' @param M a matrix of expression values for each gene (rows) and cell (columns)
+#'
+#' @return a scaled and centered matrix of expression values
+#'
+ScaleCenterData <- function(M){
+  # get a column vector of gene-wise means across cells
+  means <- t(t(apply(M, 1, mean)))
+  sds <- t(t(apply(M, 1, sd)))
+
+  # make sure we dont divide by 0
+  sds[which(sds == 0)] <- 1
+
+  # scale and center the data
+  adjM <- apply(M, 2, function(x){
+      (x - means)/sds
+  })
+  adjM
 }

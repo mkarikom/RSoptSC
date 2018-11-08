@@ -1,6 +1,6 @@
 #' Compute Cell-cell interaction probability
 #'
-#' We can have a situation where ligand/receptor expression is low, but target genes (repressors and activators) are highly expressed.  In this case we will get a false positive for P_{i,j}.  In order to correct for this, we introduce normalizing coefficients for the relationship between \alpha_{i,j} and \beta / \gamma.  When \alpha is low, then K and D will decrease rapidly with increasing \beta and \gamma, penalizing the resulting increase in P (which is increasingly likely to be a false positive, given the disparity between \alpha and \beta/\gamma)
+#' We can have a situation where ligand/receptor expression is low, but target genes (repressors and activators) are highly expressed.  In this case we will get a false positive for \eqn{P_{i,j}}.  In order to correct for this, we introduce normalizing coefficients for the relationship between \eqn{\alpha_{i,j}} and \eqn{\beta / \gamma}.  When \eqn{\alpha} is low, then K and D will decrease rapidly with increasing \eqn{\beta} and \eqn{\gamma}, penalizing the resulting increase in P (which is increasingly likely to be a false positive, given the disparity between \eqn{\alpha} and \eqn{\beta},\eqn{\gamma})
 #' \eqn{K_{i,j} = \frac{\alpha_{i,j}}{\alpha_{i,j} + \beta_{i,j}}}
 #'
 #' @param M a matrix of expression values for each cell (rows) and gene (columns)
@@ -59,6 +59,7 @@ GetSignalingPartners <- function(M = M,
     D <- PenaltyCoeff(alpha, gamma, n_cells)
     print(paste0("D ", pair))
 
+    browser()
     # compute P
     P_num <- alpha*K*beta*D*gamma
     P_denom <- apply(P, 2, function(x){

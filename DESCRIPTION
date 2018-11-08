@@ -27,7 +27,11 @@ Imports:
     NNLM (>= 0.4.2),
     knitr (>= 1.20),
     reshape2 (>= 1.4.3),
-    dplyr (>= 0.7.6)
+    dplyr (>= 0.7.6),
+    gplots (>= 3.0.1),
+    magrittr (>= 1.5),
+    ggnetwork (>= 0.5.1),
+    intergraph (>= 2.0-2)
 Suggests: testthat,
     rmarkdown
 RoxygenNote: 6.1.0

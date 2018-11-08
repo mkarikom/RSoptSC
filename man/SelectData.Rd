@@ -15,7 +15,7 @@ SelectData(M, gene_expression_threshold, n_features)
 \item{gene_expression_threshold}{for n cells, for \code{gene_expression_threshold} = m, dont consider genes
 expressed in more than n-m cells or genes expressed in less than m cells}
 
-\item{n_features}{number of marker genes per cluster to retrieve}
+\item{n_features}{number of genes to retrieve}
 }
 \value{
 a table of features (rows) and samples (columns)

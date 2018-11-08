@@ -10,6 +10,8 @@
 #'
 #' @return an igraph representation of the tree
 #'
+#' @export
+#'
 PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfile = NULL){
   directed_edge_table <- RSoptSC::ProcessMatlabDTree(edge_table, predecessors)
   directed_graph <- RSoptSC::GetDGFromTable(directed_edge_table)
@@ -40,6 +42,8 @@ PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfi
 #'
 #' @return a ggplot2 object
 #'
+#' @export
+#'
 PseudotimeScatterPlot <- function(flat_embedding, pseudotime, outputdir = NULL, outputfile = NULL){
   p <- ggplot2::ggplot(as.data.frame(flat_embedding), ggplot2::aes(x=V1, y=V2, color=pseudotime))
 
@@ -54,4 +58,69 @@ PseudotimeScatterPlot <- function(flat_embedding, pseudotime, outputdir = NULL, 
     dev.off()
   }
   return(p)
+}
+
+#' Get the marker genes for each cluster
+#'
+#' @param counts_data a matrix of expression values for each cell (rows) and gene (columns)
+#' @param cluster_labels a vector of cluster labels
+#' @param markerTabele a matrix of expression values for each cell (rows) and gene (columns)
+#' @param range the interval over which centered, normalized expression is displayed. expression values below range[1] are increased to range[1].  values above range[2] are decreased to range[2].
+#' @param n_markers number of marker genes per cluster to retrieve (0 = all)
+#'
+#' @return a table of marker genes
+#'
+#' @import tibble
+#' @import dplyr
+#' @import reshape2
+#' @import ggplot2
+#' @import igraph
+#'
+#' @export
+#'
+MarkerHeatmap <- function(counts_data,
+                          cluster_labels,
+                          markerTable,
+                          range = c(-3,3),
+                          n_markers = 0){
+  # work with the data in tibble form
+  tibbleData <- as.tibble(markerTable)
+  browser()
+  # sort the genes by cluster
+  if(n_markers > 0){
+    byCluster <- tibbleData[order(tibbleData$clusterId),]
+    clusterList <- split(byCluster, byCluster$clusterId)
+    topN <- lapply(clusterList, function(x){
+                  head(x, n_markers)})
+    gene_order <- pull(do.call(rbind, topN), geneID)
+  } else {
+    byCluster <- tibbleData[order(tibbleData$clusterId),]
+    clusterList <- split(byCluster, byCluster$clusterId)
+    topN <- lapply(clusterList, function(x){
+      head(x, nrow(markerTable))})
+    gene_order <- pull(do.call(rbind, topN), geneID)
+  }
+
+
+  # flatten the data (matrix form -> table form) so that ggplot can work
+  cell_order <- order(cluster_labels)
+  plot_data <- counts_data[gene_order, cell_order]
+  plot_data <- ScaleCenterData(plot_data)
+  plot_data_table <- melt(plot_data)
+  colnames(plot_data_table) <- c("geneID", "cellId", "expression")
+
+  # reduce the dynamic range of the plot, focusing on variation close to the mean of the centered data
+  plot_data_table[which(plot_data_table[,3] < range[1]),3] <- range[1]
+  plot_data_table[which(plot_data_table[,3] > range[2]),3] <- range[2]
+
+  print(ggplot(plot_data_table, aes(cellId, geneID )) +
+    geom_tile(aes(fill = expression), color = "white") +
+    scale_fill_gradient(low = "red", high = "green") +
+    ylab("List of Genes ") +
+    xlab("List of Cells") +
+    theme(legend.title = element_text(size = 10),
+    legend.text = element_text(size = 12),
+    plot.title = element_text(size=16),
+    axis.title=element_text(size=14,face="bold"),
+    axis.text.x = element_text(angle = 90, hjust = 1)) +labs(fill = "expression"))
 }

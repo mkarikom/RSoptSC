@@ -37,4 +37,5 @@ possible values for cell_order_by are index and distance
 }
 \examples{
 root_cell <- FindRootCell(dist_flat = RSoptSC::GuoPtime$Params$latent)
+
 }

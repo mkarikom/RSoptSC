@@ -8,7 +8,9 @@
 #' @param lambda the balance term between the rank of Z and the error
 #' @return a list containing the symetric cell to cell similarity matrix and
 #'     manifold learning error
-
+#'
+#' @export
+#'
 SimilarityM <- function(lambda,data){
 
   m = nrow(data)
@@ -80,11 +82,11 @@ SimilarityM <- function(lambda,data){
 #'
 #' Computing cell-to-cell similarity matrix by solving the following
 #' optimization problem via ADMM
-#'
-#'   min_{Z,E}  ||Z||_* + lambda ||E||_{2,1}
-#'   s.t.       X = XZ + E;
-#'              Z'1 = 1;
-#'               Z_{i,j} = 0 for (i,j)\in Omega
+#' \deqn{
+#'   min_{Z,E}  ||Z||_* + lambda ||E||_{2,1}\\
+#'   s.t.       X = XZ + E\\
+#'              Z'1 = 1\\
+#'               Z_{i,j} = 0 for (i,j) \in Omega}
 #'
 #' @param D the unweighted KNN adjacency matrix
 #' @param X normalized sample vectors

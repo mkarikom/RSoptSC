@@ -10,6 +10,8 @@
 #'
 #' @return the number of clusters
 #'
+#' @export
+#'
 CountClusters <- function(data, tol = 0.01, range = 1:20, eigengap = TRUE){
   # compute the drop tolerance, enforcing parsimony of components
   solo_count <- GetComponents(data, tol = 0.01)$n_eigs # without consensus get a pre-estimate

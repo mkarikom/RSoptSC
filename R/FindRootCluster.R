@@ -22,6 +22,9 @@
 #'           dist_graph = RSoptSC::GuoPtime$Values$Short_pathd,
 #'           dist_flat = RSoptSC::GuoPtime$Values$low_dis,
 #'           reverse = FALSE)
+#'
+#' @export
+#'
 FindRootCluster <- function(cluster_labels, flat_embedding, dist_graph, dist_flat, reverse = FALSE){
   n_clusters <- length(unique(cluster_labels))
   cluster_adj_matrix <- matrix(0, nrow = n_clusters, ncol = n_clusters)
