@@ -1,3 +1,61 @@
+#' Plot the pseudotime ordering of clusters
+#'
+#' @param network an igraph network with weighted edges corresponding to the pseudotime distance
+#' @param d_thickness controls edge width.  c(1, m) => m/distance from L2R2, c(0,m) => m.
+#'
+#' @return nothing
+#'
+#' @import ggplot2
+#' @import intergraph
+#' @import ggnetwork
+#' @import sna
+#' @import network
+#' @importFrom igraph E
+#'
+#' @export
+#'
+PlotLineage <- function(network, d_thickness = c(1,2)){
+  browser()
+  set.seed(1)
+  if(d_thickness[1]){
+    print(
+      ggplot(network,
+             arrow.gap = 0.05,
+             aes(x = x, y = y, xend = xend, yend = yend)) +
+        geom_edges(arrow = arrow(length = unit(1, "lines"),
+                                 type = 'open'),
+                   color = "black",
+                   aes(size=d_thickness[2]/weight),
+                   show.legend = FALSE) +
+        geom_nodes(color = "black",
+                   size =10) +
+        geom_nodetext(aes(color = 'red',
+                          label = vertex.names,
+                          size = 2),
+                      fontface = "bold",
+                      show.legend = FALSE) +
+        theme_blank())
+  }else{
+    print(
+      ggplot(network,
+             arrow.gap = 0.05,
+             aes(x = x, y = y, xend = xend, yend = yend)) +
+        geom_edges(arrow = arrow(length = unit(2, "lines"),
+                                 type = 'open'),
+                   color = "black",
+                   aes(size=d_thickness[2]),
+                   show.legend = FALSE) +
+        geom_nodes(color = "black",
+                   size =15) +
+        geom_nodetext(aes(color = 'red',
+                          label = vertex.names,
+                          size = 2),
+                      fontface = "bold",
+                      show.legend = FALSE) +
+        theme_blank())
+  }
+}
+
 #' Produce a plot of matlab DTree data and return the object
 #' If an output dir and filename are provided, a plot will
 #' be saved, otherwise the function will just return the graph
@@ -74,7 +132,6 @@ PseudotimeScatterPlot <- function(flat_embedding, pseudotime, outputdir = NULL, 
 #' @import dplyr
 #' @import reshape2
 #' @import ggplot2
-#' @import igraph
 #'
 #' @export
 #'
@@ -85,7 +142,6 @@ MarkerHeatmap <- function(counts_data,
                           n_markers = 0){
   # work with the data in tibble form
   tibbleData <- as.tibble(markerTable)
-  browser()
   # sort the genes by cluster
   if(n_markers > 0){
     byCluster <- tibbleData[order(tibbleData$clusterId),]

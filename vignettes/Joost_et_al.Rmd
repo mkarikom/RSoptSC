@@ -116,32 +116,8 @@ Compute the directional minimum spanning tree on the cluster-cluster graph for v
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 cluster_predecessors <- GetPredecessors(cluster_ptime$cluster_mst, cluster_ptime$root_cluster)
-cluster_dtree <- GetDominatorTree(cluster_predecessors)
-set.seed(1)
-l1 <- igraph::layout.lgl(cluster_dtree)
-l1 <- igraph::layout.norm(l1, ymin = -1, ymax = 1, xmin = -1, xmax = 1)
-plot(cluster_dtree)
-```
-
-Compute the directional minimum spanning tree on the cell-cell graph for visualization.  The network diagram uses Fruchterman-Reingold algorithm to ensure visually appealing separation of nodes.
-
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-cell_mst <- igraph::mst(mapped$similarity_graph)
-cell_predecessors <- GetPredecessors(cell_mst, root_cell)
-cell_dtree <- GetDominatorTree(cell_predecessors)
-set.seed(1)
-l2 <- igraph::layout.lgl(cell_dtree)
-l2 <- igraph::layout.norm(l2, ymin = -2, ymax = 2, xmin = -2, xmax = 2)
-plot(cell_dtree, 
-     rescale = F,
-     layout = l2 * 0.5,
-     edge.arrow.width=0.1,
-     vertex.label=NA,
-     vertex.size=1,
-     vertex.label=NA,
-     edge.width=0.5,
-     edge.arrow.size=0.5,
-     edge.arrow.width=0.7)
+cluster_dtree <- GetDominatorTree(cluster_predecessors, cluster_ptime$graph_cluster)
+PlotLineage(cluster_dtree)
 ```
 
 Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.
