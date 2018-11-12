@@ -4,12 +4,14 @@
 \alias{PlotLineage}
 \title{Plot the pseudotime ordering of clusters}
 \usage{
-PlotLineage(network, d_thickness = c(1, 3))
+PlotLineage(network, d_thickness = c(1, 2), node_color = NULL)
 }
 \arguments{
 \item{network}{an igraph network with weighted edges corresponding to the pseudotime distance}
 
 \item{d_thickness}{controls edge width.  c(1, m) => m/distance from L2R2, c(0,m) => m.}
+
+\item{node_color}{an optional vector of colors for node labeling.  If null then the nodes are all colored black}
 }
 \value{
 nothing

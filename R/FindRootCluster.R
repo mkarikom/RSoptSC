@@ -56,6 +56,26 @@ FindRootCluster <- function(cluster_labels, flat_embedding, dist_graph, dist_fla
                    cluster_mst = cluster_mst)
 }
 
+#' Find average cluster feature expression
+#'
+#' Average the expression of a feature and return the expression vector
+#'
+#' @param cluster_labels the cluster label for each cell
+#' @param M a matrix of expression values for each cell
+#' @param feature a feature id, usually a gene name
+#' @param feature_list the names of the features represented by rows of M
+#'
+#' @return a vector of feature expression for each cluster
+#'
+#' @export
+#'
+AvgFeatureExpression <- function(cluster_labels, M, feature, feature_list){
+  row <- which(feature_list == feature)
+  feature_vec <- M[row, ]
+  feature_clustered <- split(feature_vec, cluster_labels)
+  avg <- lapply(feature_clustered, mean)
+}
+
 FindVariance <- function(n_clusters, cluster_labels, flat_embedding){
   cluster_variance <- c()
   for(i in 1:n_clusters){

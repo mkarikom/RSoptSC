@@ -120,14 +120,47 @@ cluster_dtree <- GetDominatorTree(cluster_predecessors, cluster_ptime$graph_clus
 PlotLineage(cluster_dtree)
 ```
 
+Color lineage plot by Pseudotime:
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+ptime_distance <- cluster_ptime$cluster_adj_matrix[cluster_ptime$root_cluster,]
+ptime_distance <- 1 + ptime_distance/max(ptime_distance)
+PlotLineage(cluster_dtree, node_color = ptime_distance)
+```
+
 Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 pseudotime <- mapped$dist_graph[root_cell,]
 
 # plot pseudotime
-p <- PseudotimeScatterPlot(flat_embedding = mapped$flat_embedding,
-                            pseudotime = pseudotime)
-plot(p + ggplot2::geom_point())
+FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
+                         feature = pseudotime,
+                         title = "Pseudotime Labeling",
+                         subtitle = "t-SNE Embedding")
+```
 
+## Plot Features
+
+Plot Expression of Krt10 in t-SNE Space:
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+gene_index <- which(GSE67602_Joost$gene_names == 'Krt10')
+labeling <- logdata[gene_index,]
+
+# plot features
+FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
+                    feature = labeling,
+                    title = "Krt10 Labeling",
+                    subtitle = "t-SNE Embedding")
+```
+
+Color lineage plot by Krt10 expression:
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+feature_avg <- AvgFeatureExpression(cluster_labels = labels,
+                                    M = logdata,
+                                    feature = "Krt10",
+                                    feature_list = GSE67602_Joost$gene_names)
+PlotLineage(cluster_dtree, node_color = feature_avg)
 ```

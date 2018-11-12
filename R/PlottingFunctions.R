@@ -2,20 +2,23 @@
 #'
 #' @param network an igraph network with weighted edges corresponding to the pseudotime distance
 #' @param d_thickness controls edge width.  c(1, m) => m/distance from L2R2, c(0,m) => m.
+#' @param node_color an optional vector of colors for node labeling.  If null then the nodes are all colored black
 #'
 #' @return nothing
 #'
-#' @import ggplot2
 #' @import intergraph
-#' @import ggnetwork
-#' @import sna
 #' @import network
+#' @import sna
 #' @importFrom igraph E
+#' @import ggnetwork
 #'
 #' @export
 #'
-PlotLineage <- function(network, d_thickness = c(1,2)){
+PlotLineage <- function(network, d_thickness = c(1,2), node_color = NULL){
   browser()
+  if(is.null(node_color)){
+    node_color = "black"
+  }
   set.seed(1)
   if(d_thickness[1]){
     print(
@@ -27,7 +30,7 @@ PlotLineage <- function(network, d_thickness = c(1,2)){
                    color = "black",
                    aes(size=d_thickness[2]/weight),
                    show.legend = FALSE) +
-        geom_nodes(color = "black",
+        geom_nodes(color = node_color,
                    size =10) +
         geom_nodetext(aes(color = 'red',
                           label = vertex.names,
@@ -45,7 +48,7 @@ PlotLineage <- function(network, d_thickness = c(1,2)){
                    color = "black",
                    aes(size=d_thickness[2]),
                    show.legend = FALSE) +
-        geom_nodes(color = "black",
+        geom_nodes(color = node_color,
                    size =15) +
         geom_nodetext(aes(color = 'red',
                           label = vertex.names,
@@ -86,24 +89,29 @@ PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfi
   return(directed_graph)
 }
 
-#' Produce a scatter plot of the cells on selected 2-dim ebedding colored by pseudotime
-#' Here pseudotime is defined as the distance from the root cell according to
-#' the pseudotime metric recorded in \code{pseudotime}
+#' Produce a scatter plot of the cells on selected 2-dim ebedding colored by feature
 #'
 #' If an output dir and filename are provided, a plot will
-#' be saved, otherwise just return the plot
+#' be saved
 #'
 #' @param flat_embedding a low dim embedding of cells
-#' @param pseudotime a scalar representation of pseudotime
+#' @param feature a scalar representation of feature
 #' @param outputdir the output directory, relative to getwd()
 #' @param outputfile the output file
+#' @param title the title of the plot
+#' @param subtitle the subtitle of the plot
 #'
 #' @return a ggplot2 object
 #'
 #' @export
 #'
-PseudotimeScatterPlot <- function(flat_embedding, pseudotime, outputdir = NULL, outputfile = NULL){
-  p <- ggplot2::ggplot(as.data.frame(flat_embedding), ggplot2::aes(x=V1, y=V2, color=pseudotime))
+FeatureScatterPlot <- function(flat_embedding,
+                               feature,
+                               outputdir = NULL,
+                               outputfile = NULL,
+                               title,
+                               subtitle){
+  p <- ggplot2::ggplot(as.data.frame(flat_embedding), ggplot2::aes(x=V1, y=V2, color=feature)) +
 
   if(!is.null(outputdir) && !is.null(outputfile)){
     # check if the dir exists and if not then create it
@@ -112,10 +120,14 @@ PseudotimeScatterPlot <- function(flat_embedding, pseudotime, outputdir = NULL, 
     }
     file_path <- file.path(getwd(), outputdir, outputfile)
     pdf(file_path)
-    p + ggplot2::geom_point()
+    p +
+    ggplot2::geom_point() +
+    labs(title = title, subtitle = subtitle)
     dev.off()
   }
-  return(p)
+  p +
+  ggplot2::geom_point() +
+  labs(title = title, subtitle = subtitle)
 }
 
 #' Get the marker genes for each cluster
@@ -141,7 +153,7 @@ MarkerHeatmap <- function(counts_data,
                           range = c(-3,3),
                           n_markers = 0){
   # work with the data in tibble form
-  tibbleData <- as.tibble(markerTable)
+  tibbleData <- as_tibble(markerTable)
   # sort the genes by cluster
   if(n_markers > 0){
     byCluster <- tibbleData[order(tibbleData$clusterId),]
