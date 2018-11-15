@@ -13,7 +13,8 @@ GetSignalingPartners <- function(M = M,
                                  ids = ids,
                                  ligand = ligand,
                                  targets){
-  n_cells <- nrow(M)
+  n_cells <- ncol(M)
+  n_genes <- nrow(M)
 
   # represent the pathway heirarchy as a data frame
   pathway <- (reshape2::melt(ligand)[,-2])[,c(4, 3, 2, 1)]
@@ -26,10 +27,13 @@ GetSignalingPartners <- function(M = M,
   for(pair in 1:nrow(LR_pairs)){
     # find alpha
     lig_index <- which((LR_pairs[pair, 1]) == ids)
-    lig_cells <- t(replicate(n_cells, NormalizeSubset(M, lig_index)))
-    rec_index <- which((LR_pairs[pair, 1]) == ids)
-    rec_cells <- t(replicate(n_cells, NormalizeSubset(M, lig_index)))
-    alpha <- exp(-1/(lig_cells * rec_cells))
+    nsub <- NormalizeSubset(M, lig_index)
+    lig_cells <- t(replicate(n_cells, nsub))
+
+    rec_index <- which((LR_pairs[pair, 2]) == ids)
+    nsub <- NormalizeSubset(M, rec_index)
+    rec_cells <- t(replicate(n_cells, nsub))
+    alpha <- exp(-1/(lig_cells * t(rec_cells)))
 
     # find beta
     targ_up <- filter(pathway,
@@ -59,20 +63,28 @@ GetSignalingPartners <- function(M = M,
     D <- PenaltyCoeff(alpha, gamma, n_cells)
     print(paste0("D ", pair))
 
-    browser()
+    gammaM <- replicate(n_cells, gamma)
+    betaM <- replicate(n_cells, beta)
+
+    P_num <- alpha*K*betaM*D*gammaM
+
+    # compute the normalizing factor
+    denom_alpha <- apply(alpha, 2, sum)
+    denom_K <- apply(K, 2, sum)
+    denom_D <- apply(D, 2, sum)
+    denom_beta <- sum(beta)
+    denom_gamma <- sum(gamma)
+
+    P_denom <- denom_alpha * denom_gamma * denom_beta * denom_D * denom_K
+    non_zero_columns <- which(P_denom > 0)
+    P_denom[non_zero_columns] <- 1/P_denom[non_zero_columns]
+    P_norm_fact <- P_denom
+
+    #browser()
     # compute P
-    P_num <- alpha*K*beta*D*gamma
-    P_denom <- apply(P, 2, function(x){
-      sum(x)})
-    P_ind <- apply(P_num, 1, function(x){
-        x/P_denom
-      })
-    P[i] <- P_ind
-    print(paste0("pair ", pair))
+    P[[pair]] <- P_num * P_norm_fact
   }
-
   P_agg <- Reduce('+', P)/length(P)
-
   return(list(P, P_agg))
 }
 
@@ -116,6 +128,7 @@ NormalizeSubset <- function(M = M,
   M_norm <- apply(M, 2, function(x){
     x/row_max
   })
+  return(M_norm)
 }
 
 #' Generate the divergence penalty coefficient
@@ -124,14 +137,16 @@ NormalizeSubset <- function(M = M,
 #'
 #' @param alpha a matrix of normalized LR expression values for each cell (columns) and gene (rows)
 #' @param const either the normalized repression targets or the normalized expression targets
+#' @param n_cells the number of cells (row-traversal of the alpha matrix)
 #'
 PenaltyCoeff <- function(alpha = alpha,
                          const = const,
                          n_cells = n_cells){
   coeff <- apply(alpha, 1, function(x){
     ind <- which(x+const > 0, arr.ind = TRUE)
-    nonzero <- as.vector(replicate(n_cells, 0))
+    nonzero <- numeric(n_cells)
     nonzero[ind] <- x[ind]/(x+const)[ind]
+    nonzero
   })
   coeff
 }

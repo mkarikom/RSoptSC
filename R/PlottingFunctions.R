@@ -3,6 +3,7 @@
 #' @param network an igraph network with weighted edges corresponding to the pseudotime distance
 #' @param d_thickness controls edge width.  c(1, m) => m/distance from L2R2, c(0,m) => m.
 #' @param node_color an optional vector of colors for node labeling.  If null then the nodes are all colored black
+#' @param alpha_color the gradient of the nodes
 #'
 #' @return nothing
 #'
@@ -14,10 +15,10 @@
 #'
 #' @export
 #'
-PlotLineage <- function(network, d_thickness = c(1,2), node_color = NULL){
+PlotLineage <- function(network, d_thickness = c(1,2), node_color = NULL, alpha_color = 1){
   browser()
   if(is.null(node_color)){
-    node_color = "black"
+    node_color = replicate(igraph::vcount(network), "black")
   }
   set.seed(1)
   if(d_thickness[1]){
@@ -27,16 +28,17 @@ PlotLineage <- function(network, d_thickness = c(1,2), node_color = NULL){
              aes(x = x, y = y, xend = xend, yend = yend)) +
         geom_edges(arrow = arrow(length = unit(1, "lines"),
                                  type = 'open'),
-                   color = "black",
+                   color = replicate(igraph::ecount(network), "black"),
                    aes(size=d_thickness[2]/weight),
                    show.legend = FALSE) +
-        geom_nodes(color = node_color,
+        geom_nodes(aes(color = node_color),
                    size =10) +
-        geom_nodetext(aes(color = 'red',
+        geom_nodetext(aes(color = replicate(igraph::vcount(network), "black"),
                           label = vertex.names,
                           size = 2),
                       fontface = "bold",
                       show.legend = FALSE) +
+        scale_color_gradient(low = "grey80", high = "tomato")+
         theme_blank())
   }else{
     print(

@@ -124,8 +124,8 @@ Color lineage plot by Pseudotime:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 ptime_distance <- cluster_ptime$cluster_adj_matrix[cluster_ptime$root_cluster,]
-ptime_distance <- 1 + ptime_distance/max(ptime_distance)
-PlotLineage(cluster_dtree, node_color = ptime_distance)
+ptime_distance <- ptime_distance/max(ptime_distance)
+PlotLineage(cluster_dtree, alpha_color = ptime_distance)
 ```
 
 Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.
