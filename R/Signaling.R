@@ -27,13 +27,12 @@ GetSignalingPartners <- function(M = M,
   for(pair in 1:nrow(LR_pairs)){
     # find alpha
     lig_index <- which((LR_pairs[pair, 1]) == ids)
-    nsub <- NormalizeSubset(M, lig_index)
-    lig_cells <- t(replicate(n_cells, nsub))
+    lnsub <- NormalizeSubset(M, lig_index)
 
     rec_index <- which((LR_pairs[pair, 2]) == ids)
-    nsub <- NormalizeSubset(M, rec_index)
-    rec_cells <- t(replicate(n_cells, nsub))
-    alpha <- exp(-1/(lig_cells * t(rec_cells)))
+    rnsub <- NormalizeSubset(M, rec_index)
+    alpha <- exp(-1/(matrix(lnsub,n_cells,1) %*%
+                       matrix(rnsub,1,n_cells)))
 
     # find beta
     targ_up <- filter(pathway,
@@ -54,17 +53,16 @@ GetSignalingPartners <- function(M = M,
     gamma <- exp(-avg_down)
     print(paste0("a,b,g ", pair))
 
+    gammaM <- t(replicate(n_cells, gamma))
+    betaM <- t(replicate(n_cells, beta))
 
     # find K
-    K <- PenaltyCoeff(alpha, beta, n_cells)
+    K <- PenaltyCoeff(alpha = alpha, const = betaM, num = 'alpha', n_cells)
     print(paste0("K ", pair))
 
     # find D
-    D <- PenaltyCoeff(alpha, gamma, n_cells)
+    D <- PenaltyCoeff(alpha = alpha, const = gammaM, num = 'gamma', n_cells)
     print(paste0("D ", pair))
-
-    gammaM <- replicate(n_cells, gamma)
-    betaM <- replicate(n_cells, beta)
 
     P_num <- alpha*K*betaM*D*gammaM
 
@@ -137,16 +135,21 @@ NormalizeSubset <- function(M = M,
 #'
 #' @param alpha a matrix of normalized LR expression values for each cell (columns) and gene (rows)
 #' @param const either the normalized repression targets or the normalized expression targets
+#' @param num either alpha or const
 #' @param n_cells the number of cells (row-traversal of the alpha matrix)
 #'
 PenaltyCoeff <- function(alpha = alpha,
                          const = const,
+                         num = 'alpha',
                          n_cells = n_cells){
-  coeff <- apply(alpha, 1, function(x){
-    ind <- which(x+const > 0, arr.ind = TRUE)
-    nonzero <- numeric(n_cells)
-    nonzero[ind] <- x[ind]/(x+const)[ind]
-    nonzero
-  })
-  coeff
+  proper <- matrix(0, n_cells, n_cells)
+  ind <- which(alpha + const > 0)
+  if(num == 'alpha'){
+    numerator <- alpha
+  } else {
+    numerator <- const
+  }
+  nonzero <- numerator[ind]/(alpha[ind]+const[ind])
+  proper[ind] <- nonzero
+  proper
 }
