@@ -9,9 +9,9 @@
 #'     list(ligand1 = list(receptor1 = list(up = list(target1, target2),
 #'                                          down = list(target3, target4))))
 #'
-GetSignalingPartners <- function(M = M,
-                                 ids = ids,
-                                 ligand = ligand,
+GetSignalingPartners <- function(M,
+                                 ids,
+                                 ligand,
                                  targets){
   n_cells <- ncol(M)
   n_genes <- nrow(M)
@@ -35,6 +35,7 @@ GetSignalingPartners <- function(M = M,
                        matrix(rnsub,1,n_cells)))
 
     # find beta
+    print(LR_pairs[pair,])
     targ_up <- filter(pathway,
                       ligand == LR_pairs[pair,1] &
                         receptor == LR_pairs[pair,2] &
@@ -61,39 +62,32 @@ GetSignalingPartners <- function(M = M,
     print(paste0("K ", pair))
 
     # find D
-    D <- PenaltyCoeff(alpha = alpha, const = gammaM, num = 'gamma', n_cells)
+    D <- PenaltyCoeff(alpha = alpha, const = gammaM, num = 'alpha', n_cells)
     print(paste0("D ", pair))
 
     P_num <- alpha*K*betaM*D*gammaM
-
-    # compute the normalizing factor
-    denom_alpha <- apply(alpha, 2, sum)
-    denom_K <- apply(K, 2, sum)
-    denom_D <- apply(D, 2, sum)
-    denom_beta <- sum(beta)
-    denom_gamma <- sum(gamma)
-
-    P_denom <- denom_alpha * denom_gamma * denom_beta * denom_D * denom_K
-    non_zero_columns <- which(P_denom > 0)
-    P_denom[non_zero_columns] <- 1/P_denom[non_zero_columns]
-    P_norm_fact <- P_denom
-
     #browser()
-    # compute P
-    P[[pair]] <- P_num * P_norm_fact
+    # compute the normalizing factor
+    tempMat <- replicate(n_cells, apply(P_num, 1, sum))
+    non_zero_entries <- which(tempMat > 0)
+    denom_Mat <- matrix(0, n_cells, n_cells)
+    updateNonZero <- 1/tempMat[non_zero_entries]
+    denom_Mat[non_zero_entries] <- updateNonZero
+    P[[pair]] <- P_num * denom_Mat
+    P[[pair]][P[[pair]] <= 1e-6] <- 0
   }
   P_agg <- Reduce('+', P)/length(P)
-  return(list(P, P_agg))
+  return(list(P = P, P_agg = P_agg))
 }
-
 
 #' Get average target expression for each cell
 #'
 #' @param M a matrix of expression values for each cell (rows) and gene (columns)
 #' @param ind a vector of row indexes corresponding to genes
 #'
-TargetAvg <- function(M = M,
-                      ids = ids){
+TargetAvg <- function(M,
+                      ids){
+  #browser()
   # normalize expression values by max cell expression
   norm <- NormalizeSubset(M, ids)
   avg <- apply(norm, 2, function(x){
@@ -106,8 +100,8 @@ TargetAvg <- function(M = M,
 #' @param M a matrix of expression values for each cell (columns) and gene (rows)
 #' @param ind a vector of row indexes corresponding to genes
 #'
-NormalizeSubset <- function(M = M,
-                            ids = ids){
+NormalizeSubset <- function(M,
+                            ids){
   # normalize expression values by max cell expression
   M <- M[ids, ]
   if(is.null(nrow(M))){
@@ -138,10 +132,10 @@ NormalizeSubset <- function(M = M,
 #' @param num either alpha or const
 #' @param n_cells the number of cells (row-traversal of the alpha matrix)
 #'
-PenaltyCoeff <- function(alpha = alpha,
-                         const = const,
+PenaltyCoeff <- function(alpha,
+                         const,
                          num = 'alpha',
-                         n_cells = n_cells){
+                         n_cells){
   proper <- matrix(0, n_cells, n_cells)
   ind <- which(alpha + const > 0)
   if(num == 'alpha'){

@@ -194,3 +194,41 @@ MarkerHeatmap <- function(counts_data,
     axis.title=element_text(size=14,face="bold"),
     axis.text.x = element_text(angle = 90, hjust = 1)) +labs(fill = "expression"))
 }
+
+#' Produce a circle plot of the signaling
+#'
+#' @param P a low dim embedding of cells
+#' @param feature a scalar representation of feature
+#' @param outputdir the output directory, relative to getwd()
+#' @param outputfile the output file
+#' @param title the title of the plot
+#' @param subtitle the subtitle of the plot
+#'
+#' @return a ggplot2 object
+#'
+#' @export
+#'
+FeatureScatterPlot <- function(flat_embedding,
+                               feature,
+                               outputdir = NULL,
+                               outputfile = NULL,
+                               title,
+                               subtitle){
+  p <- ggplot2::ggplot(as.data.frame(flat_embedding), ggplot2::aes(x=V1, y=V2, color=feature)) +
+
+    if(!is.null(outputdir) && !is.null(outputfile)){
+      # check if the dir exists and if not then create it
+      if (!file.exists(outputdir)){
+        dir.create(file.path(getwd(), outputdir))
+      }
+      file_path <- file.path(getwd(), outputdir, outputfile)
+      pdf(file_path)
+      p +
+        ggplot2::geom_point() +
+        labs(title = title, subtitle = subtitle)
+      dev.off()
+    }
+  p +
+    ggplot2::geom_point() +
+    labs(title = title, subtitle = subtitle)
+}
