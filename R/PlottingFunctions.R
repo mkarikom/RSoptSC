@@ -16,7 +16,6 @@
 #' @export
 #'
 PlotLineage <- function(network, d_thickness = c(1,2), node_color = NULL, alpha_color = 1){
-  browser()
   if(is.null(node_color)){
     node_color = replicate(igraph::vcount(network), "black")
   }
@@ -28,31 +27,11 @@ PlotLineage <- function(network, d_thickness = c(1,2), node_color = NULL, alpha_
              aes(x = x, y = y, xend = xend, yend = yend)) +
         geom_edges(arrow = arrow(length = unit(1, "lines"),
                                  type = 'open'),
-                   color = replicate(igraph::ecount(network), "black"),
+                   color = "black",
                    aes(size=d_thickness[2]/weight),
                    show.legend = FALSE) +
-        geom_nodes(aes(color = node_color),
-                   size =10) +
-        geom_nodetext(aes(color = replicate(igraph::vcount(network), "black"),
-                          label = vertex.names,
-                          size = 2),
-                      fontface = "bold",
-                      show.legend = FALSE) +
-        scale_color_gradient(low = "grey80", high = "tomato")+
-        theme_blank())
-  }else{
-    print(
-      ggplot(network,
-             arrow.gap = 0.05,
-             aes(x = x, y = y, xend = xend, yend = yend)) +
-        geom_edges(arrow = arrow(length = unit(2, "lines"),
-                                 type = 'open'),
-                   color = "black",
-                   aes(size=d_thickness[2]),
-                   show.legend = FALSE) +
-        geom_nodes(color = node_color,
-                   size =15) +
-        geom_nodetext(aes(color = 'red',
+        geom_nodes(color = "gold", size = 8) +
+        geom_nodetext(aes(color = "black",
                           label = vertex.names,
                           size = 2),
                       fontface = "bold",
@@ -102,6 +81,7 @@ PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfi
 #' @param outputfile the output file
 #' @param title the title of the plot
 #' @param subtitle the subtitle of the plot
+#' @param featurename the name of the feature to title the legend
 #'
 #' @return a ggplot2 object
 #'
@@ -112,7 +92,8 @@ FeatureScatterPlot <- function(flat_embedding,
                                outputdir = NULL,
                                outputfile = NULL,
                                title,
-                               subtitle){
+                               subtitle,
+                               featurename){
   p <- ggplot2::ggplot(as.data.frame(flat_embedding), ggplot2::aes(x=V1, y=V2, color=feature)) +
 
   if(!is.null(outputdir) && !is.null(outputfile)){
@@ -124,12 +105,12 @@ FeatureScatterPlot <- function(flat_embedding,
     pdf(file_path)
     p +
     ggplot2::geom_point() +
-    labs(title = title, subtitle = subtitle)
+    labs(title = title, subtitle = subtitle, color = featurename)
     dev.off()
   }
   p +
   ggplot2::geom_point() +
-  labs(title = title, subtitle = subtitle)
+  labs(title = title, subtitle = subtitle, color = featurename)
 }
 
 #' Get the marker genes for each cluster
@@ -142,7 +123,6 @@ FeatureScatterPlot <- function(flat_embedding,
 #'
 #' @return a table of marker genes
 #'
-#' @import tibble
 #' @import dplyr
 #' @import reshape2
 #' @import ggplot2
@@ -155,20 +135,20 @@ MarkerHeatmap <- function(counts_data,
                           range = c(-3,3),
                           n_markers = 0){
   # work with the data in tibble form
-  tibbleData <- as_tibble(markerTable)
+  tibbleData <- tibble::as.tibble(markerTable)
   # sort the genes by cluster
   if(n_markers > 0){
     byCluster <- tibbleData[order(tibbleData$clusterId),]
     clusterList <- split(byCluster, byCluster$clusterId)
     topN <- lapply(clusterList, function(x){
                   head(x, n_markers)})
-    gene_order <- pull(do.call(rbind, topN), geneID)
+    gene_order <- dplyr::pull(do.call(rbind, topN), geneID)
   } else {
     byCluster <- tibbleData[order(tibbleData$clusterId),]
     clusterList <- split(byCluster, byCluster$clusterId)
     topN <- lapply(clusterList, function(x){
       head(x, nrow(markerTable))})
-    gene_order <- pull(do.call(rbind, topN), geneID)
+    gene_order <- dplyr::pull(do.call(rbind, topN), geneID)
   }
 
 
@@ -195,32 +175,29 @@ MarkerHeatmap <- function(counts_data,
     axis.text.x = element_text(angle = 90, hjust = 1)) +labs(fill = "expression"))
 }
 
-#' Produce a circle plot of the signaling
+#' Produce a violin plot of gene expression
 #'
-#' @param P p_{i,j} = probability of transduction from binding of ligand from cell i to receptor of cell j
-#' @param labels the cluster labels of the cells
+#' @param data a matrix with genes in rows and cells in columns
+#' @param gene_names a vector of names corresponding to the rows in data
+#' @param labels a vector of cluster assignments for the cells
+#' @param gene_name the name of the gene to plot
 #'
 #' @return nothing
 #'
+#' @import ggplot2
+#'
 #' @export
 #'
-SignalCirclePlot <- function(P, labels){
-
-  p <- ggplot2::ggplot(as.data.frame(flat_embedding), ggplot2::aes(x=V1, y=V2, color=feature)) +
-
-    if(!is.null(outputdir) && !is.null(outputfile)){
-      # check if the dir exists and if not then create it
-      if (!file.exists(outputdir)){
-        dir.create(file.path(getwd(), outputdir))
-      }
-      file_path <- file.path(getwd(), outputdir, outputfile)
-      pdf(file_path)
-      p +
-        ggplot2::geom_point() +
-        labs(title = title, subtitle = subtitle)
-      dev.off()
-    }
-  p +
-    ggplot2::geom_point() +
-    labs(title = title, subtitle = subtitle)
+ViolinPlotExpression <- function(data,
+                                 gene_names,
+                                 labels,
+                                 gene_name){
+  gene_index <- which(gene_names == gene_name)
+  expression <- data[gene_index,]
+  plot_data <- as.data.frame(cbind(exp = expression, cluster = labels))
+  plot_data$cluster = with(plot_data, reorder(cluster, exp, mean))
+  print(ggplot(plot_data, aes(x = cluster, y = exp, fill = cluster)) +
+    geom_violin(alpha = 0.6) +
+    theme(legend.position = 'none') +
+    labs(title = paste0("Expression of ", gene_name), x = "Cluster", y = "Relative Target Expression"))
 }

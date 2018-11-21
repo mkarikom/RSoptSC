@@ -10,6 +10,7 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
+rm(list = ls())
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -120,13 +121,6 @@ cluster_dtree <- GetDominatorTree(cluster_predecessors, cluster_ptime$graph_clus
 PlotLineage(cluster_dtree)
 ```
 
-Color lineage plot by Pseudotime:
-
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-ptime_distance <- cluster_ptime$cluster_adj_matrix[cluster_ptime$root_cluster,]
-ptime_distance <- ptime_distance/max(ptime_distance)
-PlotLineage(cluster_dtree, alpha_color = ptime_distance)
-```
 
 Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.
 
@@ -137,10 +131,11 @@ pseudotime <- mapped$dist_graph[root_cell,]
 FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
                          feature = pseudotime,
                          title = "Pseudotime Labeling",
-                         subtitle = "t-SNE Embedding")
+                         subtitle = "t-SNE Embedding",
+                         featurename = "Relative L2R2 Distance from Root")
 ```
 
-## Plot Features
+## Plot Gene Expression on the Flat Embedding
 
 Plot Expression of Krt10 in t-SNE Space:
 
@@ -151,16 +146,54 @@ labeling <- logdata[gene_index,]
 # plot features
 FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
                     feature = labeling,
-                    title = "Krt10 Labeling",
-                    subtitle = "t-SNE Embedding")
+                    title = "Gene Expression Labeling",
+                    subtitle = "t-SNE Embedding",
+                    featurename = "Relative Krt10 Expression")
 ```
 
-Color lineage plot by Krt10 expression:
+## Plot Gene Expression Levels in Cells Grouped by Cluster
+
+Violin Plot of Krt10 Expression:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-feature_avg <- AvgFeatureExpression(cluster_labels = labels,
-                                    M = logdata,
-                                    feature = "Krt10",
-                                    feature_list = GSE67602_Joost$gene_names)
-PlotLineage(cluster_dtree, node_color = feature_avg)
+  ViolinPlotExpression(data = logdata,
+                       gene_names = GSE67602_Joost$gene_names,
+                       labels = labels,
+                       gene_name = "Krt10")
+```
+
+## Analyze Signaling Mediated by a Ligand-Receptor Family
+
+We present a family of ligan-receptor pairs along with their up/down-regulated targets.  We compute the probability of intercellular interaction based on this pathway.
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+  ligands <- list(Tgfb1 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'),
+                                             down = list('Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1')),
+                               Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'),
+                                             down = list('Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1'))),
+                  Tgfb2 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'),
+                                             down = list('Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1')),
+                               Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'),
+                                             down = list('Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1'))))
+  Pmats <- GetSignalingPartners(logdata,
+                                  GSE67602_Joost$gene_names,
+                                  ligands)
+```
+
+### Circos Plot of Intercellular Network
+Now plot the previous result as a circos plot on the cells in the dataset, ordered by cluster.
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+  sigonly = FALSE   # If true => input is only signaler cells, and P will not be thresholded
+  subsample = TRUE
+  threshold = 0.05
+  nsample = 100
+
+  plotSig(P = Pmats$P_agg,
+          cluster_label = labels,
+          threshold = threshold,
+          sigonly = sigonly,
+          subsample = subsample,
+          nsample = nsample,
+          plottitle = "Network Inference on the Activation and Suppression of Tgfb Targets ")
 ```

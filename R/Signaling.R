@@ -67,7 +67,6 @@ GetSignalingPartners <- function(M,
     print(paste0("D ", pair))
 
     P_num <- alpha*K*betaM*D*gammaM
-    #browser()
     # compute the normalizing factor
     tempMat <- replicate(n_cells, apply(P_num, 1, sum))
     non_zero_entries <- which(tempMat > 0)
@@ -88,7 +87,6 @@ GetSignalingPartners <- function(M,
 #'
 TargetAvg <- function(M,
                       ids){
-  #browser()
   # normalize expression values by max cell expression
   norm <- NormalizeSubset(M, ids)
   avg <- apply(norm, 2, function(x){

@@ -32,7 +32,8 @@ Imports:
     ggnetwork (>= 0.5.1),
     sna (>= 2.4),
     network (>= 1.13.0.1),
-    intergraph (>= 2.0-2)
+    intergraph (>= 2.0-2),
+    circlize (>= 0.4.4)
 Suggests: testthat,
     rmarkdown
 RoxygenNote: 6.1.0

@@ -5,7 +5,7 @@
 \title{Produce a scatter plot of the cells on selected 2-dim ebedding colored by feature}
 \usage{
 FeatureScatterPlot(flat_embedding, feature, outputdir = NULL,
-  outputfile = NULL)
+  outputfile = NULL, title, subtitle, featurename)
 }
 \arguments{
 \item{flat_embedding}{a low dim embedding of cells}
@@ -19,6 +19,8 @@ FeatureScatterPlot(flat_embedding, feature, outputdir = NULL,
 \item{title}{the title of the plot}
 
 \item{subtitle}{the subtitle of the plot}
+
+\item{featurename}{the name of the feature to title the legend}
 }
 \value{
 a ggplot2 object
