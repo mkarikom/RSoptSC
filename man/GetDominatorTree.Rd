@@ -4,10 +4,12 @@
 \alias{GetDominatorTree}
 \title{Get a directed graph from a predecessor vector}
 \usage{
-GetDominatorTree(predecessors)
+GetDominatorTree(predecessors, weighted_graph = NULL)
 }
 \arguments{
-\item{predecessors}{the tree to be directionalized}
+\item{predecessors}{a predecessor vector, such that predecessors[i] = the predecessor of i}
+
+\item{weighted_graph}{a weighted igraph object}
 }
 \value{
 a directed igraph object

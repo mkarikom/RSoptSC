@@ -8,12 +8,14 @@
 #' @param ligand a named list:
 #'     list(ligand1 = list(receptor1 = list(up = list(target1, target2),
 #'                                          down = list(target3, target4))))
+#' @export
 #'
-GetSignalingPartners <- function(M = M,
-                                 ids = ids,
-                                 ligand = ligand,
+GetSignalingPartners <- function(M,
+                                 ids,
+                                 ligand,
                                  targets){
-  n_cells <- nrow(M)
+  n_cells <- ncol(M)
+  n_genes <- nrow(M)
 
   # represent the pathway heirarchy as a data frame
   pathway <- (reshape2::melt(ligand)[,-2])[,c(4, 3, 2, 1)]
@@ -26,12 +28,15 @@ GetSignalingPartners <- function(M = M,
   for(pair in 1:nrow(LR_pairs)){
     # find alpha
     lig_index <- which((LR_pairs[pair, 1]) == ids)
-    lig_cells <- t(replicate(n_cells, NormalizeSubset(M, lig_index)))
-    rec_index <- which((LR_pairs[pair, 1]) == ids)
-    rec_cells <- t(replicate(n_cells, NormalizeSubset(M, lig_index)))
-    alpha <- exp(-1/(lig_cells * rec_cells))
+    lnsub <- NormalizeSubset(M, lig_index)
+
+    rec_index <- which((LR_pairs[pair, 2]) == ids)
+    rnsub <- NormalizeSubset(M, rec_index)
+    alpha <- exp(-1/(matrix(lnsub,n_cells,1) %*%
+                       matrix(rnsub,1,n_cells)))
 
     # find beta
+    print(LR_pairs[pair,])
     targ_up <- filter(pathway,
                       ligand == LR_pairs[pair,1] &
                         receptor == LR_pairs[pair,2] &
@@ -50,40 +55,38 @@ GetSignalingPartners <- function(M = M,
     gamma <- exp(-avg_down)
     print(paste0("a,b,g ", pair))
 
+    gammaM <- t(replicate(n_cells, gamma))
+    betaM <- t(replicate(n_cells, beta))
 
     # find K
-    K <- PenaltyCoeff(alpha, beta, n_cells)
+    K <- PenaltyCoeff(alpha = alpha, const = betaM, num = 'alpha', n_cells)
     print(paste0("K ", pair))
 
     # find D
-    D <- PenaltyCoeff(alpha, gamma, n_cells)
+    D <- PenaltyCoeff(alpha = alpha, const = gammaM, num = 'alpha', n_cells)
     print(paste0("D ", pair))
 
-    browser()
-    # compute P
-    P_num <- alpha*K*beta*D*gamma
-    P_denom <- apply(P, 2, function(x){
-      sum(x)})
-    P_ind <- apply(P_num, 1, function(x){
-        x/P_denom
-      })
-    P[i] <- P_ind
-    print(paste0("pair ", pair))
+    P_num <- alpha*K*betaM*D*gammaM
+    # compute the normalizing factor
+    tempMat <- replicate(n_cells, apply(P_num, 1, sum))
+    non_zero_entries <- which(tempMat > 0)
+    denom_Mat <- matrix(0, n_cells, n_cells)
+    updateNonZero <- 1/tempMat[non_zero_entries]
+    denom_Mat[non_zero_entries] <- updateNonZero
+    P[[pair]] <- P_num * denom_Mat
+    P[[pair]][P[[pair]] <= 1e-6] <- 0
   }
-
   P_agg <- Reduce('+', P)/length(P)
-
-  return(list(P, P_agg))
+  return(list(P = P, P_agg = P_agg))
 }
-
 
 #' Get average target expression for each cell
 #'
 #' @param M a matrix of expression values for each cell (rows) and gene (columns)
 #' @param ind a vector of row indexes corresponding to genes
 #'
-TargetAvg <- function(M = M,
-                      ids = ids){
+TargetAvg <- function(M,
+                      ids){
   # normalize expression values by max cell expression
   norm <- NormalizeSubset(M, ids)
   avg <- apply(norm, 2, function(x){
@@ -96,8 +99,8 @@ TargetAvg <- function(M = M,
 #' @param M a matrix of expression values for each cell (columns) and gene (rows)
 #' @param ind a vector of row indexes corresponding to genes
 #'
-NormalizeSubset <- function(M = M,
-                            ids = ids){
+NormalizeSubset <- function(M,
+                            ids){
   # normalize expression values by max cell expression
   M <- M[ids, ]
   if(is.null(nrow(M))){
@@ -116,6 +119,7 @@ NormalizeSubset <- function(M = M,
   M_norm <- apply(M, 2, function(x){
     x/row_max
   })
+  return(M_norm)
 }
 
 #' Generate the divergence penalty coefficient
@@ -124,14 +128,21 @@ NormalizeSubset <- function(M = M,
 #'
 #' @param alpha a matrix of normalized LR expression values for each cell (columns) and gene (rows)
 #' @param const either the normalized repression targets or the normalized expression targets
+#' @param num either alpha or const
+#' @param n_cells the number of cells (row-traversal of the alpha matrix)
 #'
-PenaltyCoeff <- function(alpha = alpha,
-                         const = const,
-                         n_cells = n_cells){
-  coeff <- apply(alpha, 1, function(x){
-    ind <- which(x+const > 0, arr.ind = TRUE)
-    nonzero <- as.vector(replicate(n_cells, 0))
-    nonzero[ind] <- x[ind]/(x+const)[ind]
-  })
-  coeff
+PenaltyCoeff <- function(alpha,
+                         const,
+                         num = 'alpha',
+                         n_cells){
+  proper <- matrix(0, n_cells, n_cells)
+  ind <- which(alpha + const > 0)
+  if(num == 'alpha'){
+    numerator <- alpha
+  } else {
+    numerator <- const
+  }
+  nonzero <- numerator[ind]/(alpha[ind]+const[ind])
+  proper[ind] <- nonzero
+  proper
 }

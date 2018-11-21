@@ -17,7 +17,6 @@ Imports:
     FNN (>= 1.1.2.1),
     stringr (>= 1.3.1),
     psych (>= 1.8.4),
-    igraph (>= 1.2.2),
     ggplot2 (>= 3.0.0),
     Matrix (>= 1.2-14),
     tsne (>= 0.1-3),
@@ -31,7 +30,10 @@ Imports:
     gplots (>= 3.0.1),
     magrittr (>= 1.5),
     ggnetwork (>= 0.5.1),
-    intergraph (>= 2.0-2)
+    sna (>= 2.4),
+    network (>= 1.13.0.1),
+    intergraph (>= 2.0-2),
+    circlize (>= 0.4.4)
 Suggests: testthat,
     rmarkdown
 RoxygenNote: 6.1.0

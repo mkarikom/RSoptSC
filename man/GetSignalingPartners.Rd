@@ -4,7 +4,7 @@
 \alias{GetSignalingPartners}
 \title{Compute Cell-cell interaction probability}
 \usage{
-GetSignalingPartners(M = M, ids = ids, ligand = ligand, targets)
+GetSignalingPartners(M, ids, ligand, targets)
 }
 \arguments{
 \item{M}{a matrix of expression values for each cell (rows) and gene (columns)}

@@ -4,7 +4,7 @@
 \alias{NormalizeSubset}
 \title{Normalize a Subset of the Data}
 \usage{
-NormalizeSubset(M = M, ids = ids)
+NormalizeSubset(M, ids)
 }
 \arguments{
 \item{M}{a matrix of expression values for each cell (columns) and gene (rows)}

@@ -4,7 +4,7 @@
 \alias{TargetAvg}
 \title{Get average target expression for each cell}
 \usage{
-TargetAvg(M = M, ids = ids)
+TargetAvg(M, ids)
 }
 \arguments{
 \item{M}{a matrix of expression values for each cell (rows) and gene (columns)}

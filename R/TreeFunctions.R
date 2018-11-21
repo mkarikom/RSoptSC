@@ -21,21 +21,28 @@ GetPredecessors <- function(minspantree, root){
 
 #' Get a directed graph from a predecessor vector
 #'
-#' @param predecessors the tree to be directionalized
+#' @param predecessors a predecessor vector, such that predecessors[i] = the predecessor of i
+#' @param weighted_graph a weighted igraph object
 #'
 #' @return a directed igraph object
 #'
+#' @importFrom igraph graph.data.frame get.edge.ids E
+#'
 #' @export
 #'
-GetDominatorTree <- function(predecessors){
-  edges <- c()
-  for(i in 1:length(predecessors)){
-    if(predecessors[i] != 0){
-      edge <- c(predecessors[i], i)
-      edges <- c(edges, edge)
-    }
-  }
-  tree <- igraph::make_graph(edges = edges, directed = TRUE)
+GetDominatorTree <- function(predecessors, weighted_graph = NULL){
+  # get the edge table from the predecessor vector
+  root <- which(predecessors == 0)
+  edge_table <- cbind(i = predecessors, j = c(1:length(predecessors)))
+  edge_table <- edge_table[-root,]
+
+  weights <- apply(edge_table, 1, function(x){
+      id <- get.edge.ids(weighted_graph,x)
+      E(weighted_graph)$weight[id]
+    })
+  edge_table <- as.data.frame(cbind(edge_table, weight = as.vector(weights)))
+
+  tree <- graph.data.frame(edge_table)
 }
 
 #' Get a weighted, directed graph from a table of edges and weights
