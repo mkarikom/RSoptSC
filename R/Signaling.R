@@ -8,6 +8,7 @@
 #' @param ligand a named list:
 #'     list(ligand1 = list(receptor1 = list(up = list(target1, target2),
 #'                                          down = list(target3, target4))))
+#' @export
 #'
 GetSignalingPartners <- function(M,
                                  ids,

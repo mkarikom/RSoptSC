@@ -197,23 +197,15 @@ MarkerHeatmap <- function(counts_data,
 
 #' Produce a circle plot of the signaling
 #'
-#' @param P a low dim embedding of cells
-#' @param feature a scalar representation of feature
-#' @param outputdir the output directory, relative to getwd()
-#' @param outputfile the output file
-#' @param title the title of the plot
-#' @param subtitle the subtitle of the plot
+#' @param P p_{i,j} = probability of transduction from binding of ligand from cell i to receptor of cell j
+#' @param labels the cluster labels of the cells
 #'
-#' @return a ggplot2 object
+#' @return nothing
 #'
 #' @export
 #'
-FeatureScatterPlot <- function(flat_embedding,
-                               feature,
-                               outputdir = NULL,
-                               outputfile = NULL,
-                               title,
-                               subtitle){
+SignalCirclePlot <- function(P, labels){
+
   p <- ggplot2::ggplot(as.data.frame(flat_embedding), ggplot2::aes(x=V1, y=V2, color=feature)) +
 
     if(!is.null(outputdir) && !is.null(outputfile)){

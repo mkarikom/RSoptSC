@@ -10,7 +10,7 @@ library(RSoptSC)
 #   expect_equal(product, 1)
 # })
 
-test_that("NMF grad < tol * initGrad", {
+test_that("1st order NMF grad < tol * initGrad", {
   skip("takes too long")
   tol = 10^(-6)
   data = RSoptSC::SymNMF(RSoptSC::A0146, nC = 3, H = RSoptSC::Winit0146)
@@ -21,3 +21,7 @@ test_that("NMF grad < tol * initGrad", {
   finalNorm = norm(4*(H%*%t(H)-A)%*%H, "F")
   expect_true(finalNorm < tol * initNorm)
 })
+
+test_that("2nd order NMF grad < tol * initGrad"){
+
+}
