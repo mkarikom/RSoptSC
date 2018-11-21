@@ -4,12 +4,16 @@
 \alias{PenaltyCoeff}
 \title{Generate the divergence penalty coefficient}
 \usage{
-PenaltyCoeff(alpha = alpha, const = const, n_cells = n_cells)
+PenaltyCoeff(alpha, const, num = "alpha", n_cells)
 }
 \arguments{
 \item{alpha}{a matrix of normalized LR expression values for each cell (columns) and gene (rows)}
 
 \item{const}{either the normalized repression targets or the normalized expression targets}
+
+\item{num}{either alpha or const}
+
+\item{n_cells}{the number of cells (row-traversal of the alpha matrix)}
 }
 \description{
 This will approach 1 as the difference between alpha and \code{const} approaches 0
