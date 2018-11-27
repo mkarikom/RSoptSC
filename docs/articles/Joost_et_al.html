@@ -74,7 +74,7 @@
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2018-11-21</h4>
+            <h4 class="date">2018-11-26</h4>
       
       
       <div class="hidden name"><code>Joost_et_al.Rmd</code></div>
@@ -111,9 +111,14 @@ filtered_data &lt;-<span class="st"> </span><span class="kw"><a href="../referen
 <p>Infer cluster number using spectra of the ensemble Laplacian.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n_clusters &lt;-<span class="st"> </span><span class="kw"><a href="../reference/CountClusters.html">CountClusters</a></span>(<span class="dt">data =</span> sim<span class="op">$</span>W)</code></pre></div>
 <p>Factor the similarity matrix such that W = HxH’, using the computed cluster number for the rank of H.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">H &lt;-<span class="st"> </span>NNLM<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/NNLM/topics/nnmf">nnmf</a></span>(sim<span class="op">$</span>W, n_clusters, <span class="dt">rel.tol =</span> <span class="fl">1e-6</span>);</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res &lt;-<span class="st"> </span>NMF<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/NMF/topics/nmf">nmf</a></span>(<span class="dt">x =</span> sim<span class="op">$</span>W,
+              <span class="dt">rank =</span> n_clusters,
+              <span class="dt">method =</span> <span class="st">'lee'</span>,
+              <span class="dt">seed =</span> <span class="st">'nndsvd'</span>,
+              <span class="dt">.options =</span> <span class="st">'nP'</span>);
+H &lt;-<span class="st"> </span>NMF<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/NMF/topics/basis-coef-methods">basis</a></span>(res)</code></pre></div>
 <p>Assign cluster labels to the cells.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">labels &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(H<span class="op">$</span>W, <span class="dv">1</span>, <span class="cf">function</span>(x){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">labels &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/apply">apply</a></span>(H, <span class="dv">1</span>, <span class="cf">function</span>(x){
   <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(x <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max</a></span>(x))})</code></pre></div>
 </div>
 <div id="find-cluster-marker-genes-" class="section level2">
@@ -122,7 +127,7 @@ filtered_data &lt;-<span class="st"> </span><span class="kw"><a href="../referen
 <p>Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters. We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">markers &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetMarkerTable.html">GetMarkerTable</a></span>(<span class="dt">counts_data =</span> logdata,
                           <span class="dt">cluster_labels =</span> labels,
-                          <span class="dt">H =</span> H<span class="op">$</span>W,
+                          <span class="dt">H =</span> H,
                           <span class="dt">gene_expression_threshold =</span> gene_expression_threshold,
                           <span class="dt">n_features =</span> n_features)
 heatplot &lt;-<span class="st"> </span><span class="kw"><a href="../reference/MarkerHeatmap.html">MarkerHeatmap</a></span>(logdata,labels,markers,<span class="dt">n_markers =</span> <span class="dv">5</span>)</code></pre></div>
@@ -227,6 +232,31 @@ labeling &lt;-<span class="st"> </span>logdata[gene_index,]
           <span class="dt">nsample =</span> nsample,
           <span class="dt">plottitle =</span> <span class="st">"Network Inference on the Activation and Suppression of Tgfb Targets "</span>)</code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-16-1.png" width="100%" height="100%"></p>
+</div>
+<div id="accuracy-of-soptsc-clustering" class="section level3">
+<h3 class="hasAnchor">
+<a href="#accuracy-of-soptsc-clustering" class="anchor"></a>Accuracy of SoptSC Clustering</h3>
+<p>Use adjusted rand index (ARI) and normalized mutual information (NMI) to assess performance:</p>
+<table class="table">
+<caption>Performance Comparison Between RSoptSC and Popular Methods</caption>
+<thead><tr class="header">
+<th></th>
+<th align="right">ARI</th>
+<th align="right">NMI</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>RSoptSC</td>
+<td align="right">0.3401167</td>
+<td align="right">0.4768134</td>
+</tr>
+<tr class="even">
+<td>SoptSC</td>
+<td align="right">0.3353939</td>
+<td align="right">0.5200952</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
   </div>
