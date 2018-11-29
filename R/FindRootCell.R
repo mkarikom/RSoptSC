@@ -35,7 +35,7 @@ FindRootCell <- function(use_flat_dist = TRUE,
     n_clusters <- length(unique(cluster_labels))
     root_cluster_cells <- which(cluster_labels == root_cluster, arr.ind = TRUE)
 
-    tau_score <- matrix(0, 1, length(root_cluster_cells))
+    tau_score <- rep(0, length(root_cluster_cells))
     avg_ptime_to_clusters <- matrix(0, length(root_cluster_cells), n_clusters)
     for(i in 1:length(root_cluster_cells)){
       for(j in 1:n_clusters){
@@ -56,7 +56,7 @@ FindRootCell <- function(use_flat_dist = TRUE,
 GetCorrelation <- function(cluster_order_by, cell_metric, graph_cluster_mst, root_cluster){
   if(cluster_order_by == "distance"){
     path_lengths <- igraph::shortest.paths(graph = graph_cluster_mst, v = root_cluster) + 1
-    tau <- cor(path_lengths/max(path_lengths), cell_metric, method = "kendall")
+    tau <- cor(as.vector(path_lengths/max(path_lengths)), cell_metric, method = "kendall")
   } else if (cluster_order_by == "predecessor"){
     predecessors <- GetPredecessors(graph_cluster_mst, root_cluster) + 1
     tau <- cor(predecessors/max(predecessors), cell_metric, method = "kendall")

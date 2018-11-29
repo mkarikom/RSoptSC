@@ -37,5 +37,5 @@ Imports:
     xtable (>= 1.8-3)
 Suggests: testthat,
     rmarkdown, knitr
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr

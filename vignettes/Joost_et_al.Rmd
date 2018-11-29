@@ -29,6 +29,17 @@ data("GSE67602_Joost")
 logdata <- log10(GSE67602_Joost$data + 1)
 ```
 
+### Remove Spike-in RNA
+```{r}
+# clean the gene names
+gene_names <- GSE67602_Joost$gene_names
+spikein <- grep('ERCC', gene_names)
+gene_names <- gene_names[-spikein]
+
+# clean the data
+logdata <- logdata[-spikein,]
+```
+
 Apply number of features and exclusion threshold
 
 ```{r, results='asis'}
@@ -43,6 +54,13 @@ Run L2R2 on the processed data, outputting the number of iterations and value of
 
 ```{r, results='asis'}
 sim <- SimilarityM(lambda = 0.05, data = filtered_data$M_variable)
+```
+
+Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
+
+```{r, results='asis'}
+mapped <- RepresentationMap(similarity_matrix = sim$W,
+                            join_components = TRUE)
 ```
 
 ## Cluster the Cells
@@ -71,6 +89,31 @@ labels <- apply(H, 1, function(x){
   which(x == max(x))})
 ```
 
+
+### Visualize the Clusters
+Cells are labeled by cluster membership and plotted on low-dimensional embedding (t-SNE) of the similarity matrix.
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+# plot clusters
+FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
+                         feature = as.factor(labels),
+                         title = "NMF Cluster Labeling",
+                         subtitle = "t-SNE Embedding",
+                         featurename = "Cluster ID")
+```
+
+As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-KII, IFE-DII, IFE-KI were identified by standard techniques.
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+true_labels <- RSoptSC::GSE67602_Joost$annotation
+# plot clusters
+FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
+                         feature = as.factor(true_labels),
+                         title = "True Labeling",
+                         subtitle = "t-SNE Embedding",
+                         featurename = "Annotated Cell Types")
+```
+
 ## Find cluster marker genes.
 
 Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters.  We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters. 
@@ -87,13 +130,6 @@ heatplot <- MarkerHeatmap(logdata,labels,markers,n_markers = 5)
 
 ## Pseudotime Inference
 
-Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
-
-```{r, results='asis'}
-mapped <- RepresentationMap(similarity_matrix = sim$W,
-                            join_components = TRUE)
-```
-
 Compute cluster-cluster graph and find the root cluster.
 
 ```{r, results='asis'}
@@ -101,19 +137,20 @@ cluster_ptime <- FindRootCluster(cluster_labels = labels,
                                  flat_embedding = mapped$flat_embedding,
                                  dist_graph = mapped$dist_graph,
                                  dist_flat = mapped$dist_flat,
-                                 reverse = FALSE)
+                                 reverse = TRUE)
 ```
 
 Compute the cell-cell graph and find the root cell.
 
 ```{r, results='asis'}
-root_cell <- FindRootCell(cluster_order_by = "distance",
-                           cell_order_by = "distance",
-                           graph_cluster_mst = cluster_ptime$cluster_mst,
-                           dist_graph  = mapped$dist_graph,
-                           dist_flat = mapped$dist_flat,
-                           cluster_labels = labels,
-                           root_cluster = cluster_ptime$root_cluster)
+root_cell <- FindRootCell(use_flat_dist = FALSE,
+                          cluster_order_by = "distance",
+                          cell_order_by = "distance",
+                          graph_cluster_mst = cluster_ptime$cluster_mst,
+                          dist_graph  = mapped$dist_graph,
+                          dist_flat = mapped$dist_flat,
+                          cluster_labels = labels,
+                          root_cluster = cluster_ptime$root_cluster)
 ```
 
 ## Pseudotime Visualization
@@ -145,7 +182,7 @@ FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
 Plot Expression of Krt10 in t-SNE Space:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-gene_index <- which(GSE67602_Joost$gene_names == 'Krt10')
+gene_index <- which(gene_names == 'Krt10')
 labeling <- logdata[gene_index,]
 
 # plot features
@@ -162,7 +199,7 @@ Violin Plot of Krt10 Expression:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   ViolinPlotExpression(data = logdata,
-                       gene_names = GSE67602_Joost$gene_names,
+                       gene_names = gene_names,
                        labels = labels,
                        gene_name = "Krt10")
 ```
@@ -181,7 +218,7 @@ We present a family of ligan-receptor pairs along with their up/down-regulated t
                                Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'),
                                              down = list('Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1'))))
   Pmats <- GetSignalingPartners(logdata,
-                                  GSE67602_Joost$gene_names,
+                                  gene_names,
                                   ligands)
 ```
 
