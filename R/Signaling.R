@@ -146,3 +146,98 @@ PenaltyCoeff <- function(alpha,
   proper[ind] <- nonzero
   proper
 }
+
+#' Average cluster to cluster gene expression
+#'
+#' @param P signaling probabilities cells x cells
+#' @param cell_order permutation of the labels of P, cells ordered by cluster
+#' @param cell_labels cluster labels of the permuted cells
+#'
+#' @export
+#'
+ClusterSig <- function(P,
+                       cell_order,
+                       cell_labels){
+  n_clusters <- length(unique(cell_labels))
+  n_cells <- length(cell_labels)
+  
+  # for each cluster, get the location of the first and the last cell in the permutation of labels
+  counts <- as.matrix(table(cell_labels))
+  accumulator <- matrix(1, n_clusters, n_clusters)*lower.tri(matrix(1, n_clusters, n_clusters), diag = TRUE)
+  last_cells <- accumulator %*% counts
+  first_cells <- last_cells - counts + 1
+  
+  summing_matrix <- NULL
+  for(i in 1:n_clusters){
+    if(is.null(summing_matrix)){
+      # we must initialize
+      summing_matrix <- c(rep(0, n_cells))
+      summing_matrix[first_cells[i]:last_cells[i]] <- 1
+    } else {
+      new_col <- c(rep(0, n_cells))
+      new_col[first_cells[i]:last_cells[i]] <- 1
+      summing_matrix <- cbind(summing_matrix, new_col)
+    }
+  }
+  
+  sums <- P[cell_order, cell_order] %*% summing_matrix
+  avg_matrix <- apply(sums, 1, function(x){
+    x/counts
+  })
+  
+  avg_matrix <- t(avg_matrix)
+  
+  sums_t <- t(avg_matrix) %*% summing_matrix
+  avg_t <- apply(sums_t, 1, function(x){
+    x/counts
+  })
+  
+  return(avg_t)
+}
+
+
+#' Create a heatmap with signaling markers over clusters
+#'
+#' @param M a matrix of genes x cells where each entry is normalized expression
+#' @param gene_names the names of the genes in the rows of M
+#' @param cell_order permutation of the labels of P, cells ordered by cluster
+#' @param cell_labels cluster labels of the permuted cells
+#' @param gene_list filter by a list of gene names
+#'
+#' @export
+#'
+HeatSig <- function(M,
+                    gene_names,
+                    cell_order,
+                    cell_labels,
+                    gene_list){
+  n_clusters <- length(unique(cell_labels))
+  n_cells <- length(cell_labels)
+  
+  # for each cluster, get the location of the first and the last cell in the permutation of labels
+  counts <- as.matrix(table(cell_labels))
+  accumulator <- matrix(1, n_clusters, n_clusters)*lower.tri(matrix(1, n_clusters, n_clusters), diag = TRUE)
+  last_cells <- accumulator %*% counts
+  first_cells <- last_cells - counts + 1
+  
+  summing_matrix <- NULL
+  for(i in 1:n_clusters){
+    if(is.null(summing_matrix)){
+      # we must initialize
+      summing_matrix <- c(rep(0, n_cells))
+      summing_matrix[first_cells[i]:last_cells[i]] <- 1
+    } else {
+      new_col <- c(rep(0, n_cells))
+      new_col[first_cells[i]:last_cells[i]] <- 1
+      summing_matrix <- cbind(summing_matrix, new_col)
+    }
+  }
+  
+  sums <- M[, cell_order] %*% summing_matrix
+  avg_matrix <- apply(sums, 1, function(x){
+    x/counts
+  })
+
+  return(avg_matrix[,match(gene_list, gene_names)])
+  ## insert code for plot
+}

@@ -365,19 +365,42 @@ labeling &lt;-<span class="st"> </span>logdata[gene_index,]
           <span class="dt">subsample =</span> subsample,
           <span class="dt">nsample =</span> nsample,
           <span class="dt">plottitle =</span> <span class="st">"Network Inference on the Activation and Suppression of Tgfb Targets "</span>)</code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-24-1.png" width="100%" height="100%"> Visualize the expression of ligand/receptor and up/down target expression across clusters</p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-24-1.png" width="100%" height="100%"></p>
+</div>
+<div id="heatmap-of-signaling-marker-expression" class="section level3">
+<h3 class="hasAnchor">
+<a href="#heatmap-of-signaling-marker-expression" class="anchor"></a>Heatmap of Signaling Marker Expression</h3>
+<p>Visualize the expression of ligand/receptor and up/down target expression across clusters</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  sigonly =<span class="st"> </span><span class="ot">FALSE</span>   <span class="co"># If true =&gt; input is only signaler cells, and P will not be thresholded</span>
   subsample =<span class="st"> </span><span class="ot">FALSE</span>
   threshold =<span class="st"> </span><span class="fl">0.05</span>
-
-  Pc &lt;-<span class="st"> </span><span class="kw">ClusterSig</span>(P, sorted_cell<span class="op">$</span>ix, sorted_cell<span class="op">$</span>x)
+  gene_list =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'Tgfb1'</span>, <span class="st">'Tgfb2'</span>, 
+                <span class="st">'Tgfbr1'</span>, <span class="st">'Tgfbr2'</span>,
+                <span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>,
+                <span class="st">'Crebbp'</span>,<span class="st">'Fos'</span>,<span class="st">'Id1'</span>,<span class="st">'Jun'</span>,<span class="st">'Runx1'</span>,<span class="st">'Smad1'</span>,<span class="st">'Smad5'</span>,<span class="st">'Sox4'</span>,<span class="st">'Cdh1'</span>)
   
-  <span class="kw"><a href="../reference/plotSig.html">plotSig</a></span>(<span class="dt">Pc =</span> Pmats<span class="op">$</span>P_agg,
-          <span class="dt">cluster_label =</span> labels,
-          <span class="dt">threshold =</span> threshold,
-          <span class="dt">sigonly =</span> sigonly,
-          <span class="dt">subsample =</span> subsample,
-          <span class="dt">plottitle =</span> <span class="st">"Network Inference on the Activation and Suppression of Tgfb Targets "</span>)</code></pre></div>
+  filtered &lt;-<span class="st"> </span><span class="kw"><a href="../reference/HeatSig.html">HeatSig</a></span>(<span class="dt">M =</span> GSE67602_Joost<span class="op">$</span>data,
+                      <span class="dt">gene_names =</span> GSE67602_Joost<span class="op">$</span>gene_names,
+                      <span class="dt">cell_order =</span> sorted_cell<span class="op">$</span>ix,
+                      <span class="dt">cell_labels =</span> labels,
+                      <span class="dt">gene_list =</span> gene_list)
+  clabs &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span><span class="op">:</span>n_clusters)
+  rlabs &lt;-<span class="st"> </span>gene_list
+  
+  p &lt;-<span class="st"> </span>gplots<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/gplots/topics/heatmap.2">heatmap.2</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log10</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/t">t</a></span>(filtered) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>),
+                         <span class="dt">col =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rev">rev</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/RColorBrewer/topics/ColorBrewer">brewer.pal</a></span>(<span class="dv">11</span>,<span class="st">"RdBu"</span>)),
+                         <span class="dt">trace =</span> <span class="st">'none'</span>,
+                         <span class="dt">dendrogram=</span><span class="st">'none'</span>,
+                         <span class="dt">Rowv=</span><span class="ot">FALSE</span>, <span class="dt">Colv=</span><span class="ot">FALSE</span>,
+                         <span class="dt">labCol =</span> clabs,
+                         <span class="dt">labRow =</span> rlabs,
+                         <span class="dt">srtCol =</span> <span class="dv">0</span>,
+                         <span class="dt">cexCol =</span><span class="dv">1</span>,
+                         <span class="dt">cexRow =</span> .<span class="dv">7</span>,
+                         <span class="dt">lhei =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">2</span>),
+                         <span class="dt">key.title =</span> <span class="ot">NA</span>,
+                         <span class="dt">scale =</span> <span class="st">"row"</span>)</code></pre></div>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-25-1.png" width="100%" height="100%"></p>
 </div>
 <div id="accuracy-of-soptsc-clustering" class="section level3">
 <h3 class="hasAnchor">

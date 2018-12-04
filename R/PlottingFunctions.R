@@ -203,3 +203,27 @@ ViolinPlotExpression <- function(data,
     labs(title = paste0("Expression of ", gene_name), x = "Cluster", y = "Relative Target Expression") +
     geom_jitter(shape=16, position=position_jitter(0.2)))
 }
+
+#' Produce a plot of a cluster-cluster signaling network
+#'
+#' @param data a matrix P where p_i,j = the probability that cluster i signals to cluster j
+#'
+#' @return nothing
+#'
+#' @importFrom igraph graph.adjacency
+#' @importFrom igraph layout_in_circle
+#' @importFrom igraph plot.igraph
+#'
+#' @export
+#'
+PlotClusterSig <- function(data){
+  net <- igraph::graph.adjacency(data,
+                    mode = 'directed',
+                    weighted = TRUE)
+  coords <- igraph::layout_in_circle(net)
+  igraph::plot.igraph(net, 
+                      layout = coords, 
+                      edge.width = exp(igraph::E(net)$weight), 
+                      edge.arrow.size=1,
+                      vertex.size=20)
+}

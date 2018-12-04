@@ -334,21 +334,42 @@ Now plot the previous result as a circos plot on the cells in the dataset, order
           nsample = nsample,
           plottitle = "Network Inference on the Activation and Suppression of Tgfb Targets ")
 ```
+
+
+### Heatmap of Signaling Marker Expression
+
 Visualize the expression of ligand/receptor and up/down target expression across clusters
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=FALSE}
+```{r, results='asis', warning=FALSE, message= FALSE, out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   sigonly = FALSE   # If true => input is only signaler cells, and P will not be thresholded
   subsample = FALSE
   threshold = 0.05
-
-  Pc <- ClusterSig(P, sorted_cell$ix, sorted_cell$x)
+  gene_list = c('Tgfb1', 'Tgfb2', 
+                'Tgfbr1', 'Tgfbr2',
+                'Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1',
+                'Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1')
   
-  plotSig(Pc = Pmats$P_agg,
-          cluster_label = labels,
-          threshold = threshold,
-          sigonly = sigonly,
-          subsample = subsample,
-          plottitle = "Network Inference on the Activation and Suppression of Tgfb Targets ")
+  filtered <- HeatSig(M = GSE67602_Joost$data,
+                      gene_names = GSE67602_Joost$gene_names,
+                      cell_order = sorted_cell$ix,
+                      cell_labels = labels,
+                      gene_list = gene_list)
+  clabs <- c(1:n_clusters)
+  rlabs <- gene_list
+  
+  p <- gplots::heatmap.2(log10(t(filtered) + 1),
+                         col = rev(brewer.pal(11,"RdBu")),
+                         trace = 'none',
+                         dendrogram='none',
+                         Rowv=FALSE, Colv=FALSE,
+                         labCol = clabs,
+                         labRow = rlabs,
+                         srtCol = 0,
+                         cexCol =1,
+                         cexRow = .7,
+                         lhei = c(1,2),
+                         key.title = NA,
+                         scale = "row")
 ```
 
 
