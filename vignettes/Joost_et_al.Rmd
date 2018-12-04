@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 set.seed(13)
+par(mar=c(1,1,1,1))
 ```
 
 This is an example of clustering, marker identification and pseudotime inference on a set of skin cells.

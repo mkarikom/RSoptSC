@@ -1,0 +1,70 @@
+development:
+  mode: auto
+
+navbar:
+  structure:
+    left:
+    - home
+    - intro
+    - reference
+    - articles
+    - github
+    right: 
+  components:
+    home:
+      icon: fa-home fa-lg
+      href: index.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    articles:
+      text: Articles
+      menu:
+      - text: Clustering Pseudotime Inference on Skin Cell scRNA-seq
+        href: articles/Joost_et_al.html
+    github:
+      text: GitHub
+      icon: fa-github fa-lg
+      href: https://github.com/mkarikom/RSoptSC
+
+reference:
+- title: All functions
+  desc: ~
+  contents:
+  - '`AvgFeatureExpression`'
+  - '`CountClusters`'
+  - '`FeatureScatterPlot`'
+  - '`FindRootCell`'
+  - '`FindRootCluster`'
+  - '`GSE67602_Joost`'
+  - '`GetComponents`'
+  - '`GetConsensus`'
+  - '`GetDGFromTable`'
+  - '`GetDominatorTree`'
+  - '`GetEnsemble`'
+  - '`GetMarkerTable`'
+  - '`GetPredecessors`'
+  - '`GetSignalingPartners`'
+  - '`InitSVD`'
+  - '`JoinGraphComponents`'
+  - '`MarkerHeatmap`'
+  - '`NormalizeSubset`'
+  - '`PenaltyCoeff`'
+  - '`PlotLineage`'
+  - '`PlotMatlabDtree`'
+  - '`ProcessMatlabDTree`'
+  - '`RepresentationMap`'
+  - '`ScaleCenterData`'
+  - '`SelectData`'
+  - '`SimilarityM`'
+  - '`SymNMF`'
+  - '`TargetAvg`'
+  - '`ViolinPlotExpression`'
+  - '`computM`'
+  - '`plotSig`'
+  
+articles:
+- title: All vignettes
+  desc: ~
+  contents: '`Joost_et_al`'
+
