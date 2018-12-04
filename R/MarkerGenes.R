@@ -24,13 +24,13 @@ GetMarkerTable <- function(counts_data,
                   n_features)
 
   # normalize the expression cell by cell
-  M$M_variable <- apply(M$M_variable, 2, function(x){
+  Mnorm <- apply(M$M_variable, 2, function(x){
     x / sum(x)
   })
 
   # for each gene (rows), for each cluster (columns)
   # get cell-weighted expression score
-  gene_cluster_scores <- M$M_variable %*% H
+  gene_cluster_scores <- Mnorm %*% H
 
   # select max cluster score
   gene_assignments <- apply(gene_cluster_scores, 1, function(x){

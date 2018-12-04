@@ -8,7 +8,7 @@
 #' @param eigengap whether or not to use the max
 #'     eigengap (upper bound) cluster count
 #'
-#' @return the number of clusters
+#' @return the number of clusters and the vector of eigenvalues
 #'
 #' @export
 #'
@@ -24,18 +24,18 @@ CountClusters <- function(data, tol = 0.01, range = 1:20, eigengap = TRUE){
   }
   cmatrix <- GetEnsemble(data, tol, tau, n_prcs = 3, range = range, method = 'kmeans')
   eigs <- GetComponents(cmatrix, tol = 0.01)
-
+  
   # compute the largest eigengap
   gaps <- eigs$val[2:length(eigs$val)] - eigs$val[1:(length(eigs$val)-1)]
   upper_bound <- which(gaps == max(gaps))
-
+  
   # compute the number of zero eigenvalues
   lower_bound <- length(eigs$val[which(eigs$val <= tol)])
-
+  
   if(eigengap){
-    return(upper_bound)
+    return(list(n = upper_bound, eigs = eigs))
   } else {
-    return(lwer_bound)
+    return(list(n = lower_bound, eigs = eigs))
   }
 }
 
@@ -78,32 +78,32 @@ GetEnsemble <- function(data,
                         method = 'kmeans'){
   no_cores <- parallel::detectCores() - 1
   cl <- parallel::makeCluster(no_cores)
-
+  
   n_samples <- dim(data)[2]
   if(method == 'kmeans'){
     # reduce dimensionality
     prcs <- prcomp(t(data), center = TRUE)
-
+    
     # perform kmeans clustering over the range specified
     cluster_assign <- sapply(range, function(x){
       kmeans(prcs$x[,1:n_prcs], centers = x)$cluster
     })
-
-
+    
+    
     # generate consensus matrices
     parallel::clusterExport(cl, c("cluster_assign", "GetConsensus"), envir = environment())
     consen_list <- parallel::parLapply(cl,
-                             split(cluster_assign, col(cluster_assign)),
-                             function(x){
-                               GetConsensus(x)
-                             })
+                                       split(cluster_assign, col(cluster_assign)),
+                                       function(x){
+                                         GetConsensus(x)
+                                       })
     parallel::stopCluster(cl)
     # generate the ensemble
     consen <- Reduce("+", consen_list)
-
+    
     # truncate the ensemble consensus matrix
     consen[which(consen <= length(range) * tau)] <- 0
-
+    
     # normalize and make symmetric
     consen <- (consen + t(consen))/2
   }

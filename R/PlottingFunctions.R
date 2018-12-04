@@ -94,7 +94,7 @@ FeatureScatterPlot <- function(flat_embedding,
                                title,
                                subtitle,
                                featurename){
-  p <- ggplot2::ggplot(as.data.frame(flat_embedding), ggplot2::aes(x=V1, y=V2, color=feature)) +
+  p <- ggplot2::ggplot(as.data.frame(flat_embedding), ggplot2::aes(x=V1, y=V2, color=feature))
 
   if(!is.null(outputdir) && !is.null(outputfile)){
     # check if the dir exists and if not then create it
@@ -198,6 +198,8 @@ ViolinPlotExpression <- function(data,
   plot_data$cluster = with(plot_data, reorder(cluster, exp, mean))
   print(ggplot(plot_data, aes(x = cluster, y = exp, fill = cluster)) +
     geom_violin(alpha = 0.6) +
+    scale_fill_discrete() +
     theme(legend.position = 'none') +
-    labs(title = paste0("Expression of ", gene_name), x = "Cluster", y = "Relative Target Expression"))
+    labs(title = paste0("Expression of ", gene_name), x = "Cluster", y = "Relative Target Expression") +
+    geom_jitter(shape=16, position=position_jitter(0.2)))
 }

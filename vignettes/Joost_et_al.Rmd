@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+set.seed(13)
 ```
 
 This is an example of clustering, marker identification and pseudotime inference on a set of skin cells.
@@ -68,8 +69,20 @@ mapped <- RepresentationMap(similarity_matrix = sim$W,
 Infer cluster number using spectra of the ensemble Laplacian.
 
 ```{r, results='asis'}
-n_clusters <- CountClusters(data = sim$W)
+clust <- CountClusters(data = sim$W)
+n_clusters <- clust$n
 ```
+
+In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap.  We take this value as the cluster number here.
+
+```{r, results='asis'}
+plot(c(1:20), 
+     clust$eigs$val[1:20],
+     xlab = NA,
+     ylab = 'eigenvalues',
+     main = 'Eigenvalues of the Graph Laplacian')
+```
+
 
 Factor the similarity matrix such that W = HxH', using the computed cluster number for the rank of H.
 
@@ -102,7 +115,7 @@ FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
                          featurename = "Cluster ID")
 ```
 
-As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-KII, IFE-DII, IFE-KI were identified by standard techniques.
+As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-DII, IFE-KI, IFE-KII were identified by standard techniques.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 true_labels <- RSoptSC::GSE67602_Joost$annotation
@@ -116,15 +129,54 @@ FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
 
 ## Find cluster marker genes.
 
-Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters.  We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters. 
+Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters.  We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters.  The top six markers selected as described in Wang et. al.  As expected, markers Krt14, Krt10, and Lor are inferred for clusters overlapping with IHC-based Basal, Differentiated (IFE-DI, IFE-DII), and Keratinized (IFE-DI, IFE-DII) cell annotations.   
 
 ```{r, results='asis'}
-markers <- GetMarkerTable(counts_data = logdata,
+library(dplyr)
+n <- 6
+n_cells <- length(labels)
+
+
+markers <- GetMarkerTable(counts_data = GSE67602_Joost$data,
                           cluster_labels = labels,
                           H = H,
-                          gene_expression_threshold = gene_expression_threshold,
-                          n_features = n_features)
-heatplot <- MarkerHeatmap(logdata,labels,markers,n_markers = 5)
+                          gene_expression_threshold = 6,
+                          n_features = 20000)
+
+sorted_cell <- sort.int(labels, index.return = TRUE)
+
+markers_table <- as.data.frame(markers)
+sortedmarkers <- dplyr::arrange(markers_table, clusterId, desc(geneScore))
+sorted_gene_table <- tibble::as_tibble(sortedmarkers) %>% group_by(clusterId) %>% top_n(n, geneScore)
+sorted_gene <- sorted_gene_table$geneID
+
+plot_data <- GSE67602_Joost$data[sorted_gene, sorted_cell$ix]
+# plot_data[plot_data == 0] <- 1
+# plot_data <- scale(plot_data)
+
+rlabs <- GSE67602_Joost$gene_names[sorted_gene]
+
+clabs <- c(rep(NA, n_cells))
+counts <- as.matrix(table(labels))
+accumulator <- matrix(1, n_clusters, n_clusters)*lower.tri(matrix(1, n_clusters, n_clusters), diag = TRUE)
+last_cells <- accumulator %*% counts
+offset <- floor(counts/2)
+labeled_columns <- last_cells - offset
+clabs[labeled_columns] <- c(1:n_clusters)
+
+p <- gplots::heatmap.2(log10(plot_data+1),
+                  col = rev(brewer.pal(11,"RdBu")),
+                  trace = 'none',
+                  dendrogram='none',
+                  Rowv=FALSE, Colv=FALSE,
+                  labCol = clabs,
+                  labRow = rlabs,
+                  srtCol = 0,
+                  cexCol =1,
+                  cexRow = .7,
+                  lhei = c(1,3.5),
+                  key.title = NA,
+                  scale = "row")
 
 ```
 
@@ -158,6 +210,7 @@ root_cell <- FindRootCell(use_flat_dist = FALSE,
 Compute the directional minimum spanning tree on the cluster-cluster graph for visualization.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+library(ggnetwork)
 cluster_predecessors <- GetPredecessors(cluster_ptime$cluster_mst, cluster_ptime$root_cluster)
 cluster_dtree <- GetDominatorTree(cluster_predecessors, cluster_ptime$graph_cluster)
 PlotLineage(cluster_dtree)
@@ -179,7 +232,19 @@ FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
 
 ## Plot Gene Expression on the Flat Embedding
 
-Plot Expression of Krt10 in t-SNE Space:
+Plot Expression of Krt14, Krt10, and Lor in t-SNE Space:
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+gene_index <- which(gene_names == 'Krt14')
+labeling <- logdata[gene_index,]
+
+# plot features
+FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
+                    feature = labeling,
+                    title = "Krt14 Expression",
+                    subtitle = "t-SNE Embedding",
+                    featurename = "Log Krt14 Expression")
+```
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 gene_index <- which(gene_names == 'Krt10')
@@ -188,20 +253,48 @@ labeling <- logdata[gene_index,]
 # plot features
 FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
                     feature = labeling,
-                    title = "Gene Expression Labeling",
+                    title = "Krt10 Expression",
                     subtitle = "t-SNE Embedding",
-                    featurename = "Relative Krt10 Expression")
+                    featurename = "Log Krt10 Expression")
+```
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+gene_index <- which(gene_names == 'Lor')
+labeling <- logdata[gene_index,]
+
+# plot features
+FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
+                    feature = labeling,
+                    title = "Lor Expression",
+                    subtitle = "t-SNE Embedding",
+                    featurename = "Log Lor Expression")
 ```
 
 ## Plot Gene Expression Levels in Cells Grouped by Cluster
 
-Violin Plot of Krt10 Expression:
+Violin Plot of Krt14 expression.  Note strong expression of the basal compartment (clusters 1 and 6):
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+  ViolinPlotExpression(data = logdata,
+                       gene_names = gene_names,
+                       labels = labels,
+                       gene_name = "Krt14")
+```
+Violin Plot of Krt10 expression.  Note strong expression in the IFE-DI/DII compartments (clusters 2, 4, 5, 7):
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
                        labels = labels,
                        gene_name = "Krt10")
+```
+Violin Plot of Lor expression.  Note strong expression in cluster 3, which completely encompasses IFE-KI/KII compartments:
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+  ViolinPlotExpression(data = logdata,
+                       gene_names = gene_names,
+                       labels = labels,
+                       gene_name = "Lor")
 ```
 
 ## Analyze Signaling Mediated by a Ligand-Receptor Family
@@ -239,6 +332,23 @@ Now plot the previous result as a circos plot on the cells in the dataset, order
           nsample = nsample,
           plottitle = "Network Inference on the Activation and Suppression of Tgfb Targets ")
 ```
+Visualize the expression of ligand/receptor and up/down target expression across clusters
+
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=FALSE}
+  sigonly = FALSE   # If true => input is only signaler cells, and P will not be thresholded
+  subsample = FALSE
+  threshold = 0.05
+
+  Pc <- ClusterSig(P, sorted_cell$ix, sorted_cell$x)
+  
+  plotSig(Pc = Pmats$P_agg,
+          cluster_label = labels,
+          threshold = threshold,
+          sigonly = sigonly,
+          subsample = subsample,
+          plottitle = "Network Inference on the Activation and Suppression of Tgfb Targets ")
+```
+
 
 ### Accuracy of SoptSC Clustering
 Use adjusted rand index (ARI) and normalized mutual information (NMI) to assess performance:
