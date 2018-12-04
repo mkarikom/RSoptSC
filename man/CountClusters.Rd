@@ -19,7 +19,7 @@ consensus matrix}
 eigengap (upper bound) cluster count}
 }
 \value{
-the number of clusters
+the number of clusters and the vector of eigenvalues
 }
 \description{
 Use clustering consensus to infer cluster number

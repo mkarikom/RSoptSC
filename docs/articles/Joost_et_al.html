@@ -74,7 +74,7 @@
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2018-11-28</h4>
+            <h4 class="date">2018-12-03</h4>
       
       
       <div class="hidden name"><code>Joost_et_al.Rmd</code></div>
@@ -124,7 +124,15 @@ filtered_data &lt;-<span class="st"> </span><span class="kw"><a href="../referen
 <h2 class="hasAnchor">
 <a href="#cluster-the-cells" class="anchor"></a>Cluster the Cells</h2>
 <p>Infer cluster number using spectra of the ensemble Laplacian.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n_clusters &lt;-<span class="st"> </span><span class="kw"><a href="../reference/CountClusters.html">CountClusters</a></span>(<span class="dt">data =</span> sim<span class="op">$</span>W)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">clust &lt;-<span class="st"> </span><span class="kw"><a href="../reference/CountClusters.html">CountClusters</a></span>(<span class="dt">data =</span> sim<span class="op">$</span>W)
+n_clusters &lt;-<span class="st"> </span>clust<span class="op">$</span>n</code></pre></div>
+<p>In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap. We take this value as the cluster number here.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>), 
+     clust<span class="op">$</span>eigs<span class="op">$</span>val[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>],
+     <span class="dt">xlab =</span> <span class="ot">NA</span>,
+     <span class="dt">ylab =</span> <span class="st">'eigenvalues'</span>,
+     <span class="dt">main =</span> <span class="st">'Eigenvalues of the Graph Laplacian'</span>)</code></pre></div>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <p>Factor the similarity matrix such that W = HxH’, using the computed cluster number for the rank of H.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res &lt;-<span class="st"> </span>NMF<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/NMF/topics/nmf">nmf</a></span>(<span class="dt">x =</span> sim<span class="op">$</span>W,
               <span class="dt">rank =</span> n_clusters,
@@ -145,8 +153,8 @@ H &lt;-<span class="st"> </span>NMF<span class="op">::</span><span class="kw"><a
                          <span class="dt">title =</span> <span class="st">"NMF Cluster Labeling"</span>,
                          <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,
                          <span class="dt">featurename =</span> <span class="st">"Cluster ID"</span>)</code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-9-1.png" width="100%" height="100%"></p>
-<p>As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-KII, IFE-DII, IFE-KI were identified by standard techniques.</p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-10-1.png" width="100%" height="100%"></p>
+<p>As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-DII, IFE-KI, IFE-KII were identified by standard techniques.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">true_labels &lt;-<span class="st"> </span>RSoptSC<span class="op">::</span>GSE67602_Joost<span class="op">$</span>annotation
 <span class="co"># plot clusters</span>
 <span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> mapped<span class="op">$</span>flat_embedding,
@@ -154,20 +162,74 @@ H &lt;-<span class="st"> </span>NMF<span class="op">::</span><span class="kw"><a
                          <span class="dt">title =</span> <span class="st">"True Labeling"</span>,
                          <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,
                          <span class="dt">featurename =</span> <span class="st">"Annotated Cell Types"</span>)</code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-10-1.png" width="100%" height="100%"></p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-11-1.png" width="100%" height="100%"></p>
 </div>
 </div>
 <div id="find-cluster-marker-genes-" class="section level2">
 <h2 class="hasAnchor">
 <a href="#find-cluster-marker-genes-" class="anchor"></a>Find cluster marker genes.</h2>
-<p>Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters. We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">markers &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetMarkerTable.html">GetMarkerTable</a></span>(<span class="dt">counts_data =</span> logdata,
+<p>Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters. We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters. The top six markers selected as described in Wang et. al. As expected, markers Krt14, Krt10, and Lor are inferred for clusters overlapping with IHC-based Basal, Differentiated (IFE-DI, IFE-DII), and Keratinized (IFE-DI, IFE-DII) cell annotations.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'dplyr'</span>
+<span class="co">#&gt; The following object is masked from 'package:Biobase':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     combine</span>
+<span class="co">#&gt; The following objects are masked from 'package:BiocGenerics':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     combine, intersect, setdiff, union</span>
+<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     filter, lag</span>
+<span class="co">#&gt; The following objects are masked from 'package:base':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     intersect, setdiff, setequal, union</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(RColorBrewer)
+n &lt;-<span class="st"> </span><span class="dv">6</span>
+n_cells &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(labels)
+
+
+markers &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetMarkerTable.html">GetMarkerTable</a></span>(<span class="dt">counts_data =</span> GSE67602_Joost<span class="op">$</span>data,
                           <span class="dt">cluster_labels =</span> labels,
                           <span class="dt">H =</span> H,
-                          <span class="dt">gene_expression_threshold =</span> gene_expression_threshold,
-                          <span class="dt">n_features =</span> n_features)
-heatplot &lt;-<span class="st"> </span><span class="kw"><a href="../reference/MarkerHeatmap.html">MarkerHeatmap</a></span>(logdata,labels,markers,<span class="dt">n_markers =</span> <span class="dv">5</span>)</code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+                          <span class="dt">gene_expression_threshold =</span> <span class="dv">6</span>,
+                          <span class="dt">n_features =</span> <span class="dv">20000</span>)
+
+sorted_cell &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sort">sort.int</a></span>(labels, <span class="dt">index.return =</span> <span class="ot">TRUE</span>)
+
+markers_table &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.data.frame">as.data.frame</a></span>(markers)
+sortedmarkers &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(markers_table, clusterId, <span class="kw"><a href="http://dplyr.tidyverse.org/reference/desc.html">desc</a></span>(geneScore))
+sorted_gene_table &lt;-<span class="st"> </span>tibble<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/tibble/topics/as_tibble">as_tibble</a></span>(sortedmarkers) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(clusterId) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/top_n.html">top_n</a></span>(n, geneScore)
+sorted_gene &lt;-<span class="st"> </span>sorted_gene_table<span class="op">$</span>geneID
+
+plot_data &lt;-<span class="st"> </span>GSE67602_Joost<span class="op">$</span>data[sorted_gene, sorted_cell<span class="op">$</span>ix]
+<span class="co"># plot_data[plot_data == 0] &lt;- 1</span>
+<span class="co"># plot_data &lt;- scale(plot_data)</span>
+
+rlabs &lt;-<span class="st"> </span>GSE67602_Joost<span class="op">$</span>gene_names[sorted_gene]
+
+clabs &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="ot">NA</span>, n_cells))
+counts &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">as.matrix</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/table">table</a></span>(labels))
+accumulator &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dv">1</span>, n_clusters, n_clusters)<span class="op">*</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/lower.tri">lower.tri</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">matrix</a></span>(<span class="dv">1</span>, n_clusters, n_clusters), <span class="dt">diag =</span> <span class="ot">TRUE</span>)
+last_cells &lt;-<span class="st"> </span>accumulator <span class="op">%*%</span><span class="st"> </span>counts
+offset &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Round">floor</a></span>(counts<span class="op">/</span><span class="dv">2</span>)
+labeled_columns &lt;-<span class="st"> </span>last_cells <span class="op">-</span><span class="st"> </span>offset
+clabs[labeled_columns] &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span><span class="op">:</span>n_clusters)
+
+p &lt;-<span class="st"> </span>gplots<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/gplots/topics/heatmap.2">heatmap.2</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log10</a></span>(plot_data<span class="op">+</span><span class="dv">1</span>),
+                  <span class="dt">col =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rev">rev</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/RColorBrewer/topics/ColorBrewer">brewer.pal</a></span>(<span class="dv">11</span>,<span class="st">"RdBu"</span>)),
+                  <span class="dt">trace =</span> <span class="st">'none'</span>,
+                  <span class="dt">dendrogram=</span><span class="st">'none'</span>,
+                  <span class="dt">Rowv=</span><span class="ot">FALSE</span>, <span class="dt">Colv=</span><span class="ot">FALSE</span>,
+                  <span class="dt">labCol =</span> clabs,
+                  <span class="dt">labRow =</span> rlabs,
+                  <span class="dt">srtCol =</span> <span class="dv">0</span>,
+                  <span class="dt">cexCol =</span><span class="dv">1</span>,
+                  <span class="dt">cexRow =</span> .<span class="dv">7</span>,
+                  <span class="dt">lhei =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="fl">3.5</span>),
+                  <span class="dt">key.title =</span> <span class="ot">NA</span>,
+                  <span class="dt">scale =</span> <span class="st">"row"</span>)</code></pre></div>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 </div>
 <div id="pseudotime-inference" class="section level2">
 <h2 class="hasAnchor">
@@ -192,10 +254,12 @@ heatplot &lt;-<span class="st"> </span><span class="kw"><a href="../reference/Ma
 <h2 class="hasAnchor">
 <a href="#pseudotime-visualization" class="anchor"></a>Pseudotime Visualization</h2>
 <p>Compute the directional minimum spanning tree on the cluster-cluster graph for visualization.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cluster_predecessors &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetPredecessors.html">GetPredecessors</a></span>(cluster_ptime<span class="op">$</span>cluster_mst, cluster_ptime<span class="op">$</span>root_cluster)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggnetwork)
+<span class="co">#&gt; Loading required package: ggplot2</span>
+cluster_predecessors &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetPredecessors.html">GetPredecessors</a></span>(cluster_ptime<span class="op">$</span>cluster_mst, cluster_ptime<span class="op">$</span>root_cluster)
 cluster_dtree &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetDominatorTree.html">GetDominatorTree</a></span>(cluster_predecessors, cluster_ptime<span class="op">$</span>graph_cluster)
 <span class="kw"><a href="../reference/PlotLineage.html">PlotLineage</a></span>(cluster_dtree)</code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-14-1.png" width="100%" height="100%"></p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-15-1.png" width="100%" height="100%"></p>
 <p>Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pseudotime &lt;-<span class="st"> </span>mapped<span class="op">$</span>dist_graph[root_cell,]
 
@@ -205,32 +269,62 @@ cluster_dtree &lt;-<span class="st"> </span><span class="kw"><a href="../referen
                          <span class="dt">title =</span> <span class="st">"Pseudotime Labeling"</span>,
                          <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,
                          <span class="dt">featurename =</span> <span class="st">"Relative L2R2 Distance from Root"</span>)</code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-15-1.png" width="100%" height="100%"></p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-16-1.png" width="100%" height="100%"></p>
 </div>
 <div id="plot-gene-expression-on-the-flat-embedding" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-gene-expression-on-the-flat-embedding" class="anchor"></a>Plot Gene Expression on the Flat Embedding</h2>
-<p>Plot Expression of Krt10 in t-SNE Space:</p>
+<p>Plot Expression of Krt14, Krt10, and Lor in t-SNE Space:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Krt14'</span>)
+labeling &lt;-<span class="st"> </span>logdata[gene_index,]
+
+<span class="co"># plot features</span>
+<span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> mapped<span class="op">$</span>flat_embedding,
+                    <span class="dt">feature =</span> labeling,
+                    <span class="dt">title =</span> <span class="st">"Krt14 Expression"</span>,
+                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,
+                    <span class="dt">featurename =</span> <span class="st">"Log Krt14 Expression"</span>)</code></pre></div>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-17-1.png" width="100%" height="100%"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Krt10'</span>)
 labeling &lt;-<span class="st"> </span>logdata[gene_index,]
 
 <span class="co"># plot features</span>
 <span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> mapped<span class="op">$</span>flat_embedding,
                     <span class="dt">feature =</span> labeling,
-                    <span class="dt">title =</span> <span class="st">"Gene Expression Labeling"</span>,
+                    <span class="dt">title =</span> <span class="st">"Krt10 Expression"</span>,
                     <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,
-                    <span class="dt">featurename =</span> <span class="st">"Relative Krt10 Expression"</span>)</code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-16-1.png" width="100%" height="100%"></p>
+                    <span class="dt">featurename =</span> <span class="st">"Log Krt10 Expression"</span>)</code></pre></div>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-18-1.png" width="100%" height="100%"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Lor'</span>)
+labeling &lt;-<span class="st"> </span>logdata[gene_index,]
+
+<span class="co"># plot features</span>
+<span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> mapped<span class="op">$</span>flat_embedding,
+                    <span class="dt">feature =</span> labeling,
+                    <span class="dt">title =</span> <span class="st">"Lor Expression"</span>,
+                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,
+                    <span class="dt">featurename =</span> <span class="st">"Log Lor Expression"</span>)</code></pre></div>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-19-1.png" width="100%" height="100%"></p>
 </div>
 <div id="plot-gene-expression-levels-in-cells-grouped-by-cluster" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-gene-expression-levels-in-cells-grouped-by-cluster" class="anchor"></a>Plot Gene Expression Levels in Cells Grouped by Cluster</h2>
-<p>Violin Plot of Krt10 Expression:</p>
+<p>Violin Plot of Krt14 expression. Note strong expression of the basal compartment (clusters 1 and 6):</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,
+                       <span class="dt">gene_names =</span> gene_names,
+                       <span class="dt">labels =</span> labels,
+                       <span class="dt">gene_name =</span> <span class="st">"Krt14"</span>)</code></pre></div>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-20-1.png" width="100%" height="100%"> Violin Plot of Krt10 expression. Note strong expression in the IFE-DI/DII compartments (clusters 2, 4, 5, 7):</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,
                        <span class="dt">gene_names =</span> gene_names,
                        <span class="dt">labels =</span> labels,
                        <span class="dt">gene_name =</span> <span class="st">"Krt10"</span>)</code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-17-1.png" width="100%" height="100%"></p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-21-1.png" width="100%" height="100%"> Violin Plot of Lor expression. Note strong expression in cluster 3, which completely encompasses IFE-KI/KII compartments:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,
+                       <span class="dt">gene_names =</span> gene_names,
+                       <span class="dt">labels =</span> labels,
+                       <span class="dt">gene_name =</span> <span class="st">"Lor"</span>)</code></pre></div>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-22-1.png" width="100%" height="100%"></p>
 </div>
 <div id="analyze-signaling-mediated-by-a-ligand-receptor-family" class="section level2">
 <h2 class="hasAnchor">
@@ -264,7 +358,19 @@ labeling &lt;-<span class="st"> </span>logdata[gene_index,]
           <span class="dt">subsample =</span> subsample,
           <span class="dt">nsample =</span> nsample,
           <span class="dt">plottitle =</span> <span class="st">"Network Inference on the Activation and Suppression of Tgfb Targets "</span>)</code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-19-1.png" width="100%" height="100%"></p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-24-1.png" width="100%" height="100%"> Visualize the expression of ligand/receptor and up/down target expression across clusters</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  sigonly =<span class="st"> </span><span class="ot">FALSE</span>   <span class="co"># If true =&gt; input is only signaler cells, and P will not be thresholded</span>
+  subsample =<span class="st"> </span><span class="ot">FALSE</span>
+  threshold =<span class="st"> </span><span class="fl">0.05</span>
+
+  Pc &lt;-<span class="st"> </span><span class="kw">ClusterSig</span>(P, sorted_cell<span class="op">$</span>ix, sorted_cell<span class="op">$</span>x)
+  
+  <span class="kw"><a href="../reference/plotSig.html">plotSig</a></span>(<span class="dt">Pc =</span> Pmats<span class="op">$</span>P_agg,
+          <span class="dt">cluster_label =</span> labels,
+          <span class="dt">threshold =</span> threshold,
+          <span class="dt">sigonly =</span> sigonly,
+          <span class="dt">subsample =</span> subsample,
+          <span class="dt">plottitle =</span> <span class="st">"Network Inference on the Activation and Suppression of Tgfb Targets "</span>)</code></pre></div>
 </div>
 <div id="accuracy-of-soptsc-clustering" class="section level3">
 <h3 class="hasAnchor">

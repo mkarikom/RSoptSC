@@ -133,6 +133,7 @@ Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the marker
 
 ```{r, results='asis'}
 library(dplyr)
+library(RColorBrewer)
 n <- 6
 n_cells <- length(labels)
 
