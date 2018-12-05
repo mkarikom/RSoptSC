@@ -23,9 +23,9 @@ We present SoptSC, a similarity matrix optimization method for single-cell data 
 ## Installation
 
 ```{r, eval = FALSE}
-# Download the zip from GitHub and unzip
-# 
-devtools::install("path to unzipped file")
+# install.packages("devtools")
+library(devtools)
+install_github("mkarikom/RSoptSC")
 ```
 
 
