@@ -11,9 +11,9 @@ Installation
 ------------
 
 ``` r
-# Download the zip from GitHub and unzip
-# 
-devtools::install("path to unzipped file")
+install.packages("devtools")
+library(devtools)
+install_github("mkarikom/RSoptSC")
 ```
 
 Features
