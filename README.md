@@ -3,9 +3,13 @@
 RSoptSC
 =======
 
-<img src="man/figures/logo.svg" width="100%" />
+<img src="man/figures/logo.svg" width="60%" />
 
-We present SoptSC, a similarity matrix optimization method for single-cell data analysis, which performs clustering, pseudotemporal ordering, lineage and marker gene identification from a cell similarity matrix. SoptSC also presents a new function: cell-cell signaling network inference, enabling the reconstruction of complex lineage relationships and associated feedback/feedforward interactions. As we show by application to several datasets, SoptSC can predict the number of clusters and the initial state unsupervised, and outperforms current methods for inference of clusters and pseudotime from single-cell data. Learn more at `vignette("Joost_et_al")`.
+RSoptSC is an R package for SoptSC: performing analysis and prediction on single-cell RNA sequencing (scRNA-seq) data. SoptSC can infer cell-cell communication between single cells, and completes multiple single-cell analysis tasks from a single coherent framework. This enables the reconstruction of complex lineage relationships alongside prediction of specific feedback or feedforward interactions.
+
+-   Demo SoptSC at `vignette("Joost_et_al")`
+
+-   Read the SoptSC preprint on [bioRxiv](https://www.biorxiv.org/content/early/2018/05/12/168922)
 
 Installation
 ------------
