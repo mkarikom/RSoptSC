@@ -139,7 +139,7 @@ computM <- function(D,X,lambda){
 
     if (iter >= 3){
       if (Err[iter-1,1] >= Err[iter-2,1] || norm(as.matrix(X-X%*%Z),"2") <= epsilon){
-        print("not reach epsilon")
+        print("convergence by error min")
         return(list(Z = Z, E = norm(X-X%*%Z,"f")))
       }
     }

@@ -29,7 +29,7 @@ RepresentationMap <- function(flat_embedding = NULL, similarity_matrix, join_com
     set.seed(1)
     # initialize with low dim embedding
     print("computing flat embedding")
-    lat_pc = prcomp(sim$W, center = TRUE)
+    lat_pc = prcomp(similarity_matrix, center = TRUE)
     flat_embedding = Rtsne::Rtsne(X = lat_pc$x[,1:2],
                                   perplexity = 35,
                                   pca_center = TRUE,

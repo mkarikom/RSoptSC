@@ -55,13 +55,13 @@ filtered_data <- SelectData(logdata, gene_expression_threshold, n_features)
 Run L2R2 on the processed data, outputting the number of iterations and value of the objective.
 
 ```{r, results='asis'}
-sim <- SimilarityM(lambda = 0.05, data = filtered_data$M_variable)
+S <- SimilarityM(lambda = 0.05, data = filtered_data$M_variable)
 ```
 
 Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
 
 ```{r, results='asis'}
-mapped <- RepresentationMap(similarity_matrix = sim$W,
+low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
                             join_components = TRUE)
 ```
 
@@ -70,15 +70,16 @@ mapped <- RepresentationMap(similarity_matrix = sim$W,
 Infer cluster number using spectra of the ensemble Laplacian.
 
 ```{r, results='asis'}
-clust <- CountClusters(data = sim$W)
-n_clusters <- clust$n
+clusters_evalues <- CountClusters(data = S$W)
+n_clusters <- clusters_evalues$n
 ```
 
 In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap.  We take this value as the cluster number here.
 
 ```{r, results='asis'}
+par(mar=c(1,1,1,1))
 plot(c(1:20), 
-     clust$eigs$val[1:20],
+     clusters_evalues$eigs$val[1:20],
      xlab = NA,
      ylab = 'eigenvalues',
      main = 'Eigenvalues of the Graph Laplacian')
@@ -88,12 +89,12 @@ plot(c(1:20),
 Factor the similarity matrix such that W = HxH', using the computed cluster number for the rank of H.
 
 ```{r, results='asis', warning=FALSE}
-res <- NMF::nmf(x = sim$W,
+output_NMF <- NMF::nmf(x = S$W,
               rank = n_clusters,
               method = 'lee',
               seed = 'nndsvd',
               .options = 'nP');
-H <- NMF::basis(res)
+H <- NMF::basis(output_NMF)
 ```
 
 Assign cluster labels to the cells.
@@ -109,7 +110,8 @@ Cells are labeled by cluster membership and plotted on low-dimensional embedding
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 # plot clusters
-FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
+par(mar=c(1,1,1,1))
+FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = as.factor(labels),
                          title = "NMF Cluster Labeling",
                          subtitle = "t-SNE Embedding",
@@ -121,7 +123,8 @@ As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 true_labels <- RSoptSC::GSE67602_Joost$annotation
 # plot clusters
-FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
+par(mar=c(1,1,1,1))
+FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = as.factor(true_labels),
                          title = "True Labeling",
                          subtitle = "t-SNE Embedding",
@@ -135,6 +138,7 @@ Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the marker
 ```{r, results='asis'}
 library(dplyr)
 library(RColorBrewer)
+par(mar=c(1,1,1,1))
 n <- 6
 n_cells <- length(labels)
 
@@ -188,9 +192,9 @@ Compute cluster-cluster graph and find the root cluster.
 
 ```{r, results='asis'}
 cluster_ptime <- FindRootCluster(cluster_labels = labels,
-                                 flat_embedding = mapped$flat_embedding,
-                                 dist_graph = mapped$dist_graph,
-                                 dist_flat = mapped$dist_flat,
+                                 flat_embedding = low_dim_mapping$flat_embedding,
+                                 dist_graph = low_dim_mapping$dist_graph,
+                                 dist_flat = low_dim_mapping$dist_flat,
                                  reverse = TRUE)
 ```
 
@@ -201,8 +205,8 @@ root_cell <- FindRootCell(use_flat_dist = FALSE,
                           cluster_order_by = "distance",
                           cell_order_by = "distance",
                           graph_cluster_mst = cluster_ptime$cluster_mst,
-                          dist_graph  = mapped$dist_graph,
-                          dist_flat = mapped$dist_flat,
+                          dist_graph  = low_dim_mapping$dist_graph,
+                          dist_flat = low_dim_mapping$dist_flat,
                           cluster_labels = labels,
                           root_cluster = cluster_ptime$root_cluster)
 ```
@@ -213,6 +217,7 @@ Compute the directional minimum spanning tree on the cluster-cluster graph for v
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 library(ggnetwork)
+par(mar=c(1,1,1,1))
 cluster_predecessors <- GetPredecessors(cluster_ptime$cluster_mst, cluster_ptime$root_cluster)
 cluster_dtree <- GetDominatorTree(cluster_predecessors, cluster_ptime$graph_cluster)
 PlotLineage(cluster_dtree)
@@ -222,10 +227,11 @@ PlotLineage(cluster_dtree)
 Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-pseudotime <- mapped$dist_graph[root_cell,]
+pseudotime <- low_dim_mapping$dist_graph[root_cell,]
 
 # plot pseudotime
-FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
+par(mar=c(1,1,1,1))
+FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = pseudotime,
                          title = "Pseudotime Labeling",
                          subtitle = "t-SNE Embedding",
@@ -238,11 +244,12 @@ Plot Expression of Krt14, Krt10, and Lor in t-SNE Space:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 gene_index <- which(gene_names == 'Krt14')
-labeling <- logdata[gene_index,]
+data_gene <- logdata[gene_index,]
 
 # plot features
-FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
-                    feature = labeling,
+par(mar=c(1,1,1,1))
+FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
+                    feature = data_gene,
                     title = "Krt14 Expression",
                     subtitle = "t-SNE Embedding",
                     featurename = "Log Krt14 Expression")
@@ -250,11 +257,12 @@ FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 gene_index <- which(gene_names == 'Krt10')
-labeling <- logdata[gene_index,]
+data_gene <- logdata[gene_index,]
 
 # plot features
-FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
-                    feature = labeling,
+par(mar=c(1,1,1,1))
+FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
+                    feature = data_gene,
                     title = "Krt10 Expression",
                     subtitle = "t-SNE Embedding",
                     featurename = "Log Krt10 Expression")
@@ -262,11 +270,12 @@ FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 gene_index <- which(gene_names == 'Lor')
-labeling <- logdata[gene_index,]
+data_gene <- logdata[gene_index,]
 
 # plot features
-FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
-                    feature = labeling,
+par(mar=c(1,1,1,1))
+FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
+                    feature = data_gene,
                     title = "Lor Expression",
                     subtitle = "t-SNE Embedding",
                     featurename = "Log Lor Expression")
@@ -277,6 +286,7 @@ FeatureScatterPlot(flat_embedding = mapped$flat_embedding,
 Violin Plot of Krt14 expression.  Note strong expression of the basal compartment (clusters 1 and 6):
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+  par(mar=c(1,1,1,1))
   ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
                        labels = labels,
@@ -285,6 +295,7 @@ Violin Plot of Krt14 expression.  Note strong expression of the basal compartmen
 Violin Plot of Krt10 expression.  Note strong expression in the IFE-DI/DII compartments (clusters 2, 4, 5, 7):
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+  par(mar=c(1,1,1,1))
   ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
                        labels = labels,
@@ -293,6 +304,7 @@ Violin Plot of Krt10 expression.  Note strong expression in the IFE-DI/DII compa
 Violin Plot of Lor expression.  Note strong expression in cluster 3, which completely encompasses IFE-KI/KII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+  par(mar=c(1,1,1,1))
   ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
                        labels = labels,
@@ -321,6 +333,7 @@ We present a family of ligan-receptor pairs along with their up/down-regulated t
 Now plot the previous result as a circos plot on the cells in the dataset, ordered by cluster.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+  par(mar=c(1,1,1,1))
   sigonly = FALSE   # If true => input is only signaler cells, and P will not be thresholded
   subsample = TRUE
   threshold = 0.05
@@ -335,4 +348,39 @@ Now plot the previous result as a circos plot on the cells in the dataset, order
           plottitle = "Network Inference on the Activation and Suppression of Tgfb Targets ")
 ```
 
+### Heatmap of Signaling Marker Expression
 
+Visualize the expression of ligand/receptor and up/down target expression across clusters
+
+```{r, results='asis', warning=FALSE, message= FALSE, out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+  par(mar=c(1,1,1,1))
+  sigonly = FALSE   # If true => input is only signaler cells, and P will not be thresholded
+  subsample = FALSE
+  threshold = 0.05
+  gene_list = c('Tgfb1', 'Tgfb2', 
+                'Tgfbr1', 'Tgfbr2',
+                'Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1',
+                'Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1')
+  
+  filtered <- HeatSig(M = GSE67602_Joost$data,
+                      gene_names = GSE67602_Joost$gene_names,
+                      cell_order = sorted_cell$ix,
+                      cell_labels = labels,
+                      gene_list = gene_list)
+  clabs <- c(1:n_clusters)
+  rlabs <- gene_list
+  
+  p <- gplots::heatmap.2(log10(t(filtered) + 1),
+                         col = rev(brewer.pal(11,"RdBu")),
+                         trace = 'none',
+                         dendrogram='none',
+                         Rowv=FALSE, Colv=FALSE,
+                         labCol = clabs,
+                         labRow = rlabs,
+                         srtCol = 0,
+                         cexCol =1,
+                         cexRow = .7,
+                         lhei = c(1,2),
+                         key.title = NA,
+                         scale = "row")
+```
