@@ -7,3 +7,4 @@ doc
 *.Rproj
 .Rproj.user
 inst/doc
+test/testthat/backupclusterlabel.rds
