@@ -138,7 +138,8 @@ Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the marker
 ```{r, results='asis'}
 library(dplyr)
 library(RColorBrewer)
-par(mar=c(1,1,1,1))
+
+#par(mar=c(1,1,1,1))
 n <- 6
 n_cells <- length(labels)
 
@@ -178,9 +179,9 @@ p <- gplots::heatmap.2(log10(plot_data+1),
                   labCol = clabs,
                   labRow = rlabs,
                   srtCol = 0,
-                  cexCol =1,
-                  cexRow = .7,
-                  lhei = c(1,3.5),
+                  #cexCol =1,
+                  #cexRow = .7,
+                  #lhei = c(1,3.5),
                   key.title = NA,
                   scale = "row")
 
