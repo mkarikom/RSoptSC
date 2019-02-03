@@ -42,7 +42,7 @@ test_that("added inter-component edges correctly", {
   expect_equal(connected_graph, RSoptSC::GuoPtime$Values$W_graph)
 })
 
-test_that("mapping is correct, when components have been previously joined", {
+test_that("mapping is correct, when components are not joined", {
   mapping <- RepresentationMap(flat_embedding = RSoptSC::GuoPtime$Params$latent,
                                similarity_matrix = RSoptSC::GuoPtime$Params$W,
                                join_components = FALSE)
@@ -57,4 +57,22 @@ test_that("mapping is correct, when components have been previously joined", {
   expect_equal(mapping$sizes, RSoptSC::GuoPtime$Values$sizes)
   expect_equal(mapping$members, mem)
 
+})
+
+test_that("mapping is correct, when components are joined", {
+  mapping <- RepresentationMap(flat_embedding = RSoptSC::GuoPtime$Params$latent,
+                               similarity_matrix = RSoptSC::GuoPtime$Params$W,
+                               join_components = TRUE)
+  mem <- RSoptSC::GuoPtime$Values$members
+  mem <- lapply(mem, function(x) sort(x))
+  mem <- mem[order(sapply(mem, length), decreasing=FALSE)]
+  
+  expect_equal(mapping$dist_flat, RSoptSC::GuoPtime$Values$low_dis, check.attributes = FALSE)
+  expect_equal(mapping$dist_graph, RSoptSC::GuoPtime$Values$Short_pathd)
+  expect_equal(mapping$adj_matrix, RSoptSC::GuoPtime$Values$W_graph)
+  expect_equal(mapping$n_components, RSoptSC::GuoPtime$Values$nComponents)
+  expect_equal(mapping$sizes, RSoptSC::GuoPtime$Values$sizes)
+  expect_equal(mapping$members, mem)
+  print("joined")
+  
 })

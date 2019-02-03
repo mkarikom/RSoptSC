@@ -61,8 +61,19 @@ S <- SimilarityM(lambda = 0.05, data = filtered_data$M_variable)
 Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
 
 ```{r, results='asis'}
+# perplexity = perplexity,
+#                                   pca_center = TRUE,
+#                                   pca_scale = TRUE,
+#                                   dims = 2
 low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
-                            join_components = TRUE)
+                            join_components = FALSE,
+                            perplexity = 50,
+                            theta = 0.5,
+                            normalize = FALSE,
+                            pca = TRUE,
+                            pca_center = TRUE,
+                            pca_scale = TRUE,
+                            dims = 2)
 ```
 
 ## Cluster the Cells
@@ -106,16 +117,22 @@ labels <- apply(H, 1, function(x){
 
 
 ### Visualize the Clusters
+
 Cells are labeled by cluster membership and plotted on low-dimensional embedding (t-SNE) of the similarity matrix.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+# define a scheme for the coloring.  This is a required parameter for plotting discrete (factor) data
+colorscale <- ColorHue(n = length(unique(labels)))
+colorscale <- colorscale$hex.1.n.
+
 # plot clusters
 par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = as.factor(labels),
                          title = "NMF Cluster Labeling",
                          subtitle = "t-SNE Embedding",
-                         featurename = "Cluster ID")
+                         featurename = "Cluster ID",
+                         colorscale = colorscale)
 ```
 
 As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-DII, IFE-KI, IFE-KII were identified by standard techniques.
@@ -133,58 +150,21 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 
 ## Find cluster marker genes.
 
-Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters.  We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters.  The top six markers selected as described in Wang et. al.  As expected, markers Krt14, Krt10, and Lor are inferred for clusters overlapping with IHC-based Basal, Differentiated (IFE-DI, IFE-DII), and Keratinized (IFE-DI, IFE-DII) cell annotations.   
+Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters.  We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters.  The top six markers selected as described in Wang et. al.  As expected, markers Krt14, Krt10, and Lor are inferred for clusters overlapping with IHC-based Basal, Differentiated (IFE-DI, IFE-DII), and Keratinized (IFE-KI, IFE-KII) cell annotations.   
 
-```{r, results='asis'}
-library(dplyr)
-library(RColorBrewer)
+```{r, fig.width=7, fig.height=7}
 
-#par(mar=c(1,1,1,1))
-n <- 6
-n_cells <- length(labels)
-
-
-markers <- GetMarkerTable(counts_data = GSE67602_Joost$data,
+markers <- GetMarkerTable(counts_data = logdata,
                           cluster_labels = labels,
                           H = H,
                           gene_expression_threshold = 6,
                           n_features = 20000)
 
-sorted_cell <- sort.int(labels, index.return = TRUE)
-
-markers_table <- as.data.frame(markers)
-sortedmarkers <- dplyr::arrange(markers_table, clusterId, desc(geneScore))
-sorted_gene_table <- tibble::as_tibble(sortedmarkers) %>% group_by(clusterId) %>% top_n(n, geneScore)
-sorted_gene <- sorted_gene_table$geneID
-
-plot_data <- GSE67602_Joost$data[sorted_gene, sorted_cell$ix]
-# plot_data[plot_data == 0] <- 1
-# plot_data <- scale(plot_data)
-
-rlabs <- GSE67602_Joost$gene_names[sorted_gene]
-
-clabs <- c(rep(NA, n_cells))
-counts <- as.matrix(table(labels))
-accumulator <- matrix(1, n_clusters, n_clusters)*lower.tri(matrix(1, n_clusters, n_clusters), diag = TRUE)
-last_cells <- accumulator %*% counts
-offset <- floor(counts/2)
-labeled_columns <- last_cells - offset
-clabs[labeled_columns] <- c(1:n_clusters)
-
-p <- gplots::heatmap.2(log10(plot_data+1),
-                  col = rev(brewer.pal(11,"RdBu")),
-                  trace = 'none',
-                  dendrogram='none',
-                  Rowv=FALSE, Colv=FALSE,
-                  labCol = clabs,
-                  labRow = rlabs,
-                  srtCol = 0,
-                  #cexCol =1,
-                  #cexRow = .7,
-                  #lhei = c(1,3.5),
-                  key.title = NA,
-                  scale = "row")
-
+PlotTopN(data = logdata,
+         gene_names = gene_names,
+         cluster_labels = labels,
+         markers = markers,
+         n_features = 6)
 ```
 
 ## Pseudotime Inference
@@ -293,7 +273,7 @@ Violin Plot of Krt14 expression.  Note strong expression of the basal compartmen
                        labels = labels,
                        gene_name = "Krt14")
 ```
-Violin Plot of Krt10 expression.  Note strong expression in the IFE-DI/DII compartments (clusters 2, 4, 5, 7):
+Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/DII compartments (clusters 2, 4, 5, 7).  Note that the mixed expression of Krt10 in cluster 3, which may indicate a population of cells whose global expression profile marks an intermediate state prior to the fully differentiated keratinized layer:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
@@ -316,37 +296,38 @@ Violin Plot of Lor expression.  Note strong expression in cluster 3, which compl
 
 We present a family of ligan-receptor pairs along with their up/down-regulated targets.  We compute the probability of intercellular interaction based on this pathway.
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-  ligands <- list(Tgfb1 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'),
-                                             down = list('Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1')),
-                               Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'),
-                                             down = list('Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1'))),
-                  Tgfb2 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'),
-                                             down = list('Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1')),
-                               Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'),
-                                             down = list('Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1'))))
+```{r, results='hide', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7,echo=FALSE, message=FALSE}
+  ligands <- list(Tgfb1 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')),
+                               Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'))),
+                  Tgfb2 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')),
+                               Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'))))
   Pmats <- GetSignalingPartners(logdata,
                                   gene_names,
                                   ligands)
 ```
 
 ### Circos Plot of Intercellular Network
-Now plot the previous result as a circos plot on the cells in the dataset, ordered by cluster.
+Now plot the previous result as a circos plot on the top five ligand-producing and top five receptor-bearing cells from every cluster.  The upper hemisphere of the plot shows receptor-bearing cells.  The chords of the plot are colored by the ligand-producing cells in the lower hemisphere.
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, out.height='100%', out.width='100%'}
   par(mar=c(1,1,1,1))
-  sigonly = FALSE   # If true => input is only signaler cells, and P will not be thresholded
-  subsample = TRUE
-  threshold = 0.05
-  nsample = 100
 
-  plotSig(P = Pmats$P_agg,
-          cluster_label = labels,
-          threshold = threshold,
-          sigonly = sigonly,
-          subsample = subsample,
-          nsample = nsample,
-          plottitle = "Network Inference on the Activation and Suppression of Tgfb Targets ")
+SigPlot(P = Pmats$P_agg,
+        cluster_labels = labels,
+        lig_cells_per_cluster = 5,
+        rec_cells_per_cluster = 5,
+        rgb_gap = 0.60)
+```
+
+### Circos Plot of Intercluster Network
+Directional plot of cluster-to-cluster signaling.  The root of the directional chord is raised.
+
+```{r, out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+  cluster_P <- ClusterSig(Pmats$P_agg,
+                          cluster_labels = labels)
+  SigPlot(P = cluster_P,
+          cluster_labels = c(1:n_clusters),
+          rgb_gap = 0.60)
 ```
 
 ### Heatmap of Signaling Marker Expression
@@ -355,33 +336,13 @@ Visualize the expression of ligand/receptor and up/down target expression across
 
 ```{r, results='asis', warning=FALSE, message= FALSE, out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
-  sigonly = FALSE   # If true => input is only signaler cells, and P will not be thresholded
-  subsample = FALSE
-  threshold = 0.05
+
   gene_list = c('Tgfb1', 'Tgfb2', 
                 'Tgfbr1', 'Tgfbr2',
-                'Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1',
-                'Crebbp','Fos','Id1','Jun','Runx1','Smad1','Smad5','Sox4','Cdh1')
-  
-  filtered <- HeatSig(M = GSE67602_Joost$data,
-                      gene_names = GSE67602_Joost$gene_names,
-                      cell_order = sorted_cell$ix,
-                      cell_labels = labels,
-                      gene_list = gene_list)
-  clabs <- c(1:n_clusters)
-  rlabs <- gene_list
-  
-  p <- gplots::heatmap.2(log10(t(filtered) + 1),
-                         col = rev(brewer.pal(11,"RdBu")),
-                         trace = 'none',
-                         dendrogram='none',
-                         Rowv=FALSE, Colv=FALSE,
-                         labCol = clabs,
-                         labRow = rlabs,
-                         srtCol = 0,
-                         cexCol =1,
-                         cexRow = .7,
-                         lhei = c(1,2),
-                         key.title = NA,
-                         scale = "row")
+                'Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')
+
+  PlotClusterExpression(data = logdata,
+                        gene_names = gene_names,
+                        cluster_labels = labels, 
+                        markers = gene_list)
 ```

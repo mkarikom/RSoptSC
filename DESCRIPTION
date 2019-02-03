@@ -19,7 +19,6 @@ Imports:
     psych (>= 1.8.4),
     ggplot2 (>= 3.0.0),
     Matrix (>= 1.2-14),
-    tsne (>= 0.1-3),
     Rtsne (>= 0.13),
     pracma (>= 2.1.4),
     RSpectra (>= 0.13-1),
@@ -28,10 +27,6 @@ Imports:
     dplyr (>= 0.7.6),
     gplots (>= 3.0.1),
     magrittr (>= 1.5),
-    ggnetwork (>= 0.5.1),
-    sna (>= 2.4),
-    network (>= 1.13.0.1),
-    intergraph (>= 2.0-2),
     circlize (>= 0.4.4),
     ClusterR (>= 1.1.6),
     xtable (>= 1.8-3)

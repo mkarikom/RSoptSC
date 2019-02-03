@@ -6,7 +6,7 @@
 representations of the data are necessary for subsequent lineage analysis}
 \usage{
 RepresentationMap(flat_embedding = NULL, similarity_matrix,
-  join_components = TRUE)
+  join_components = TRUE, ...)
 }
 \arguments{
 \item{flat_embedding}{optionally provided low dim embedding, if not then 2d tsne will be used}
@@ -14,6 +14,8 @@ RepresentationMap(flat_embedding = NULL, similarity_matrix,
 \item{similarity_matrix}{the graphical embedding of the cells}
 
 \item{join_components}{boolean, whether or not to join disconnected components of the similarity matrix}
+
+\item{...}{arguments to called functions}
 }
 \value{
 a list containing:

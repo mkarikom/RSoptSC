@@ -32,8 +32,7 @@
 
 <meta property="og:title" content="Produce a scatter plot of the cells on selected 2-dim ebedding colored by feature — FeatureScatterPlot" />
 
-<meta property="og:description" content="If an output dir and filename are provided, a plot will
-be saved" />
+<meta property="og:description" content="Create a scatter plot of the data.  If discrete (factor) data is passed, the colorscale parameter must be provided, otherwise the plot will default to gradient shading." />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -123,13 +122,12 @@ be saved" />
 
     <div class="ref-description">
     
-    <p>If an output dir and filename are provided, a plot will
-be saved</p>
+    <p>Create a scatter plot of the data.  If discrete (factor) data is passed, the colorscale parameter must be provided, otherwise the plot will default to gradient shading.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>FeatureScatterPlot</span>(<span class='no'>flat_embedding</span>, <span class='no'>feature</span>, <span class='kw'>outputdir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>outputfile</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>title</span>, <span class='no'>subtitle</span>, <span class='no'>featurename</span>)</pre>
+    <pre class="usage"><span class='fu'>FeatureScatterPlot</span>(<span class='no'>flat_embedding</span>, <span class='no'>feature</span>, <span class='no'>title</span>, <span class='no'>subtitle</span>, <span class='no'>featurename</span>,
+  <span class='kw'>colorscale</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -143,14 +141,6 @@ be saved</p>
       <td><p>a scalar representation of feature</p></td>
     </tr>
     <tr>
-      <th>outputdir</th>
-      <td><p>the output directory, relative to getwd()</p></td>
-    </tr>
-    <tr>
-      <th>outputfile</th>
-      <td><p>the output file</p></td>
-    </tr>
-    <tr>
       <th>title</th>
       <td><p>the title of the plot</p></td>
     </tr>
@@ -161,6 +151,10 @@ be saved</p>
     <tr>
       <th>featurename</th>
       <td><p>the name of the feature to title the legend</p></td>
+    </tr>
+    <tr>
+      <th>colorscale</th>
+      <td><p>color scale for discrete data</p></td>
     </tr>
     </table>
     
@@ -187,7 +181,7 @@ be saved</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
 </div>
       </footer>
    </div>

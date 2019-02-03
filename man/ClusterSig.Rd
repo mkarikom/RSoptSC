@@ -4,14 +4,14 @@
 \alias{ClusterSig}
 \title{Average cluster to cluster gene expression}
 \usage{
-ClusterSig(P, cell_order, cell_labels)
+ClusterSig(P, cluster_labels, remove_zeros = TRUE)
 }
 \arguments{
 \item{P}{signaling probabilities cells x cells}
 
-\item{cell_order}{permutation of the labels of P, cells ordered by cluster}
+\item{cluster_labels}{labels of cells 1:n}
 
-\item{cell_labels}{cluster labels of the permuted cells}
+\item{remove_zeros}{boolean whether to remove zero rows from the P matrix}
 }
 \description{
 Average cluster to cluster gene expression

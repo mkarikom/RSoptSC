@@ -4,7 +4,8 @@
 \alias{ViolinPlotExpression}
 \title{Produce a violin plot of gene expression}
 \usage{
-ViolinPlotExpression(data, gene_names, labels, gene_name)
+ViolinPlotExpression(data, gene_names, labels, gene_name,
+  colorscale = NULL)
 }
 \arguments{
 \item{data}{a matrix with genes in rows and cells in columns}
@@ -14,6 +15,8 @@ ViolinPlotExpression(data, gene_names, labels, gene_name)
 \item{labels}{a vector of cluster assignments for the cells}
 
 \item{gene_name}{the name of the gene to plot}
+
+\item{colorscale}{optionally provided color scale}
 }
 \value{
 nothing

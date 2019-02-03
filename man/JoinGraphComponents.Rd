@@ -32,4 +32,5 @@ my_matrix <- JoinGraphComponents(root_cell = RSoptSC::GuoPtime$Values$root_cell0
     flat_distances = RSoptSC::GuoPtime$Values$low_dis,
     n_components = RSoptSC::GuoPtime$Values$nComponents,
     component_members = RSoptSC::GuoPtime$Values$members)
+    
 }

@@ -4,28 +4,25 @@
 \alias{FeatureScatterPlot}
 \title{Produce a scatter plot of the cells on selected 2-dim ebedding colored by feature}
 \usage{
-FeatureScatterPlot(flat_embedding, feature, outputdir = NULL,
-  outputfile = NULL, title, subtitle, featurename)
+FeatureScatterPlot(flat_embedding, feature, title, subtitle, featurename,
+  colorscale = NULL)
 }
 \arguments{
 \item{flat_embedding}{a low dim embedding of cells}
 
 \item{feature}{a scalar representation of feature}
 
-\item{outputdir}{the output directory, relative to getwd()}
-
-\item{outputfile}{the output file}
-
 \item{title}{the title of the plot}
 
 \item{subtitle}{the subtitle of the plot}
 
 \item{featurename}{the name of the feature to title the legend}
+
+\item{colorscale}{color scale for discrete data}
 }
 \value{
 a ggplot2 object
 }
 \description{
-If an output dir and filename are provided, a plot will
-be saved
+Create a scatter plot of the data.  If discrete (factor) data is passed, the colorscale parameter must be provided, otherwise the plot will default to gradient shading.
 }
