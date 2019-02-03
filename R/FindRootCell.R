@@ -1,4 +1,4 @@
-#' Infer the root cell
+#' Find the root cell
 #'
 #' Use either the primary manifold embedding of cell similarity to find the root cell by cluster-cell rank-correlation
 #' or use the flattened representation of this embedding to find the root cell by maximum separation heuristic

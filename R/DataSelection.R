@@ -1,4 +1,5 @@
 #' Return a set of the most variable genes
+#' 
 #' First filter using the expression threshold
 #' Then use the coefficient of the top variance PCA components
 #' to determine the variability of the gene

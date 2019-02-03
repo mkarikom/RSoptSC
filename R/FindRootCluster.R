@@ -1,7 +1,6 @@
-#' Find the root cluster, given a weighted adjacency matrix
-#' Generate a cluser-to-cluster graph based on a similarity-matrix of connected cells
-#' Generate the minimum spanning tree on the cluster-to-cluster graph
-#' Use one of the max dist clusters from this graph, unless
+#' Find the root cluster
+#' 
+#' Given a weighted adjacency matrix, generate a cluser-to-cluster graph based on a similarity-matrix of connected cells.  Generate the minimum spanning tree on the cluster-to-cluster graph.  Use one of the max dist clusters from this graph, unless:
 #'     The cluster is given, then proceed to find the root cell
 #'     The root cell is given, then use its cluster
 #'
