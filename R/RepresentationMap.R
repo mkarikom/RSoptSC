@@ -16,11 +16,6 @@
 #'     \item{sizes}{sizes of components in \code{components}}
 #'     \item{members}{list of members of \code{components}, sorted by component size and member index}
 #'
-#'
-#' @examples embeddings <- RepresentationMap(flat_embedding = RSoptSC::GuoPtime$Params$latent,
-#'     similarity_matrix = RSoptSC::GuoPtime$Params$W,
-#'     join_components = FALSE)
-#'
 #' @export
 #'
 RepresentationMap <- function(flat_embedding = NULL,

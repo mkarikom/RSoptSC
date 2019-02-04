@@ -15,13 +15,6 @@
 #'     \item{root_cluster}{index of the root cluster}
 #'     \item{cluster_mst}{an igraph mst object}
 #'
-#'
-#' @examples FindRootCluster(cluster_labels = RSoptSC::GuoPtime$Params$cluster_label,
-#'           flat_embedding = RSoptSC::GuoPtime$Params$latent,
-#'           dist_graph = RSoptSC::GuoPtime$Values$Short_pathd,
-#'           dist_flat = RSoptSC::GuoPtime$Values$low_dis,
-#'           reverse = FALSE)
-#'
 #' @export
 #'
 FindRootCluster <- function(cluster_labels, 

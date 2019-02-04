@@ -17,7 +17,3 @@ a vector[] of node ids, where vector[i] is the predecessor of node i
 \description{
 Get the predecessor vector for a dominator tree encoded as an undirected tree and root
 }
-\examples{
-predecessors <- GetPredecessors(minspantree = RSoptSC::GuoPtimeFull$mst, root = 6)
-
-}

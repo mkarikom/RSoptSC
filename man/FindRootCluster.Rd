@@ -2,12 +2,7 @@
 % Please edit documentation in R/FindRootCluster.R
 \name{FindRootCluster}
 \alias{FindRootCluster}
-\title{Find the root cluster, given a weighted adjacency matrix
-Generate a cluser-to-cluster graph based on a similarity-matrix of connected cells
-Generate the minimum spanning tree on the cluster-to-cluster graph
-Use one of the max dist clusters from this graph, unless
-    The cluster is given, then proceed to find the root cell
-    The root cell is given, then use its cluster}
+\title{Find the root cluster}
 \usage{
 FindRootCluster(cluster_labels, flat_embedding, dist_graph, dist_flat,
   reverse = FALSE)
@@ -31,18 +26,7 @@ a list containing:
     \item{cluster_mst}{an igraph mst object}
 }
 \description{
-Find the root cluster, given a weighted adjacency matrix
-Generate a cluser-to-cluster graph based on a similarity-matrix of connected cells
-Generate the minimum spanning tree on the cluster-to-cluster graph
-Use one of the max dist clusters from this graph, unless
+Given a weighted adjacency matrix, generate a cluser-to-cluster graph based on a similarity-matrix of connected cells.  Generate the minimum spanning tree on the cluster-to-cluster graph.  Use one of the max dist clusters from this graph, unless:
     The cluster is given, then proceed to find the root cell
     The root cell is given, then use its cluster
-}
-\examples{
-FindRootCluster(cluster_labels = RSoptSC::GuoPtime$Params$cluster_label,
-          flat_embedding = RSoptSC::GuoPtime$Params$latent,
-          dist_graph = RSoptSC::GuoPtime$Values$Short_pathd,
-          dist_flat = RSoptSC::GuoPtime$Values$low_dis,
-          reverse = FALSE)
-
 }

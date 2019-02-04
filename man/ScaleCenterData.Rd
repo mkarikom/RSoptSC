@@ -2,8 +2,7 @@
 % Please edit documentation in R/DataSelection.R
 \name{ScaleCenterData}
 \alias{ScaleCenterData}
-\title{Scale and center a data matrix
-We want a matrix whose values are standard deviations from the mean and which are centered at zero.}
+\title{Scale and center a data matrix}
 \usage{
 ScaleCenterData(M)
 }
@@ -14,6 +13,5 @@ ScaleCenterData(M)
 a scaled and centered matrix of expression values
 }
 \description{
-Scale and center a data matrix
 We want a matrix whose values are standard deviations from the mean and which are centered at zero.
 }

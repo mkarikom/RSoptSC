@@ -4,7 +4,6 @@
 #' @param root the id of the root
 #'
 #' @return a vector[] of node ids, where vector[i] is the predecessor of node i
-#' @examples predecessors <- GetPredecessors(minspantree = GuoPtimeFull$mst, root = 6)
 #'
 #' @export
 #'

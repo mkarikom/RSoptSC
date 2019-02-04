@@ -2,7 +2,7 @@
 % Please edit documentation in R/FindRootCell.R
 \name{FindRootCell}
 \alias{FindRootCell}
-\title{Infer the root cell}
+\title{Find the root cell}
 \usage{
 FindRootCell(use_flat_dist = TRUE, cluster_order_by = "distance",
   cell_order_by = "distance", graph_cluster_mst = NULL,
@@ -34,8 +34,4 @@ Use either the primary manifold embedding of cell similarity to find the root ce
 or use the flattened representation of this embedding to find the root cell by maximum separation heuristic
 possible values for cluster_order_by are predecessor and distance
 possible values for cell_order_by are index and distance
-}
-\examples{
-root_cell <- FindRootCell(dist_flat = RSoptSC::GuoPtime$Params$latent)
-
 }

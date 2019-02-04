@@ -2,10 +2,7 @@
 % Please edit documentation in R/DataSelection.R
 \name{SelectData}
 \alias{SelectData}
-\title{Return a set of the most variable genes
-First filter using the expression threshold
-Then use the coefficient of the top variance PCA components
-to determine the variability of the gene}
+\title{Return a set of the most variable genes}
 \usage{
 SelectData(M, gene_expression_threshold, n_features)
 }
@@ -21,7 +18,6 @@ expressed in more than n-m cells or genes expressed in less than m cells}
 a table of features (rows) and samples (columns)
 }
 \description{
-Return a set of the most variable genes
 First filter using the expression threshold
 Then use the coefficient of the top variance PCA components
 to determine the variability of the gene

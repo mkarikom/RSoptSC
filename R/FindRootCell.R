@@ -15,7 +15,6 @@
 #' @param root_cluster the id of the root cluster on the cluster-cluster graph
 #'
 #' @return integer index of the root cell
-#' @examples root_cell <- FindRootCell(dist_flat = RSoptSC::GuoPtime$Params$latent)
 #'
 #' @export
 #'

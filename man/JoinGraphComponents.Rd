@@ -26,11 +26,3 @@ JoinGraphComponents(root_cell, adjacency_matrix, flat_distances,
 In case the graph is not connected, join the components
 This function updates the original adjacency matrix and returns a new object.
 }
-\examples{
-my_matrix <- JoinGraphComponents(root_cell = RSoptSC::GuoPtime$Values$root_cell0,
-    adjacency_matrix = RSoptSC::GuoPtime$Values$W_graph1,
-    flat_distances = RSoptSC::GuoPtime$Values$low_dis,
-    n_components = RSoptSC::GuoPtime$Values$nComponents,
-    component_members = RSoptSC::GuoPtime$Values$members)
-    
-}

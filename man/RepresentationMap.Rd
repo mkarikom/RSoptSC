@@ -33,9 +33,3 @@ a list containing:
 generate convenient representations of the data
 representations of the data are necessary for subsequent lineage analysis
 }
-\examples{
-embeddings <- RepresentationMap(flat_embedding = RSoptSC::GuoPtime$Params$latent,
-    similarity_matrix = RSoptSC::GuoPtime$Params$W,
-    join_components = FALSE)
-
-}

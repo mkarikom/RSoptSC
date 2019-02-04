@@ -51,6 +51,7 @@ SelectData <- function(M, gene_expression_threshold, n_features){
 }
 
 #' Scale and center a data matrix
+#' 
 #' We want a matrix whose values are standard deviations from the mean and which are centered at zero.
 #'
 #' @param M a matrix of expression values for each gene (rows) and cell (columns)
