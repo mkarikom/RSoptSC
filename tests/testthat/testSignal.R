@@ -18,8 +18,8 @@ test_that("signaling probability between cells is equal to matlab", {
   Pmats <- GetSignalingPartners(JoostSignal$data,
                                   JoostSignal$genes,
                                   ligands)
-  expect_equal(Pmats$P, RSoptSC::JoostSignal$P)
-  expect_equal(Pmats$P_agg, RSoptSC::JoostSignal$P_agg)
+  expect_equal(Pmats$P, JoostSignal$P)
+  expect_equal(Pmats$P_agg, JoostSignal$P_agg)
 })
 
 test_that("signaling probability between cells is equal to matlab", {
@@ -34,6 +34,6 @@ test_that("signaling probability between cells is equal to matlab", {
   Pmats <- GetSignalingPartners(JoostSignal$data,
                                 JoostSignal$genes,
                                 ligands)
-  expect_equal(Pmats$P, RSoptSC::JoostSignal$P_ind_up_only)
-  expect_equal(Pmats$P_agg, RSoptSC::JoostSignal$P_agg_up_only)
+  expect_equal(Pmats$P, JoostSignal$P_ind_up_only)
+  expect_equal(Pmats$P_agg, JoostSignal$P_agg_up_only)
 })

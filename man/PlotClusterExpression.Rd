@@ -2,7 +2,7 @@
 % Please edit documentation in R/PlottingFunctions.R
 \name{PlotClusterExpression}
 \alias{PlotClusterExpression}
-\title{Given a set of markers, plot their expression across clusters on a heatmap}
+\title{Heatmap of specific genes}
 \usage{
 PlotClusterExpression(data, gene_names, cluster_labels, markers)
 }
@@ -19,5 +19,5 @@ PlotClusterExpression(data, gene_names, cluster_labels, markers)
 nothing
 }
 \description{
-Given a set of markers, plot their expression across clusters on a heatmap
+Given a set of markers, plot their expression across clusters on a heatmap.
 }

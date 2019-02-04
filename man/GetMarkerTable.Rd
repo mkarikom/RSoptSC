@@ -2,7 +2,7 @@
 % Please edit documentation in R/MarkerGenes.R
 \name{GetMarkerTable}
 \alias{GetMarkerTable}
-\title{Get the marker genes for each cluster and report their 1-normalized expression value}
+\title{Get the marker genes for each cluster}
 \usage{
 GetMarkerTable(counts_data, cluster_labels, H, gene_expression_threshold,
   n_features)
@@ -24,5 +24,5 @@ expressed in more than n-m cells or genes expressed in less than m cells}
 a table of marker genes
 }
 \description{
-Get the marker genes for each cluster and report their 1-normalized expression value
+Get the marker genes for each cluster and report their 1-normalized expression value.
 }

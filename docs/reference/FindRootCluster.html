@@ -6,12 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Find the root cluster, given a weighted adjacency matrix
-Generate a cluser-to-cluster graph based on a similarity-matrix of connected cells
-Generate the minimum spanning tree on the cluster-to-cluster graph
-Use one of the max dist clusters from this graph, unless
-    The cluster is given, then proceed to find the root cell
-    The root cell is given, then use its cluster — FindRootCluster • RSoptSC</title>
+<title>Find the root cluster — FindRootCluster • RSoptSC</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -35,17 +30,9 @@ Use one of the max dist clusters from this graph, unless
 
 
 
-<meta property="og:title" content="Find the root cluster, given a weighted adjacency matrix
-Generate a cluser-to-cluster graph based on a similarity-matrix of connected cells
-Generate the minimum spanning tree on the cluster-to-cluster graph
-Use one of the max dist clusters from this graph, unless
-    The cluster is given, then proceed to find the root cell
-    The root cell is given, then use its cluster — FindRootCluster" />
+<meta property="og:title" content="Find the root cluster — FindRootCluster" />
 
-<meta property="og:description" content="Find the root cluster, given a weighted adjacency matrix
-Generate a cluser-to-cluster graph based on a similarity-matrix of connected cells
-Generate the minimum spanning tree on the cluster-to-cluster graph
-Use one of the max dist clusters from this graph, unless
+<meta property="og:description" content="Given a weighted adjacency matrix, generate a cluser-to-cluster graph based on a similarity-matrix of connected cells.  Generate the minimum spanning tree on the cluster-to-cluster graph.  Use one of the max dist clusters from this graph, unless:
     The cluster is given, then proceed to find the root cell
     The root cell is given, then use its cluster" />
 
@@ -130,22 +117,14 @@ Use one of the max dist clusters from this graph, unless
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Find the root cluster, given a weighted adjacency matrix
-Generate a cluser-to-cluster graph based on a similarity-matrix of connected cells
-Generate the minimum spanning tree on the cluster-to-cluster graph
-Use one of the max dist clusters from this graph, unless
-    The cluster is given, then proceed to find the root cell
-    The root cell is given, then use its cluster</h1>
+    <h1>Find the root cluster</h1>
     
     <div class="hidden name"><code>FindRootCluster.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Find the root cluster, given a weighted adjacency matrix
-Generate a cluser-to-cluster graph based on a similarity-matrix of connected cells
-Generate the minimum spanning tree on the cluster-to-cluster graph
-Use one of the max dist clusters from this graph, unless
+    <p>Given a weighted adjacency matrix, generate a cluser-to-cluster graph based on a similarity-matrix of connected cells.  Generate the minimum spanning tree on the cluster-to-cluster graph.  Use one of the max dist clusters from this graph, unless:
     The cluster is given, then proceed to find the root cell
     The root cell is given, then use its cluster</p>
     
@@ -189,13 +168,6 @@ Use one of the max dist clusters from this graph, unless
 
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>FindRootCluster</span>(<span class='kw'>cluster_labels</span> <span class='kw'>=</span> <span class='kw pkg'>RSoptSC</span><span class='kw ns'>::</span><span class='no'>GuoPtime</span>$<span class='no'>Params</span>$<span class='no'>cluster_label</span>,
-          <span class='kw'>flat_embedding</span> <span class='kw'>=</span> <span class='kw pkg'>RSoptSC</span><span class='kw ns'>::</span><span class='no'>GuoPtime</span>$<span class='no'>Params</span>$<span class='no'>latent</span>,
-          <span class='kw'>dist_graph</span> <span class='kw'>=</span> <span class='kw pkg'>RSoptSC</span><span class='kw ns'>::</span><span class='no'>GuoPtime</span>$<span class='no'>Values</span>$<span class='no'>Short_pathd</span>,
-          <span class='kw'>dist_flat</span> <span class='kw'>=</span> <span class='kw pkg'>RSoptSC</span><span class='kw ns'>::</span><span class='no'>GuoPtime</span>$<span class='no'>Values</span>$<span class='no'>low_dis</span>,
-          <span class='kw'>reverse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='error'>Error: 'GuoPtime' is not an exported object from 'namespace:RSoptSC'</span></div><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -203,9 +175,7 @@ Use one of the max dist clusters from this graph, unless
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+          </ul>
 
   </div>
 </div>

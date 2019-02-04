@@ -15,22 +15,18 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     FNN (>= 1.1.2.1),
-    stringr (>= 1.3.1),
-    psych (>= 1.8.4),
     ggplot2 (>= 3.0.0),
     Matrix (>= 1.2-14),
     Rtsne (>= 0.13),
-    pracma (>= 2.1.4),
-    RSpectra (>= 0.13-1),
     NMF (>= 0.21.0),
     reshape2 (>= 1.4.3),
     dplyr (>= 0.7.6),
     gplots (>= 3.0.1),
-    magrittr (>= 1.5),
     circlize (>= 0.4.4),
-    ClusterR (>= 1.1.6),
-    xtable (>= 1.8-3)
+    igraph (>= 1.2.2),
+    RColorBrewer (>= 1.1-2),
+    tibble (>= 2.0.1)
 Suggests: testthat,
-    rmarkdown, knitr
+    rmarkdown, knitr, ClusterR
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr

@@ -30,8 +30,7 @@ FindRootCell(use_flat_dist = TRUE, cluster_order_by = "distance",
 integer index of the root cell
 }
 \description{
-Use either the primary manifold embedding of cell similarity to find the root cell by cluster-cell rank-correlation
-or use the flattened representation of this embedding to find the root cell by maximum separation heuristic
-possible values for cluster_order_by are predecessor and distance
-possible values for cell_order_by are index and distance
+Use either the primary manifold embedding of cell similarity to find the root cell by cluster-cell rank-correlation or use the flattened representation of this embedding to find the root cell by maximum separation heuristic.
+Possible values for cluster_order_by are predecessor and distance.
+Possible values for cell_order_by are index and distance.
 }

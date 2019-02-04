@@ -22,5 +22,5 @@ eigengap (upper bound) cluster count}
 the number of clusters and the vector of eigenvalues
 }
 \description{
-Use clustering consensus to infer cluster number
+Use clustering consensus to infer cluster number.
 }

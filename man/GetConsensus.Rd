@@ -13,5 +13,5 @@ GetConsensus(clusters)
 a consensus matrix
 }
 \description{
-Produce a consensus matrix
+Produce a consensus matrix for ensemble analysis.
 }

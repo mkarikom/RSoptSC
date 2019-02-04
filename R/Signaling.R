@@ -9,6 +9,8 @@
 #' @param ligand a named list:
 #'     list(ligand1 = list(receptor1 = list(up = list(target1, target2),
 #'                                          down = list(target3, target4))))
+#' @importFrom reshape2 melt
+#' 
 #' @export
 #'
 GetSignalingPartners <- function(M,
@@ -19,7 +21,7 @@ GetSignalingPartners <- function(M,
   n_genes <- nrow(M)
 
   # represent the pathway heirarchy as a data frame
-  pathway <- (reshape2::melt(ligand)[,-2])[,c(4, 3, 2, 1)]
+  pathway <- (melt(ligand)[,-2])[,c(4, 3, 2, 1)]
   colnames(pathway) <- c('ligand', 'receptor', 'logic', 'target')
 
   # ligand-receptor pairs
@@ -92,7 +94,9 @@ GetSignalingPartners <- function(M,
   return(list(P = P, P_agg = P_agg))
 }
 
-#' Get average target expression for each cell
+#' Get target expression
+#' 
+#' Get average target expression for each cell.
 #'
 #' @param M a matrix of expression values for each cell (rows) and gene (columns)
 #' @param ind a vector of row indexes corresponding to genes
@@ -106,7 +110,9 @@ TargetAvg <- function(M,
   })
 }
 
-#' Normalize a Subset of the Data
+#' Normalize a Subset of the data
+#' 
+#' Normalize a Subset of the data.
 #'
 #' @param M a matrix of expression values for each cell (columns) and gene (rows)
 #' @param ind a vector of row indexes corresponding to genes
@@ -136,7 +142,7 @@ NormalizeSubset <- function(M,
 
 #' Generate the divergence penalty coefficient
 #'
-#' This will approach 1 as the difference between alpha and \code{const} approaches 0
+#' This will approach 1 as the difference between alpha and \code{const} approaches 0.
 #'
 #' @param alpha a matrix of normalized LR expression values for each cell (columns) and gene (rows)
 #' @param const either the normalized repression targets or the normalized expression targets
@@ -160,6 +166,8 @@ PenaltyCoeff <- function(alpha,
 }
 
 #' Average cluster to cluster gene expression
+#'
+#' Average cluster to cluster gene expression.
 #'
 #' @param P signaling probabilities cells x cells
 #' @param cluster_labels labels of cells 1:n
@@ -230,6 +238,8 @@ ClusterSig <- function(P,
 
 
 #' Create a heatmap with signaling markers over clusters
+#' 
+#' Create a heatmap with signaling markers over clusters.
 #'
 #' @param M a matrix of genes x cells where each entry is normalized expression
 #' @param gene_names the names of the genes in the rows of M

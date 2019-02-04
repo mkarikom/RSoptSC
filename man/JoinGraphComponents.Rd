@@ -2,8 +2,7 @@
 % Please edit documentation in R/JoinGraphComponents.R
 \name{JoinGraphComponents}
 \alias{JoinGraphComponents}
-\title{In case the graph is not connected, join the components
-This function updates the original adjacency matrix and returns a new object.}
+\title{Join Graph Components}
 \usage{
 JoinGraphComponents(root_cell, adjacency_matrix, flat_distances,
   n_components, component_members)
@@ -23,6 +22,6 @@ JoinGraphComponents(root_cell, adjacency_matrix, flat_distances,
 \code{adjacency_matrix} such that new edges between disconnected components have length 2
 }
 \description{
-In case the graph is not connected, join the components
+In case the graph is not connected, join the components.
 This function updates the original adjacency matrix and returns a new object.
 }

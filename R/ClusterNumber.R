@@ -1,4 +1,6 @@
 #' Use clustering consensus to infer cluster number
+#' 
+#' Use clustering consensus to infer cluster number.
 #'
 #' @param data a symmetric nonnegative similarity matrix
 #' @param tol  cutoff for lambda zero
@@ -39,7 +41,9 @@ CountClusters <- function(data, tol = 0.01, range = 1:20, eigengap = TRUE){
   }
 }
 
-#' Use the graph laplacian to get the number of graph components
+#' Get graph components
+#' 
+#' Use the graph laplacian to get the number of graph components.
 #'
 #' @param data a symmetric nonnegative similarity matrix
 #' @param tol  cutoff for lambda zero
@@ -56,7 +60,9 @@ GetComponents <- function(data,
   return(list(val = sort(eigs), n_eigs = n_zeros))
 }
 
-#' Produce a truncated ensemble consensus matrix
+#' Produce consensus matrix
+#' 
+#' Produce a truncated ensemble consensus matrix.
 #'
 #' @param data a symmetric nonnegative similarity matrix
 #' @param tol  cutoff for lambda zero
@@ -68,6 +74,8 @@ GetComponents <- function(data,
 #'     consensus matrix
 #' @param method the clustering method for building consensus clusters
 #'
+#' @importFrom parallel detectCores makeCluster clusterExport parLapply stopCluster
+#'
 #' @return a truncated ensemble consensus matrix
 #'
 GetEnsemble <- function(data,
@@ -76,8 +84,8 @@ GetEnsemble <- function(data,
                         tau,
                         range = 1:20,
                         method = 'kmeans'){
-  no_cores <- parallel::detectCores() - 1
-  cl <- parallel::makeCluster(no_cores)
+  no_cores <- detectCores() - 1
+  cl <- makeCluster(no_cores)
   
   n_samples <- dim(data)[2]
   if(method == 'kmeans'){
@@ -92,12 +100,12 @@ GetEnsemble <- function(data,
     
     # generate consensus matrices
     parallel::clusterExport(cl, c("cluster_assign", "GetConsensus"), envir = environment())
-    consen_list <- parallel::parLapply(cl,
-                                       split(cluster_assign, col(cluster_assign)),
-                                       function(x){
-                                         GetConsensus(x)
-                                       })
-    parallel::stopCluster(cl)
+    consen_list <- parLapply(cl,
+                             split(cluster_assign, col(cluster_assign)),
+                             function(x){
+                               GetConsensus(x)
+                             })
+    stopCluster(cl)
     # generate the ensemble
     consen <- Reduce("+", consen_list)
     
@@ -110,6 +118,8 @@ GetEnsemble <- function(data,
 }
 
 #' Produce a consensus matrix
+#' 
+#' Produce a consensus matrix for ensemble analysis.
 #'
 #' @param clusters the cluster assignment of each cell
 #'

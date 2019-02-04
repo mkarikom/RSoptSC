@@ -197,7 +197,6 @@ root_cell <- FindRootCell(use_flat_dist = FALSE,
 Compute the directional minimum spanning tree on the cluster-cluster graph for visualization.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-library(ggnetwork)
 par(mar=c(1,1,1,1))
 cluster_predecessors <- GetPredecessors(cluster_ptime$cluster_mst, cluster_ptime$root_cluster)
 cluster_dtree <- GetDominatorTree(cluster_predecessors, cluster_ptime$graph_cluster)
@@ -282,7 +281,7 @@ Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/D
                        labels = labels,
                        gene_name = "Krt10")
 ```
-Violin Plot of Lor expression.  Note strong expression in cluster 3, which completely encompasses IFE-KI/KII compartments:
+Violin Plot of Lor expression.  Note strong expression in clusters 3 and 5, which encompass IFE-KI/KII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))

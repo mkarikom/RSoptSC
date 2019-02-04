@@ -14,5 +14,5 @@ ChordColors(edge_table, cluster_cols, gap)
 \item{gap}{the hue gap}
 }
 \description{
-Get chord colors for cells
+Get chord colors for cells.
 }

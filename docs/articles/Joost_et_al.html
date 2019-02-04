@@ -81,7 +81,7 @@
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2019-02-03</h4>
+            <h4 class="date">2019-02-04</h4>
       
       
       <div class="hidden name"><code>Joost_et_al.Rmd</code></div>
@@ -119,7 +119,7 @@
 <a href="#compute-the-similarity-matrix" class="anchor"></a>Compute the Similarity Matrix</h2>
 <p>Run L2R2 on the processed data, outputting the number of iterations and value of the objective.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">S &lt;-<span class="st"> </span><span class="kw"><a href="../reference/SimilarityM.html">SimilarityM</a></span>(<span class="dt">lambda =</span> <span class="fl">0.05</span>, <span class="dt">data =</span> filtered_data<span class="op">$</span>M_variable)</a></code></pre></div>
-<p>[1] “Iter Err” 1, 20.597435 2, 19.520815 3, 18.476136 4, 17.491670 5, 16.569212 6, 15.705525 7, 7.770185 8, 0.415020 9, 0.356815 10, 0.339246 11, 0.328628 12, 0.318293 13, 0.307808 14, 0.297460 15, 0.287398 16, 0.277677 17, 0.268311 18, 0.253743 19, 0.232315 20, 0.204575 21, 0.170748 22, 0.130527 23, 0.083237 24, 0.041469 25, 0.100519 [1] “convergence by error min”</p>
+<p>[1] “convergence by error min”</p>
 <p>Compute distances on the similarity matrix. If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># perplexity = perplexity,</span></a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#                                   pca_center = TRUE,</span></a>
@@ -134,7 +134,6 @@
 <a class="sourceLine" id="cb5-11" data-line-number="11">                            <span class="dt">pca_center =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb5-12" data-line-number="12">                            <span class="dt">pca_scale =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb5-13" data-line-number="13">                            <span class="dt">dims =</span> <span class="dv">2</span>)</a></code></pre></div>
-<p>[1] “computing flat embedding”</p>
 </div>
 <div id="cluster-the-cells" class="section level2">
 <h2 class="hasAnchor">
@@ -230,12 +229,10 @@
 <h2 class="hasAnchor">
 <a href="#pseudotime-visualization" class="anchor"></a>Pseudotime Visualization</h2>
 <p>Compute the directional minimum spanning tree on the cluster-cluster graph for visualization.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggnetwork)</a>
-<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="co">#&gt; Loading required package: ggplot2</span></a>
-<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb15-4" data-line-number="4">cluster_predecessors &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetPredecessors.html">GetPredecessors</a></span>(cluster_ptime<span class="op">$</span>cluster_mst, cluster_ptime<span class="op">$</span>root_cluster)</a>
-<a class="sourceLine" id="cb15-5" data-line-number="5">cluster_dtree &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetDominatorTree.html">GetDominatorTree</a></span>(cluster_predecessors, cluster_ptime<span class="op">$</span>graph_cluster)</a>
-<a class="sourceLine" id="cb15-6" data-line-number="6"><span class="kw"><a href="../reference/PlotLineage.html">PlotLineage</a></span>(cluster_dtree)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">cluster_predecessors &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetPredecessors.html">GetPredecessors</a></span>(cluster_ptime<span class="op">$</span>cluster_mst, cluster_ptime<span class="op">$</span>root_cluster)</a>
+<a class="sourceLine" id="cb15-3" data-line-number="3">cluster_dtree &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetDominatorTree.html">GetDominatorTree</a></span>(cluster_predecessors, cluster_ptime<span class="op">$</span>graph_cluster)</a>
+<a class="sourceLine" id="cb15-4" data-line-number="4"><span class="kw"><a href="../reference/PlotLineage.html">PlotLineage</a></span>(cluster_dtree)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-15-1.png" width="100%" height="100%"></p>
 <p>Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">pseudotime &lt;-<span class="st"> </span>low_dim_mapping<span class="op">$</span>dist_graph[root_cell,]</a>
@@ -302,7 +299,7 @@
 <a class="sourceLine" id="cb21-3" data-line-number="3">                       <span class="dt">gene_names =</span> gene_names,</a>
 <a class="sourceLine" id="cb21-4" data-line-number="4">                       <span class="dt">labels =</span> labels,</a>
 <a class="sourceLine" id="cb21-5" data-line-number="5">                       <span class="dt">gene_name =</span> <span class="st">"Krt10"</span>)</a></code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-21-1.png" width="100%" height="100%"> Violin Plot of Lor expression. Note strong expression in cluster 3, which completely encompasses IFE-KI/KII compartments:</p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-21-1.png" width="100%" height="100%"> Violin Plot of Lor expression. Note strong expression in clusters 3 and 5, which encompass IFE-KI/KII compartments:</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb22-2" data-line-number="2">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
 <a class="sourceLine" id="cb22-3" data-line-number="3">                       <span class="dt">gene_names =</span> gene_names,</a>

@@ -2,7 +2,7 @@
 % Please edit documentation in R/PlottingFunctions.R
 \name{ViolinPlotExpression}
 \alias{ViolinPlotExpression}
-\title{Produce a violin plot of gene expression}
+\title{Violin plot of gene expression}
 \usage{
 ViolinPlotExpression(data, gene_names, labels, gene_name,
   colorscale = NULL)
@@ -22,5 +22,5 @@ ViolinPlotExpression(data, gene_names, labels, gene_name,
 nothing
 }
 \description{
-Produce a violin plot of gene expression
+Produce a violin plot of gene expression.
 }

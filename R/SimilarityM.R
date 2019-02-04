@@ -2,12 +2,15 @@
 #'
 #' Computes low dim embedding, constructs KNN graph on the embedding -> unweighted adjacency
 #' Calls manifold learning algorithm which uses the normalized sample vectors and the
-#' unweighted adjacency matrix to compute a low rank approximation of the data
+#' unweighted adjacency matrix to compute a low rank approximation of the data.
 #'
 #' @param data the expression data, where each column is treated as a normalized vector
 #' @param lambda the balance term between the rank of Z and the error
 #' @return a list containing the symetric cell to cell similarity matrix and
 #'     manifold learning error
+#'
+#' @importFrom Rtsne Rtsne
+#' @importFrom FNN get.knnx
 #'
 #' @export
 #'
@@ -59,19 +62,19 @@ SimilarityM <- function(lambda,data){
   # Currently this is not "InitialY" as in MATLAB tsne('InitialY', InitY)
 
   set.seed(1)
-  X2 = Rtsne::Rtsne(X = t(X), perplexity = 20, pca_center = TRUE, pca_scale = TRUE, dims = 3)
-  D = matrix(1, n, n)
+  X2 <- Rtsne(X = t(X), perplexity = 20, pca_center = TRUE, pca_scale = TRUE, dims = 3)
+  D <- matrix(1, n, n)
   if (No_Comps1>=1){
     No_Comps1 = 1
   }
-  knn_object = FNN::get.knnx(X2$Y[,1:(No_Comps1+2)], X2$Y[,1:(No_Comps1+2)], k = K)
+  knn_object = get.knnx(X2$Y[,1:(No_Comps1+2)], X2$Y[,1:(No_Comps1+2)], k = K)
   IDX = knn_object$nn.index
 
   for (jj in 1:n){
     D[jj,IDX[jj,]] = 0
   }
 
-  Z <- computM(D,X,lambda)
+  Z <- computeM(D,X,lambda)
   Z$Z[Z$Z <= .Machine$double.eps] <- 0
   W <- 0.5*(abs(Z$Z)+abs(t(Z$Z)))
   return(list(W = W, E = Z$E))
@@ -80,7 +83,7 @@ SimilarityM <- function(lambda,data){
 
 #' Perform ADMM
 #'
-#' Computing cell-to-cell similarity matrix by solving the following
+#' Compute cell-to-cell similarity matrix by solving the following
 #' optimization problem via ADMM
 #' \deqn{
 #'   min_{Z,E}  ||Z||_* + lambda ||E||_{2,1}\\
@@ -93,7 +96,7 @@ SimilarityM <- function(lambda,data){
 #' @param lambda the balance term between the rank of Z and the error
 #' @return a list containing the low rank approximation of X and manifold learning error
 
-computM <- function(D,X,lambda){
+computeM <- function(D,X,lambda){
   ## ADMM iteration
   maxiter = 100
   Err = matrix(0, maxiter, 2)
@@ -109,8 +112,6 @@ computM <- function(D,X,lambda){
   Y2 = matrix(0, 1, n)
   Y3 = matrix(0, n, n)
   iter = 0
-
-  print('Iter  Err')
 
   while(TRUE){
     iter = iter + 1
@@ -162,7 +163,6 @@ computM <- function(D,X,lambda){
     Y2 = Y2 + mu*(matrix(1,1,n) - matrix(1,1,n)%*%Z)
     Y3 = Y3 + mu*(Z - J)
 
-    pracma::fprintf('%d, %8.6f\n',iter,norm(X-X%*%Z-E,"2"))
     Err[iter,] = c(norm(X-X%*%Z-E,"2"), norm(Z-J,"2"))
 
     if (max(Err[iter,]) <= epsilon){

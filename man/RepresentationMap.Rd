@@ -2,8 +2,7 @@
 % Please edit documentation in R/RepresentationMap.R
 \name{RepresentationMap}
 \alias{RepresentationMap}
-\title{generate convenient representations of the data
-representations of the data are necessary for subsequent lineage analysis}
+\title{Generate multiple representations}
 \usage{
 RepresentationMap(flat_embedding = NULL, similarity_matrix,
   join_components = TRUE, ...)
@@ -30,6 +29,5 @@ a list containing:
     \item{members}{list of members of \code{components}, sorted by component size and member index}
 }
 \description{
-generate convenient representations of the data
-representations of the data are necessary for subsequent lineage analysis
+Generate representations of the data to be used in lineage analysis.
 }

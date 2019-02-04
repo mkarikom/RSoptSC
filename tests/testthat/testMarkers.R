@@ -8,7 +8,7 @@ test_that("Joost clustering matches when fewer are requested than var genes avai
                           JoostMarkers$H,
                           JoostMarkers$No_exc_cell,
                           JoostMarkers$No_features)
-  expect_equal(check_markers[,2], RSoptSC::JoostMarkers$Gene_labels_all[,2])
+  expect_equal(check_markers[,2], JoostMarkers$Gene_labels_all[,2])
 })
 
 test_that("Gene score deviation on all Joost is below threshold", {
@@ -19,8 +19,8 @@ test_that("Gene score deviation on all Joost is below threshold", {
                                   JoostMarkers$H,
                                   JoostMarkers$No_exc_cell,
                                   JoostMarkers$No_features)
-  deviation <- check_markers[,3] - RSoptSC::JoostMarkers$Gene_labels_all[,3]
-  per_gene_percentage <- deviation / RSoptSC::JoostMarkers$Gene_labels_all[,3]
+  deviation <- check_markers[,3] - JoostMarkers$Gene_labels_all[,3]
+  per_gene_percentage <- deviation / JoostMarkers$Gene_labels_all[,3]
   avg_deviation_percentage <- mean(per_gene_percentage)
   expect_true(avg_deviation_percentage < 10^(-15))
 })

@@ -19,5 +19,5 @@ ColorHue(n, starthue = 15, endhue = 360, luminance = 65,
 \item{chroma}{the chroma of the hcl value}
 }
 \description{
-Get a vector of n equally spaced rgb colors
+Get a vector of n equally spaced rgb colors.
 }

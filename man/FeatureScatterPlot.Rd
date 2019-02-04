@@ -2,7 +2,7 @@
 % Please edit documentation in R/PlottingFunctions.R
 \name{FeatureScatterPlot}
 \alias{FeatureScatterPlot}
-\title{Produce a scatter plot of the cells on selected 2-dim ebedding colored by feature}
+\title{Produce a scatter plot of the cells}
 \usage{
 FeatureScatterPlot(flat_embedding, feature, title, subtitle, featurename,
   colorscale = NULL)
@@ -24,5 +24,5 @@ FeatureScatterPlot(flat_embedding, feature, title, subtitle, featurename,
 a ggplot2 object
 }
 \description{
-Create a scatter plot of the data.  If discrete (factor) data is passed, the colorscale parameter must be provided, otherwise the plot will default to gradient shading.
+Create a scatter plot of the data on a 2-dim ebedding colored by feature.  If discrete (factor) data is passed, the colorscale parameter must be provided, otherwise the plot will default to gradient shading.
 }

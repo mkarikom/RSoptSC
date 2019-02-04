@@ -14,5 +14,5 @@ ClusterSig(P, cluster_labels, remove_zeros = TRUE)
 \item{remove_zeros}{boolean whether to remove zero rows from the P matrix}
 }
 \description{
-Average cluster to cluster gene expression
+Average cluster to cluster gene expression.
 }

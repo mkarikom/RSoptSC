@@ -19,5 +19,5 @@ AvgFeatureExpression(cluster_labels, M, feature, feature_list)
 a vector of feature expression for each cluster
 }
 \description{
-Average the expression of a feature and return the expression vector
+Average the expression of a feature and return the expression vector.
 }

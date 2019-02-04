@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create a heatmap with signaling markers over clusters — HeatSig • RSoptSC</title>
+<title>Perform ADMM — computeM • RSoptSC</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,15 @@
 
 
 
-<meta property="og:title" content="Create a heatmap with signaling markers over clusters — HeatSig" />
+<meta property="og:title" content="Perform ADMM — computeM" />
 
-<meta property="og:description" content="Create a heatmap with signaling markers over clusters" />
+<meta property="og:description" content="Compute cell-to-cell similarity matrix by solving the following
+optimization problem via ADMM
+$$
+  min_{Z,E}  ||Z||_* + lambda ||E||_{2,1}\\
+  s.t.       X = XZ + E\\
+             Z'1 = 1\\
+              Z_{i,j} = 0 for (i,j) \in Omega$$" />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -115,43 +121,45 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create a heatmap with signaling markers over clusters</h1>
+    <h1>Perform ADMM</h1>
     
-    <div class="hidden name"><code>HeatSig.Rd</code></div>
+    <div class="hidden name"><code>computeM.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Create a heatmap with signaling markers over clusters</p>
+    <p>Compute cell-to-cell similarity matrix by solving the following
+optimization problem via ADMM
+$$
+  min_{Z,E}  ||Z||_* + lambda ||E||_{2,1}\\
+  s.t.       X = XZ + E\\
+             Z'1 = 1\\
+              Z_{i,j} = 0 for (i,j) \in Omega$$</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>HeatSig</span>(<span class='no'>M</span>, <span class='no'>gene_names</span>, <span class='no'>cell_order</span>, <span class='no'>cell_labels</span>, <span class='no'>gene_list</span>)</pre>
+    <pre class="usage"><span class='fu'>computeM</span>(<span class='no'>D</span>, <span class='no'>X</span>, <span class='no'>lambda</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>M</th>
-      <td><p>a matrix of genes x cells where each entry is normalized expression</p></td>
+      <th>D</th>
+      <td><p>the unweighted KNN adjacency matrix</p></td>
     </tr>
     <tr>
-      <th>gene_names</th>
-      <td><p>the names of the genes in the rows of M</p></td>
+      <th>X</th>
+      <td><p>normalized sample vectors</p></td>
     </tr>
     <tr>
-      <th>cell_order</th>
-      <td><p>permutation of the labels of P, cells ordered by cluster</p></td>
-    </tr>
-    <tr>
-      <th>cell_labels</th>
-      <td><p>cluster labels of the permuted cells</p></td>
-    </tr>
-    <tr>
-      <th>gene_list</th>
-      <td><p>filter by a list of gene names</p></td>
+      <th>lambda</th>
+      <td><p>the balance term between the rank of Z and the error</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>a list containing the low rank approximation of X and manifold learning error</p>
     
 
   </div>
@@ -159,7 +167,9 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#value">Value</a></li>
+          </ul>
 
   </div>
 </div>

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ClusterNumber.R
 \name{GetComponents}
 \alias{GetComponents}
-\title{Use the graph laplacian to get the number of graph components}
+\title{Get graph components}
 \usage{
 GetComponents(data, tol = 0.01)
 }
@@ -15,5 +15,5 @@ GetComponents(data, tol = 0.01)
 the number of components
 }
 \description{
-Use the graph laplacian to get the number of graph components
+Use the graph laplacian to get the number of graph components.
 }

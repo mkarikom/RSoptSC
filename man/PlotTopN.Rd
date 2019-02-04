@@ -2,7 +2,7 @@
 % Please edit documentation in R/PlottingFunctions.R
 \name{PlotTopN}
 \alias{PlotTopN}
-\title{Plot the heatmap of markers and return the marker table}
+\title{Heatmap of the top n markers}
 \usage{
 PlotTopN(data, gene_names, cluster_labels, markers, n_features)
 }
@@ -21,5 +21,5 @@ PlotTopN(data, gene_names, cluster_labels, markers, n_features)
 nothing
 }
 \description{
-Plot the heatmap of markers and return the marker table
+Plot the heatmap of the top n inferred markers for each cluster.
 }

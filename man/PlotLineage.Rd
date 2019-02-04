@@ -24,5 +24,5 @@ PlotLineage(network, node_color = NULL, alpha_color = 1,
 nothing
 }
 \description{
-Plot the pseudotime ordering of clusters
+Plot the pseudotime ordering of clusters using igraph tools.
 }

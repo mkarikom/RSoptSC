@@ -2,9 +2,7 @@
 % Please edit documentation in R/PlottingFunctions.R
 \name{PlotMatlabDtree}
 \alias{PlotMatlabDtree}
-\title{Produce a plot of matlab DTree data and return the object
-If an output dir and filename are provided, a plot will
-be saved, otherwise the function will just return the graph}
+\title{Produce a plot of matlab DTree data and return the object}
 \usage{
 PlotMatlabDtree(edge_table, predecessors, outputdir = NULL,
   outputfile = NULL)
@@ -23,7 +21,5 @@ col 1 is v1, col2 is v2, col3 is weight}
 an igraph representation of the tree
 }
 \description{
-Produce a plot of matlab DTree data and return the object
-If an output dir and filename are provided, a plot will
-be saved, otherwise the function will just return the graph
+If an output dir and filename are provided, a plot will be saved, otherwise the function will just return the graph.  This is used for internal analysis to compare with matlab implementation.
 }

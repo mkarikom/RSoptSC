@@ -2,7 +2,7 @@
 % Please edit documentation in R/Signaling.R
 \name{NormalizeSubset}
 \alias{NormalizeSubset}
-\title{Normalize a Subset of the Data}
+\title{Normalize a Subset of the data}
 \usage{
 NormalizeSubset(M, ids)
 }
@@ -12,5 +12,5 @@ NormalizeSubset(M, ids)
 \item{ind}{a vector of row indexes corresponding to genes}
 }
 \description{
-Normalize a Subset of the Data
+Normalize a Subset of the data.
 }

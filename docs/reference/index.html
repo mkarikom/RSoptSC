@@ -148,24 +148,19 @@
         <td>
           <p><code><a href="FeatureScatterPlot.html">FeatureScatterPlot()</a></code> </p>
         </td>
-        <td><p>Produce a scatter plot of the cells on selected 2-dim ebedding colored by feature</p></td>
+        <td><p>Produce a scatter plot of the cells</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="FindRootCell.html">FindRootCell()</a></code> </p>
         </td>
-        <td><p>Infer the root cell</p></td>
+        <td><p>Find the root cell</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="FindRootCluster.html">FindRootCluster()</a></code> </p>
         </td>
-        <td><p>Find the root cluster, given a weighted adjacency matrix
-Generate a cluser-to-cluster graph based on a similarity-matrix of connected cells
-Generate the minimum spanning tree on the cluster-to-cluster graph
-Use one of the max dist clusters from this graph, unless
-    The cluster is given, then proceed to find the root cell
-    The root cell is given, then use its cluster</p></td>
+        <td><p>Find the root cluster</p></td>
       </tr><tr>
         
         <td>
@@ -177,7 +172,7 @@ Use one of the max dist clusters from this graph, unless
         <td>
           <p><code><a href="GetComponents.html">GetComponents()</a></code> </p>
         </td>
-        <td><p>Use the graph laplacian to get the number of graph components</p></td>
+        <td><p>Get graph components</p></td>
       </tr><tr>
         
         <td>
@@ -201,13 +196,13 @@ Use one of the max dist clusters from this graph, unless
         <td>
           <p><code><a href="GetEnsemble.html">GetEnsemble()</a></code> </p>
         </td>
-        <td><p>Produce a truncated ensemble consensus matrix</p></td>
+        <td><p>Produce consensus matrix</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="GetMarkerTable.html">GetMarkerTable()</a></code> </p>
         </td>
-        <td><p>Get the marker genes for each cluster and report their 1-normalized expression value</p></td>
+        <td><p>Get the marker genes for each cluster</p></td>
       </tr><tr>
         
         <td>
@@ -223,22 +218,15 @@ Use one of the max dist clusters from this graph, unless
       </tr><tr>
         
         <td>
-          <p><code><a href="InitSVD.html">InitSVD()</a></code> </p>
-        </td>
-        <td><p>Initialize non-negative factorization of the similarity matrix</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="JoinGraphComponents.html">JoinGraphComponents()</a></code> </p>
         </td>
-        <td><p>In case the graph is not connected, join the components
-This function updates the original adjacency matrix and returns a new object.</p></td>
+        <td><p>Join Graph Components</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="NormalizeSubset.html">NormalizeSubset()</a></code> </p>
         </td>
-        <td><p>Normalize a Subset of the Data</p></td>
+        <td><p>Normalize a Subset of the data</p></td>
       </tr><tr>
         
         <td>
@@ -256,9 +244,7 @@ This function updates the original adjacency matrix and returns a new object.</p
         <td>
           <p><code><a href="PlotMatlabDtree.html">PlotMatlabDtree()</a></code> </p>
         </td>
-        <td><p>Produce a plot of matlab DTree data and return the object
-If an output dir and filename are provided, a plot will
-be saved, otherwise the function will just return the graph</p></td>
+        <td><p>Produce a plot of matlab DTree data and return the object</p></td>
       </tr><tr>
         
         <td>
@@ -270,24 +256,19 @@ be saved, otherwise the function will just return the graph</p></td>
         <td>
           <p><code><a href="RepresentationMap.html">RepresentationMap()</a></code> </p>
         </td>
-        <td><p>generate convenient representations of the data
-representations of the data are necessary for subsequent lineage analysis</p></td>
+        <td><p>Generate multiple representations</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="ScaleCenterData.html">ScaleCenterData()</a></code> </p>
         </td>
-        <td><p>Scale and center a data matrix
-We want a matrix whose values are standard deviations from the mean and which are centered at zero.</p></td>
+        <td><p>Scale and center a data matrix</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="SelectData.html">SelectData()</a></code> </p>
         </td>
-        <td><p>Return a set of the most variable genes
-First filter using the expression threshold
-Then use the coefficient of the top variance PCA components
-to determine the variability of the gene</p></td>
+        <td><p>Set of the most variable genes</p></td>
       </tr><tr>
         
         <td>
@@ -297,25 +278,19 @@ to determine the variability of the gene</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="SymNMF.html">SymNMF()</a></code> </p>
-        </td>
-        <td><p>Factor a matrix based on an initial factor guess from SVD</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="TargetAvg.html">TargetAvg()</a></code> </p>
         </td>
-        <td><p>Get average target expression for each cell</p></td>
+        <td><p>Get target expression</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="ViolinPlotExpression.html">ViolinPlotExpression()</a></code> </p>
         </td>
-        <td><p>Produce a violin plot of gene expression</p></td>
+        <td><p>Violin plot of gene expression</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="computM.html">computM()</a></code> </p>
+          <p><code><a href="computeM.html">computeM()</a></code> </p>
         </td>
         <td><p>Perform ADMM</p></td>
       </tr>

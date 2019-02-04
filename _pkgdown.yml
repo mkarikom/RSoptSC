@@ -45,9 +45,7 @@ reference:
   - '`GetMarkerTable`'
   - '`GetPredecessors`'
   - '`GetSignalingPartners`'
-  - '`InitSVD`'
   - '`JoinGraphComponents`'
-  - '`MarkerHeatmap`'
   - '`NormalizeSubset`'
   - '`PenaltyCoeff`'
   - '`PlotLineage`'
@@ -57,12 +55,10 @@ reference:
   - '`ScaleCenterData`'
   - '`SelectData`'
   - '`SimilarityM`'
-  - '`SymNMF`'
   - '`TargetAvg`'
   - '`ViolinPlotExpression`'
-  - '`computM`'
-  - '`plotSig`'
-  
+  - '`computeM`'
+
 articles:
 - title: All vignettes
   desc: ~

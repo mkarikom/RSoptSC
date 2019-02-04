@@ -2,7 +2,7 @@
 % Please edit documentation in R/PlottingFunctions.R
 \name{SigPlot}
 \alias{SigPlot}
-\title{Produce a plot of a cell signaling network}
+\title{Circos plot of signaling score}
 \usage{
 SigPlot(P, rgb_gap = 0.2, cluster_labels, lig_cells_per_cluster = 10,
   lig_cells_total = 0, lig_edge_per_cell = 0,
@@ -34,5 +34,5 @@ SigPlot(P, rgb_gap = 0.2, cluster_labels, lig_cells_per_cluster = 10,
 \item{zero_threshold}{real value for zero cutoff (0 to keep all edges)}
 }
 \description{
-Produce a plot of a cell signaling network
+Produce a plot of a cell signaling network according to the cell-normalized expression score.
 }

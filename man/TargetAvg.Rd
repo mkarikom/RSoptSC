@@ -2,7 +2,7 @@
 % Please edit documentation in R/Signaling.R
 \name{TargetAvg}
 \alias{TargetAvg}
-\title{Get average target expression for each cell}
+\title{Get target expression}
 \usage{
 TargetAvg(M, ids)
 }
@@ -12,5 +12,5 @@ TargetAvg(M, ids)
 \item{ind}{a vector of row indexes corresponding to genes}
 }
 \description{
-Get average target expression for each cell
+Get average target expression for each cell.
 }

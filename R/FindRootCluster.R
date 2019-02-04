@@ -15,6 +15,8 @@
 #'     \item{root_cluster}{index of the root cluster}
 #'     \item{cluster_mst}{an igraph mst object}
 #'
+#' @importFrom igraph graph_from_adjacency_matrix mst
+#'
 #' @export
 #'
 FindRootCluster <- function(cluster_labels, 
@@ -32,11 +34,11 @@ FindRootCluster <- function(cluster_labels,
       cluster_adj_matrix[i, j] <- sum(i_j_distances)/n_i_j
     }
   }
-  graph_cluster <- igraph::graph_from_adjacency_matrix(adjmatrix = cluster_adj_matrix,
+  graph_cluster <- graph_from_adjacency_matrix(adjmatrix = cluster_adj_matrix,
                                                        mode = "upper",
                                                         weighted = TRUE)
 
-  cluster_mst <- igraph::mst(graph_cluster)
+  cluster_mst <- mst(graph_cluster)
   root_cluster_candidates <- which(cluster_adj_matrix == max(cluster_adj_matrix), arr.ind = TRUE)
   cluster_variance <- FindVariance(n_clusters, cluster_labels, flat_embedding)
   root_cluster_variance <- cluster_variance[root_cluster_candidates]
@@ -55,7 +57,7 @@ FindRootCluster <- function(cluster_labels,
 
 #' Find average cluster feature expression
 #'
-#' Average the expression of a feature and return the expression vector
+#' Average the expression of a feature and return the expression vector.
 #'
 #' @param cluster_labels the cluster label for each cell
 #' @param M a matrix of expression values for each cell

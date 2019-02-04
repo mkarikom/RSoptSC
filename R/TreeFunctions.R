@@ -5,10 +5,12 @@
 #'
 #' @return a vector[] of node ids, where vector[i] is the predecessor of node i
 #'
+#' @importFrom igraph get.shortest.paths
+#'
 #' @export
 #'
 GetPredecessors <- function(minspantree, root){
-  pathdata <- igraph::get.shortest.paths(graph = minspantree, from = root)
+  pathdata <- get.shortest.paths(graph = minspantree, from = root)
   pathlist <- prelist <- lapply(pathdata$vpath, function(x){
     y = as.vector(x)
     y[(length(y)-1)]
@@ -34,13 +36,13 @@ GetDominatorTree <- function(predecessors, weighted_graph = NULL){
   root <- which(predecessors == 0)
   edge_table <- cbind(i = predecessors, j = c(1:length(predecessors)))
   edge_table <- edge_table[-root,]
-
+  
   weights <- apply(edge_table, 1, function(x){
-      id <- get.edge.ids(weighted_graph,x)
-      E(weighted_graph)$weight[id]
-    })
+    id <- get.edge.ids(weighted_graph,x)
+    E(weighted_graph)$weight[id]
+  })
   edge_table <- as.data.frame(cbind(edge_table, weight = as.vector(weights)))
-
+  
   tree <- graph.data.frame(edge_table)
 }
 
@@ -49,6 +51,8 @@ GetDominatorTree <- function(predecessors, weighted_graph = NULL){
 #' @param edge_table a numeric matrix whose rows are edges, col 1 is v1, col2 is v2, col3 is weight
 #'
 #' @return a directed igraph object
+#' 
+#' @importFrom igraph graph_from_adjacency_matrix
 #'
 GetDGFromTable <- function(directed_edge_table){
   n_vertices <- max(directed_edge_table[,1:2])
@@ -57,9 +61,11 @@ GetDGFromTable <- function(directed_edge_table){
   for(i in 1:n_edges){
     adj_matrix[directed_edge_table[i,1], directed_edge_table[i,2]] <- directed_edge_table[i,3]
   }
-  tree <- igraph::graph_from_adjacency_matrix(adjmatrix = adj_matrix,
-                                              weighted = TRUE,
-                                              mode = 'directed')
+  tree <- graph_from_adjacency_matrix(adjmatrix = adj_matrix,
+                                      weighted = TRU
+                                      
+                                      ,
+                                      mode = 'directed')
 }
 
 
@@ -75,7 +81,9 @@ ProcessMatlabDTree <- function(edge_table, predecessors){
   # make a directed edge list
   directed_edges <- cbind(c(predecessors), 1:length(predecessors), rep(0, length(predecessors)))
   # remove the null edge leading to root
-  directed_edges <- directed_edges[-(which(directed_edges[,1] == 0, arr.ind = TRUE)),]
+  directed_edges <- directed_edges[-(which(directed_edges[,1] == 0, arr.ind = TRU
+                                           
+                                           )),]
 
   n_edges <- nrow(edge_table)
   for(i in 1:n_edges){

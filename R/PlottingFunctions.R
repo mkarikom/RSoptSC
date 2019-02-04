@@ -1,4 +1,6 @@
 #' Plot the pseudotime ordering of clusters
+#' 
+#' Plot the pseudotime ordering of clusters using igraph tools.
 #'
 #' @param network an igraph network with weighted edges corresponding to the pseudotime distance
 #' @param node_color an optional vector of colors for node labeling.  If null then the nodes are all colored black
@@ -9,6 +11,8 @@
 #' 
 #' @return nothing
 #'
+#' @importFrom igraph edges E plot.igraph E<-
+#'
 #' @export
 #'
 PlotLineage <- function(network, node_color = NULL, alpha_color = 1, 
@@ -17,26 +21,26 @@ PlotLineage <- function(network, node_color = NULL, alpha_color = 1,
                         arrow_scaler = 0.8){
   set.seed(1)
   if(is.null(node_color)){
-    node_color <- ColorHue(n = length(igraph::edges(network)[[1]][1]))
+    node_color <- ColorHue(n = length(edges(network)[[1]][1]))
     node_color <- node_color$hex.1.n.
   }
   if(exaggerate){
-    igraph::E(network)$width <-
-      (exp(igraph::E(network)$weight)) * weight_scaler
-    igraph::E(network)$arrow.width <- arrow_scaler * igraph::E(network)$weight
+    E(network)$width <-
+      (exp(E(network)$weight)) * weight_scaler
+    E(network)$arrow.width <- arrow_scaler * E(network)$weight
   }else{
-    igraph::E(network)$width <-
-      igraph::E(network)$weight
+    E(network)$width <-
+      E(network)$weight
   }
 
-  vertex_order <- as.numeric(names(igraph::edges(network)[[1]][1]))
+  vertex_order <- as.numeric(names(edges(network)[[1]][1]))
   node_color <- node_color[vertex_order]
-  igraph::plot.igraph(network, vertex.color = node_color)
+  plot.igraph(network, vertex.color = node_color)
 }
 
 #' Produce a plot of matlab DTree data and return the object
-#' If an output dir and filename are provided, a plot will
-#' be saved, otherwise the function will just return the graph
+#' 
+#' If an output dir and filename are provided, a plot will be saved, otherwise the function will just return the graph.  This is used for internal analysis to compare with matlab implementation.
 #'
 #' @param edge_table a numeric matrix whose rows are directed edges of a tree:
 #'     col 1 is v1, col2 is v2, col3 is weight
@@ -46,11 +50,9 @@ PlotLineage <- function(network, node_color = NULL, alpha_color = 1,
 #'
 #' @return an igraph representation of the tree
 #'
-#' @export
-#'
 PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfile = NULL){
-  directed_edge_table <- RSoptSC::ProcessMatlabDTree(edge_table, predecessors)
-  directed_graph <- RSoptSC::GetDGFromTable(directed_edge_table)
+  directed_edge_table <- ProcessMatlabDTree(edge_table, predecessors)
+  directed_graph <- GetDGFromTable(directed_edge_table)
   if(!is.null(outputdir) && !is.null(outputfile)){
     file_path <- paste0(getwd(),
                         .Platform$file.sep,
@@ -64,9 +66,9 @@ PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfi
   return(directed_graph)
 }
 
-#' Produce a scatter plot of the cells on selected 2-dim ebedding colored by feature
+#' Produce a scatter plot of the cells
 #'
-#' Create a scatter plot of the data.  If discrete (factor) data is passed, the colorscale parameter must be provided, otherwise the plot will default to gradient shading. 
+#' Create a scatter plot of the data on a 2-dim ebedding colored by feature.  If discrete (factor) data is passed, the colorscale parameter must be provided, otherwise the plot will default to gradient shading. 
 #'
 #' @param flat_embedding a low dim embedding of cells
 #' @param feature a scalar representation of feature
@@ -88,8 +90,14 @@ FeatureScatterPlot <- function(flat_embedding,
                                featurename,
                                colorscale = NULL){
   n_features <- length(unique(feature))
-  p <- ggplot(as.data.frame(flat_embedding), ggplot2::aes(x=V1, y=V2, color=feature))
+  #p <- ggplot(flat_embedding, aes(x=V1, y=V2, color=feature))
 
+  p <- ggplot(flat_embedding,
+         aes_(x = as.name(colnames(flat_embedding)[1]),
+              y = as.name(colnames(flat_embedding)[2]),
+              color = ~`feature`))
+    
+  
   if(is.null(colorscale)){
     p +
       geom_point() +
@@ -105,7 +113,9 @@ FeatureScatterPlot <- function(flat_embedding,
 }
 
 
-#' Plot the heatmap of markers and return the marker table
+#' Heatmap of the top n markers
+#' 
+#' Plot the heatmap of the top n inferred markers for each cluster.
 #'
 #' @param data expression data with genes x cells
 #' @param gene_names a vector of symbolic gene names corresponding to the rows in the data matrix
@@ -118,6 +128,7 @@ FeatureScatterPlot <- function(flat_embedding,
 #' @import dplyr
 #' @import RColorBrewer
 #' @import gplots
+#' @importFrom tibble as_tibble
 #'
 #' @export
 #'
@@ -131,8 +142,8 @@ PlotTopN <- function(data,
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
 
   markers_table <- as.data.frame(markers)
-  sortedmarkers <- dplyr::arrange(markers_table, clusterId, desc(geneScore))
-  sorted_gene_table <- tibble::as_tibble(sortedmarkers) %>% group_by(clusterId) %>% top_n(n_features, geneScore)
+  sortedmarkers <- arrange(markers_table, clusterId, desc(geneScore))
+  sorted_gene_table <- as_tibble(sortedmarkers) %>% group_by(clusterId) %>% top_n(n_features, geneScore)
   sorted_gene <- sorted_gene_table$geneID
 
   plot_data <- data[sorted_gene, sorted_cell$ix]
@@ -163,7 +174,9 @@ PlotTopN <- function(data,
                  scale = "row")
 }
 
-#' Given a set of markers, plot their expression across clusters on a heatmap
+#' Heatmap of specific genes
+#' 
+#' Given a set of markers, plot their expression across clusters on a heatmap.
 #'
 #' @param data expression data with genes x cells
 #' @param gene_names a vector of symbolic gene names corresponding to the rows in the data matrix
@@ -191,23 +204,25 @@ PlotClusterExpression <- function(data,
                          cell_labels = cluster_labels,
                          gene_list = markers)
   
-  p <- gplots::heatmap.2(log10(t(filtered) + 1),
-                         col = rev(brewer.pal(11,"RdBu")),
-                         trace = 'none',
-                         dendrogram='none',
-                         Rowv=FALSE, Colv=FALSE,
-                         labCol = c(1:n_clusters),
-                         labRow = markers,
-                         srtCol = 0,
-                         cexCol =1,
-                         cexRow = .7,
-                         lhei = c(1,2),
-                         key.title = NA,
-                         scale = "row")
+  p <- heatmap.2(log10(t(filtered) + 1),
+                 col = rev(brewer.pal(11,"RdBu")),
+                 trace = 'none',
+                 dendrogram='none',
+                 Rowv=FALSE, Colv=FALSE,
+                 labCol = c(1:n_clusters),
+                 labRow = markers,
+                 srtCol = 0,
+                 cexCol =1,
+                 cexRow = .7,
+                 lhei = c(1,2),
+                 key.title = NA,
+                 scale = "row")
 }
 
 
-#' Produce a violin plot of gene expression
+#' Violin plot of gene expression
+#' 
+#' Produce a violin plot of gene expression.
 #'
 #' @param data a matrix with genes in rows and cells in columns
 #' @param gene_names a vector of names corresponding to the rows in data
@@ -247,7 +262,9 @@ ViolinPlotExpression <- function(data,
           theme_minimal())
 }
 
-#' Produce a plot of a cell signaling network
+#' Circos plot of signaling score
+#' 
+#' Produce a plot of a cell signaling network according to the cell-normalized expression score.
 #'
 #' @param P signaling probabilities cells x cells
 #' @param rgb_gap real percent of the inter-cluster spectrum gap to encompass cluster highlighting
@@ -263,6 +280,7 @@ ViolinPlotExpression <- function(data,
 #'
 #' @import dplyr
 #' @import circlize
+#' @importFrom reshape2 melt
 #'
 #' @export
 #'
@@ -350,8 +368,8 @@ SigPlot <- function(P,
   # col1 is the ligand cell
   # col2 is the receptor cell
   # col3 is the weight of the link
-  P_table <- reshape2::melt(P_ordered)
-  base::colnames(P_table) <- c("lig_cell", "rec_cell", "link_weight")
+  P_table <- melt(P_ordered)
+  colnames(P_table) <- c("lig_cell", "rec_cell", "link_weight")
   ind_lig <- match(P_table$lig_cell, ordering)
   lig_clust_num <- labels[ind_lig]
   P_table$lig_cluster_number <- lig_clust_num
@@ -360,7 +378,7 @@ SigPlot <- function(P,
   rec_clust_num <- labels[ind_rec]
   P_table$rec_cluster_number <- rec_clust_num
   
-  P_table <- dplyr::arrange(P_table, lig_cluster_number, lig_cell)
+  P_table <- arrange(P_table, lig_cluster_number, lig_cell)
   
   # add a prefix to make the rec cells unique for sector highlighting
   P_table$rec_cell <- paste(P_table$rec_cell, "R", sep = "_")
@@ -412,6 +430,8 @@ SigPlot <- function(P,
 }
 
 #' Get a vector of n equally spaced rgb colors
+#' 
+#' Get a vector of n equally spaced rgb colors.
 #'
 #' @param n integer number of hex codes to return
 #' @param starthue real hue argument for the grDevices::hcl() generates value 1
@@ -430,6 +450,8 @@ ColorHue <- function(n, starthue = 15, endhue = 360,
 }
 
 #' Get chord colors for cells
+#' 
+#' Get chord colors for cells.
 #'
 #' @param edge_table a table with lig, rec, score, lig_cluster, rec_cluster
 #' @param cluster_cols colors for the clusters

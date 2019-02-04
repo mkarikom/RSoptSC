@@ -2,7 +2,7 @@
 % Please edit documentation in R/ClusterNumber.R
 \name{GetEnsemble}
 \alias{GetEnsemble}
-\title{Produce a truncated ensemble consensus matrix}
+\title{Produce consensus matrix}
 \usage{
 GetEnsemble(data, tol, n_prcs = 3, tau, range = 1:20,
   method = "kmeans")
@@ -27,5 +27,5 @@ consensus matrix}
 a truncated ensemble consensus matrix
 }
 \description{
-Produce a truncated ensemble consensus matrix
+Produce a truncated ensemble consensus matrix.
 }

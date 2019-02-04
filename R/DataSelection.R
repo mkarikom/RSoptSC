@@ -1,8 +1,6 @@
-#' Return a set of the most variable genes
+#' Set of the most variable genes
 #' 
-#' First filter using the expression threshold
-#' Then use the coefficient of the top variance PCA components
-#' to determine the variability of the gene
+#' First filter using the expression threshold.  Then use the coefficient of the top variance PCA components to determine the variability of the gene.
 #'
 #' @param M a matrix of expression values for each gene (rows) and cell (columns)
 #' @param gene_expression_threshold for n cells, for \code{gene_expression_threshold} = m, dont consider genes
@@ -10,6 +8,8 @@
 #' @param n_features number of genes to retrieve
 #'
 #' @return a table of features (rows) and samples (columns)
+#'
+#' @importFrom Matrix nnzero
 #'
 #' @export
 #'
@@ -21,7 +21,7 @@ SelectData <- function(M, gene_expression_threshold, n_features){
   if(gene_expression_threshold > 0){
     alpha_filter <- gene_expression_threshold / n_cells
     gene_nnz <- apply(M, 1, function(x){
-      Matrix::nnzero(x) / n_cells
+      nnzero(x) / n_cells
     })
     gene_use <- intersect(which(gene_nnz > alpha_filter, arr.ind = TRUE),
                           which(gene_nnz < 1 - alpha_filter, arr.ind = TRUE))

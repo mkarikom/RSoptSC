@@ -1,5 +1,6 @@
-#' generate convenient representations of the data
-#' representations of the data are necessary for subsequent lineage analysis
+#' Generate multiple representations
+#' 
+#' Generate representations of the data to be used in lineage analysis.
 #'
 #' @param similarity_matrix the graphical embedding of the cells
 #' @param join_components boolean, whether or not to join disconnected components of the similarity matrix
@@ -16,25 +17,22 @@
 #'     \item{sizes}{sizes of components in \code{components}}
 #'     \item{members}{list of members of \code{components}, sorted by component size and member index}
 #'
+#' @importFrom igraph graph_from_adjacency_matrix components distances
+#' @importFrom Rtsne Rtsne
+#'
 #' @export
 #'
 RepresentationMap <- function(flat_embedding = NULL,
                               similarity_matrix, 
                               join_components = TRUE, 
                               ...){
-  #browser()
   if(is.null(flat_embedding)){
     # set the seed for tsne
     set.seed(1)
     # initialize with low dim embedding
-    print("computing flat embedding")
-    lat_pc = prcomp(similarity_matrix, center = TRUE)
-    # flat_embedding = Rtsne::Rtsne(X = lat_pc$x[,1:2],
-    #                               perplexity = perplexity,
-    #                               pca_center = TRUE,
-    #                               pca_scale = TRUE,
-    #                               dims = 2)$Y
-    flat_embedding = Rtsne::Rtsne(X = similarity_matrix, ...)$Y
+    flat_embedding <- Rtsne(X = similarity_matrix, ...)$Y
+    flat_embedding <- as.data.frame(flat_embedding)
+    colnames(flat_embedding) <- c("C1", "C2")
   }
 
   dist_flat <- as.matrix(dist(flat_embedding, method="euclidean", diag = TRUE))
@@ -44,8 +42,8 @@ RepresentationMap <- function(flat_embedding = NULL,
   adj_matrix[similarity_matrix>0] <- 1
   diag(adj_matrix) <- 0
 
-  similarity_graph <- igraph::graph_from_adjacency_matrix(adj_matrix, mode = c("undirected"))
-  components <- igraph::components(similarity_graph)
+  similarity_graph <- graph_from_adjacency_matrix(adj_matrix, mode = c("undirected"))
+  components <- components(similarity_graph)
   n_components <- components$no
   
   ### Join the components if more than one
@@ -58,7 +56,7 @@ RepresentationMap <- function(flat_embedding = NULL,
                                       flat_distances = dist_flat,
                                       n_components = n_components,
                                       component_members = membership_list)
-    similarity_graph <- igraph::graph_from_adjacency_matrix(adj_matrix, mode = c("undirected"))
+    similarity_graph <- graph_from_adjacency_matrix(adj_matrix, mode = c("undirected"))
   }
   
   sizes <- sort(components$csize, decreasing = TRUE)
@@ -69,7 +67,7 @@ RepresentationMap <- function(flat_embedding = NULL,
   members <- lapply(members, function(x) sort(x))
   members <- members[order(sapply(members, length), decreasing=FALSE)]
 
-  dist_graph <- igraph::distances(similarity_graph)
+  dist_graph <- distances(similarity_graph)
 
   mappings <- list(dist_flat = dist_flat,
                    dist_graph = dist_graph,
@@ -82,7 +80,13 @@ RepresentationMap <- function(flat_embedding = NULL,
                    members = members)
 }
 
-# give a list of vectors where list[[i]] = c(cells in component i)
+#' Get a list of membership vectors
+#' 
+#' Get a list of membership vectors to facilitate component-joining
+#'
+#' @param membership_vector the component membership of cells
+#' @return where list[[i]] = c(cells in component i)
+#' 
 MembershipList <- function(membership_vector){
   components <- unique(membership_vector)
   membership_list <- list()

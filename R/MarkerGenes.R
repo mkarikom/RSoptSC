@@ -1,4 +1,6 @@
-#' Get the marker genes for each cluster and report their 1-normalized expression value
+#' Get the marker genes for each cluster
+#' 
+#' Get the marker genes for each cluster and report their 1-normalized expression value.
 #'
 #' @param counts_data a matrix of expression values for each cell (rows) and gene (columns)
 #' @param cluster_labels a vector of cluster labels

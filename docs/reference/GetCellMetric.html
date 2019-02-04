@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Perform ADMM — computM • RSoptSC</title>
+<title>Get metric of pseudotime — GetCellMetric • RSoptSC</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,15 +30,9 @@
 
 
 
-<meta property="og:title" content="Perform ADMM — computM" />
+<meta property="og:title" content="Get metric of pseudotime — GetCellMetric" />
 
-<meta property="og:description" content="Computing cell-to-cell similarity matrix by solving the following
-optimization problem via ADMM
-$$
-  min_{Z,E}  ||Z||_* + lambda ||E||_{2,1}\\
-  s.t.       X = XZ + E\\
-             Z'1 = 1\\
-              Z_{i,j} = 0 for (i,j) \in Omega$$" />
+<meta property="og:description" content="Measure pseudotime from the given cell to its cluster partners." />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -121,45 +115,48 @@ $$
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Perform ADMM</h1>
+    <h1>Get metric of pseudotime</h1>
     
-    <div class="hidden name"><code>computM.Rd</code></div>
+    <div class="hidden name"><code>GetCellMetric.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Computing cell-to-cell similarity matrix by solving the following
-optimization problem via ADMM
-$$
-  min_{Z,E}  ||Z||_* + lambda ||E||_{2,1}\\
-  s.t.       X = XZ + E\\
-             Z'1 = 1\\
-              Z_{i,j} = 0 for (i,j) \in Omega$$</p>
+    <p>Measure pseudotime from the given cell to its cluster partners.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>computM</span>(<span class='no'>D</span>, <span class='no'>X</span>, <span class='no'>lambda</span>)</pre>
+    <pre class="usage"><span class='fu'>GetCellMetric</span>(<span class='no'>cell_order_by</span>, <span class='no'>cell_id</span>, <span class='no'>cluster_id</span>, <span class='no'>cluster_labels</span>,
+  <span class='no'>dist_graph</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>D</th>
-      <td><p>the unweighted KNN adjacency matrix</p></td>
+      <th>cell_order_by</th>
+      <td><p>cell-wise pseudotime parameter for measuring cluster/cell rank correlation</p></td>
     </tr>
     <tr>
-      <th>X</th>
-      <td><p>normalized sample vectors</p></td>
+      <th>cell_id</th>
+      <td><p>the cell to measure from</p></td>
     </tr>
     <tr>
-      <th>lambda</th>
-      <td><p>the balance term between the rank of Z and the error</p></td>
+      <th>cluster_id</th>
+      <td><p>the cluster of the cell</p></td>
+    </tr>
+    <tr>
+      <th>cluster_labels</th>
+      <td><p>the cluster label for each cell</p></td>
+    </tr>
+    <tr>
+      <th>dist_graph</th>
+      <td><p>a distance matrix of cells embedded in a graph</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a list containing the low rank approximation of X and manifold learning error</p>
+    <p>the mean distance (by given metric) from the given cell</p>
     
 
   </div>

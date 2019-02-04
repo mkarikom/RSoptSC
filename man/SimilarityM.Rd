@@ -18,5 +18,5 @@ a list containing the symetric cell to cell similarity matrix and
 \description{
 Computes low dim embedding, constructs KNN graph on the embedding -> unweighted adjacency
 Calls manifold learning algorithm which uses the normalized sample vectors and the
-unweighted adjacency matrix to compute a low rank approximation of the data
+unweighted adjacency matrix to compute a low rank approximation of the data.
 }
