@@ -311,44 +311,51 @@
 <h2 class="hasAnchor">
 <a href="#analyze-signaling-mediated-by-a-ligand-receptor-family" class="anchor"></a>Analyze Signaling Mediated by a Ligand-Receptor Family</h2>
 <p>We present a family of ligan-receptor pairs along with their up/down-regulated targets. We compute the probability of intercellular interaction based on this pathway.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">  ligands &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">Tgfb1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">Tgfbr1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">up =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>)),</a>
+<a class="sourceLine" id="cb23-2" data-line-number="2">                               <span class="dt">Tgfbr2 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">up =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>))),</a>
+<a class="sourceLine" id="cb23-3" data-line-number="3">                  <span class="dt">Tgfb2 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">Tgfbr1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">up =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>)),</a>
+<a class="sourceLine" id="cb23-4" data-line-number="4">                               <span class="dt">Tgfbr2 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">up =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>))))</a>
+<a class="sourceLine" id="cb23-5" data-line-number="5">  Pmats &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetSignalingPartners.html">GetSignalingPartners</a></span>(logdata,</a>
+<a class="sourceLine" id="cb23-6" data-line-number="6">                                  gene_names,</a>
+<a class="sourceLine" id="cb23-7" data-line-number="7">                                  ligands)</a></code></pre></div>
 <div id="circos-plot-of-intercellular-network" class="section level3">
 <h3 class="hasAnchor">
 <a href="#circos-plot-of-intercellular-network" class="anchor"></a>Circos Plot of Intercellular Network</h3>
 <p>Now plot the previous result as a circos plot on the top five ligand-producing and top five receptor-bearing cells from every cluster. The upper hemisphere of the plot shows receptor-bearing cells. The chords of the plot are colored by the ligand-producing cells in the lower hemisphere.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb23-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb23-3" data-line-number="3"><span class="kw"><a href="../reference/SigPlot.html">SigPlot</a></span>(<span class="dt">P =</span> Pmats<span class="op">$</span>P_agg,</a>
-<a class="sourceLine" id="cb23-4" data-line-number="4">        <span class="dt">cluster_labels =</span> labels,</a>
-<a class="sourceLine" id="cb23-5" data-line-number="5">        <span class="dt">lig_cells_per_cluster =</span> <span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb23-6" data-line-number="6">        <span class="dt">rec_cells_per_cluster =</span> <span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb23-7" data-line-number="7">        <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb24-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="kw"><a href="../reference/SigPlot.html">SigPlot</a></span>(<span class="dt">P =</span> Pmats<span class="op">$</span>P_agg,</a>
+<a class="sourceLine" id="cb24-4" data-line-number="4">        <span class="dt">cluster_labels =</span> labels,</a>
+<a class="sourceLine" id="cb24-5" data-line-number="5">        <span class="dt">lig_cells_per_cluster =</span> <span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb24-6" data-line-number="6">        <span class="dt">rec_cells_per_cluster =</span> <span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb24-7" data-line-number="7">        <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-24-1.png" width="100%" height="100%"></p>
 </div>
 <div id="circos-plot-of-intercluster-network" class="section level3">
 <h3 class="hasAnchor">
 <a href="#circos-plot-of-intercluster-network" class="anchor"></a>Circos Plot of Intercluster Network</h3>
 <p>Directional plot of cluster-to-cluster signaling. The root of the directional chord is raised.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">  cluster_P &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ClusterSig.html">ClusterSig</a></span>(Pmats<span class="op">$</span>P_agg,</a>
-<a class="sourceLine" id="cb24-2" data-line-number="2">                          <span class="dt">cluster_labels =</span> labels)</a>
-<a class="sourceLine" id="cb24-3" data-line-number="3">  <span class="kw"><a href="../reference/SigPlot.html">SigPlot</a></span>(<span class="dt">P =</span> cluster_P,</a>
-<a class="sourceLine" id="cb24-4" data-line-number="4">          <span class="dt">cluster_labels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span><span class="op">:</span>n_clusters),</a>
-<a class="sourceLine" id="cb24-5" data-line-number="5">          <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">  cluster_P &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ClusterSig.html">ClusterSig</a></span>(Pmats<span class="op">$</span>P_agg,</a>
+<a class="sourceLine" id="cb25-2" data-line-number="2">                          <span class="dt">cluster_labels =</span> labels)</a>
+<a class="sourceLine" id="cb25-3" data-line-number="3">  <span class="kw"><a href="../reference/SigPlot.html">SigPlot</a></span>(<span class="dt">P =</span> cluster_P,</a>
+<a class="sourceLine" id="cb25-4" data-line-number="4">          <span class="dt">cluster_labels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span><span class="op">:</span>n_clusters),</a>
+<a class="sourceLine" id="cb25-5" data-line-number="5">          <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-25-1.png" width="100%" height="100%"></p>
 </div>
 <div id="heatmap-of-signaling-marker-expression" class="section level3">
 <h3 class="hasAnchor">
 <a href="#heatmap-of-signaling-marker-expression" class="anchor"></a>Heatmap of Signaling Marker Expression</h3>
 <p>Visualize the expression of ligand/receptor and up/down target expression across clusters</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb25-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb25-3" data-line-number="3">  gene_list =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'Tgfb1'</span>, <span class="st">'Tgfb2'</span>, </a>
-<a class="sourceLine" id="cb25-4" data-line-number="4">                <span class="st">'Tgfbr1'</span>, <span class="st">'Tgfbr2'</span>,</a>
-<a class="sourceLine" id="cb25-5" data-line-number="5">                <span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>)</a>
-<a class="sourceLine" id="cb25-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb25-7" data-line-number="7">  <span class="kw"><a href="../reference/PlotClusterExpression.html">PlotClusterExpression</a></span>(<span class="dt">data =</span> logdata,</a>
-<a class="sourceLine" id="cb25-8" data-line-number="8">                        <span class="dt">gene_names =</span> gene_names,</a>
-<a class="sourceLine" id="cb25-9" data-line-number="9">                        <span class="dt">cluster_labels =</span> labels, </a>
-<a class="sourceLine" id="cb25-10" data-line-number="10">                        <span class="dt">markers =</span> gene_list)</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb26-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb26-3" data-line-number="3">  gene_list =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'Tgfb1'</span>, <span class="st">'Tgfb2'</span>, </a>
+<a class="sourceLine" id="cb26-4" data-line-number="4">                <span class="st">'Tgfbr1'</span>, <span class="st">'Tgfbr2'</span>,</a>
+<a class="sourceLine" id="cb26-5" data-line-number="5">                <span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>)</a>
+<a class="sourceLine" id="cb26-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb26-7" data-line-number="7">  <span class="kw"><a href="../reference/PlotClusterExpression.html">PlotClusterExpression</a></span>(<span class="dt">data =</span> logdata,</a>
+<a class="sourceLine" id="cb26-8" data-line-number="8">                        <span class="dt">gene_names =</span> gene_names,</a>
+<a class="sourceLine" id="cb26-9" data-line-number="9">                        <span class="dt">cluster_labels =</span> labels, </a>
+<a class="sourceLine" id="cb26-10" data-line-number="10">                        <span class="dt">markers =</span> gene_list)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-26-1.png" width="100%" height="100%"></p>
 </div>
 </div>
