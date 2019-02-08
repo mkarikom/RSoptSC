@@ -67,13 +67,14 @@ Compute distances on the similarity matrix.  If the truncated graph has multiple
 #                                   dims = 2
 low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
                             join_components = FALSE,
-                            perplexity = 50,
+                            perplexity = 35,
                             theta = 0.5,
                             normalize = FALSE,
                             pca = TRUE,
                             pca_center = TRUE,
                             pca_scale = TRUE,
-                            dims = 2)
+                            dims = 2,
+                            initial_dims = 2)
 ```
 
 ## Cluster the Cells
