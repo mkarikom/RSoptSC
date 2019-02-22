@@ -130,7 +130,7 @@ Note that activated genes are required under this model.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>GetSignalingPartners</span>(<span class='no'>M</span>, <span class='no'>ids</span>, <span class='no'>ligand</span>, <span class='no'>targets</span>)</pre>
+    <pre class="usage"><span class='fu'>GetSignalingPartners</span>(<span class='no'>M</span>, <span class='no'>ids</span>, <span class='no'>pathway</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -144,12 +144,17 @@ Note that activated genes are required under this model.</p>
       <td><p>a vector of gene ids</p></td>
     </tr>
     <tr>
-      <th>ligand</th>
-      <td><p>a named list:
-list(ligand1 = list(receptor1 = list(up = list(target1, target2),
-                                     down = list(target3, target4))))</p></td>
+      <th>pathway</th>
+      <td><p>a data frame with "ligands", "receptors", "direction", and "targets"</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>a list containing:</p>
+<dt>P</dt><dd><p>a list of the cell-cell signaling probabilities for all ligand/receptor pairs</p></dd>
+    <dt>P_agg</dt><dd><p>the aggregate matrix of all ligand/receptor pairs</p></dd>
+
     
 
   </div>
@@ -157,7 +162,9 @@ list(ligand1 = list(receptor1 = list(up = list(target1, target2),
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#value">Value</a></li>
+          </ul>
 
   </div>
 </div>

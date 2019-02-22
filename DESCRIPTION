@@ -27,6 +27,6 @@ Imports:
     RColorBrewer (>= 1.1-2),
     tibble (>= 2.0.1)
 Suggests: testthat,
-    rmarkdown, knitr, ClusterR
+    rmarkdown, knitr, ClusterR, kableExtra
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr

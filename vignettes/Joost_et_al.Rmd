@@ -294,9 +294,11 @@ Violin Plot of Lor expression.  Note strong expression in clusters 3 and 5, whic
 
 ## Analyze Signaling Mediated by a Ligand-Receptor Family
 
-We present a family of ligan-receptor pairs along with their up/down-regulated targets.  We compute the probability of intercellular interaction based on this pathway.
+We present a family of ligan-receptor pairs along with their up/down-regulated targets.  The following table can be passed as a data frame to RSoptSC::GetSignalingPartners.  We compute the probability of intercellular interaction based on this pathway.
 
 ```{r, echo=FALSE}
+library(knitr)
+library(kableExtra)
 ligands <- list(Tgfb1 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')),
                                Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'))),
                   Tgfb2 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')),
@@ -305,7 +307,7 @@ pathway <- reshape2::melt(ligands)
 pathway <- pathway[,-c(2)]
 pathway <- pathway[,c(4, 3, 2, 1)]
 colnames(pathway) <- c("ligand", "receptor", "direction", "target")
-print(pathway)
+pathway %>% kable() %>% kable_styling()
 ```
 
 ```{r, results='hide', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, message=FALSE}

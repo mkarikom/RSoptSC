@@ -75,13 +75,13 @@
 <!--/.navbar -->
 
       
-      </header><div class="row">
+      </header><script src="Joost_et_al_files/kePrint-0.0.1/kePrint.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2019-02-07</h4>
+            <h4 class="date">2019-02-21</h4>
       
       
       <div class="hidden name"><code>Joost_et_al.Rmd</code></div>
@@ -311,14 +311,421 @@
 <div id="analyze-signaling-mediated-by-a-ligand-receptor-family" class="section level2">
 <h2 class="hasAnchor">
 <a href="#analyze-signaling-mediated-by-a-ligand-receptor-family" class="anchor"></a>Analyze Signaling Mediated by a Ligand-Receptor Family</h2>
-<p>We present a family of ligan-receptor pairs along with their up/down-regulated targets. We compute the probability of intercellular interaction based on this pathway.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">  ligands &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">Tgfb1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">Tgfbr1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">up =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>)),</a>
-<a class="sourceLine" id="cb23-2" data-line-number="2">                               <span class="dt">Tgfbr2 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">up =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>))),</a>
-<a class="sourceLine" id="cb23-3" data-line-number="3">                  <span class="dt">Tgfb2 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">Tgfbr1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">up =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>)),</a>
-<a class="sourceLine" id="cb23-4" data-line-number="4">                               <span class="dt">Tgfbr2 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">up =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>))))</a>
-<a class="sourceLine" id="cb23-5" data-line-number="5">  Pmats &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetSignalingPartners.html">GetSignalingPartners</a></span>(logdata,</a>
-<a class="sourceLine" id="cb23-6" data-line-number="6">                                  gene_names,</a>
-<a class="sourceLine" id="cb23-7" data-line-number="7">                                  ligands)</a></code></pre></div>
+<p>We present a family of ligan-receptor pairs along with their up/down-regulated targets. The following table can be passed as a data frame to RSoptSC::GetSignalingPartners. We compute the probability of intercellular interaction based on this pathway.</p>
+<table class="table table">
+<thead><tr>
+<th style="text-align:left;">
+ligand
+</th>
+<th style="text-align:left;">
+receptor
+</th>
+<th style="text-align:left;">
+direction
+</th>
+<th style="text-align:left;">
+target
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Zeb2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Smad2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Wnt4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Wnt11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Bmp7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Sox9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Notch1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Zeb2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Smad2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Wnt4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Wnt11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Bmp7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Sox9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Notch1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Zeb2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Smad2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Wnt4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Wnt11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Bmp7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Sox9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Notch1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Zeb2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Smad2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Wnt4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Wnt11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Bmp7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Sox9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+up
+</td>
+<td style="text-align:left;">
+Notch1
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">  </a>
+<a class="sourceLine" id="cb23-2" data-line-number="2">  Pmats &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetSignalingPartners.html">GetSignalingPartners</a></span>(logdata,</a>
+<a class="sourceLine" id="cb23-3" data-line-number="3">                                  gene_names,</a>
+<a class="sourceLine" id="cb23-4" data-line-number="4">                                  pathway)</a></code></pre></div>
 <div id="circos-plot-of-intercellular-network" class="section level3">
 <h3 class="hasAnchor">
 <a href="#circos-plot-of-intercellular-network" class="anchor"></a>Circos Plot of Intercellular Network</h3>
@@ -330,7 +737,7 @@
 <a class="sourceLine" id="cb24-5" data-line-number="5">        <span class="dt">lig_cells_per_cluster =</span> <span class="dv">5</span>,</a>
 <a class="sourceLine" id="cb24-6" data-line-number="6">        <span class="dt">rec_cells_per_cluster =</span> <span class="dv">5</span>,</a>
 <a class="sourceLine" id="cb24-7" data-line-number="7">        <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>)</a></code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-24-1.png" width="100%" height="100%"></p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-25-1.png" width="100%" height="100%"></p>
 </div>
 <div id="circos-plot-of-intercluster-network" class="section level3">
 <h3 class="hasAnchor">
@@ -341,7 +748,7 @@
 <a class="sourceLine" id="cb25-3" data-line-number="3">  <span class="kw"><a href="../reference/SigPlot.html">SigPlot</a></span>(<span class="dt">P =</span> cluster_P,</a>
 <a class="sourceLine" id="cb25-4" data-line-number="4">          <span class="dt">cluster_labels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span><span class="op">:</span>n_clusters),</a>
 <a class="sourceLine" id="cb25-5" data-line-number="5">          <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>)</a></code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-25-1.png" width="100%" height="100%"></p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-26-1.png" width="100%" height="100%"></p>
 </div>
 <div id="heatmap-of-signaling-marker-expression" class="section level3">
 <h3 class="hasAnchor">
@@ -357,7 +764,7 @@
 <a class="sourceLine" id="cb26-8" data-line-number="8">                        <span class="dt">gene_names =</span> gene_names,</a>
 <a class="sourceLine" id="cb26-9" data-line-number="9">                        <span class="dt">cluster_labels =</span> labels, </a>
 <a class="sourceLine" id="cb26-10" data-line-number="10">                        <span class="dt">markers =</span> gene_list)</a></code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-26-1.png" width="100%" height="100%"></p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-27-1.png" width="100%" height="100%"></p>
 </div>
 </div>
   </div>
