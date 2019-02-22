@@ -4,16 +4,19 @@
 \alias{GetSignalingPartners}
 \title{Compute Cell-cell interaction probability}
 \usage{
-GetSignalingPartners(M, ids, ligand, targets)
+GetSignalingPartners(M, ids, pathway)
 }
 \arguments{
 \item{M}{a matrix of expression values for each cell (rows) and gene (columns)}
 
 \item{ids}{a vector of gene ids}
 
-\item{ligand}{a named list:
-list(ligand1 = list(receptor1 = list(up = list(target1, target2),
-                                     down = list(target3, target4))))}
+\item{pathway}{a data frame with "ligands", "receptors", "direction", and "targets"}
+}
+\value{
+a list containing:
+    \item{P}{a list of the cell-cell signaling probabilities for all ligand/receptor pairs}
+    \item{P_agg}{the aggregate matrix of all ligand/receptor pairs}
 }
 \description{
 We can have a situation where ligand/receptor expression is low, but target genes (repressors and activators) are highly expressed.  In this case we will get a false positive for \eqn{P_{i,j}}.  In order to correct for this, we introduce normalizing coefficients for the relationship between \eqn{\alpha_{i,j}} and \eqn{\beta / \gamma}.  When \eqn{\alpha} is low, then K and D will decrease rapidly with increasing \eqn{\beta} and \eqn{\gamma}, penalizing the resulting increase in P (which is increasingly likely to be a false positive, given the disparity between \eqn{\alpha} and \eqn{\beta},\eqn{\gamma})

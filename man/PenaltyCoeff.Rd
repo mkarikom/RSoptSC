@@ -15,6 +15,9 @@ PenaltyCoeff(alpha, const, num = "alpha", n_cells)
 
 \item{n_cells}{the number of cells (row-traversal of the alpha matrix)}
 }
+\value{
+the K or D penalty for a signaling matrix
+}
 \description{
 This will approach 1 as the difference between alpha and \code{const} approaches 0.
 }

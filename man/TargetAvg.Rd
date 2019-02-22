@@ -11,6 +11,9 @@ TargetAvg(M, ids)
 
 \item{ind}{a vector of row indexes corresponding to genes}
 }
+\value{
+avg expression over a list of ids
+}
 \description{
 Get average target expression for each cell.
 }

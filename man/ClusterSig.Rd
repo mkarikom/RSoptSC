@@ -2,7 +2,7 @@
 % Please edit documentation in R/Signaling.R
 \name{ClusterSig}
 \alias{ClusterSig}
-\title{Average cluster to cluster gene expression}
+\title{Average cluster to cluster signaling}
 \usage{
 ClusterSig(P, cluster_labels, remove_zeros = TRUE)
 }
@@ -13,6 +13,9 @@ ClusterSig(P, cluster_labels, remove_zeros = TRUE)
 
 \item{remove_zeros}{boolean whether to remove zero rows from the P matrix}
 }
+\value{
+a matrix of cluster to cluster signaling
+}
 \description{
-Average cluster to cluster gene expression.
+Average cluster to cluster signaling.
 }

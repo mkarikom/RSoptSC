@@ -17,6 +17,9 @@ ClusterAvg(M, gene_names, cell_order, cell_labels, gene_list)
 
 \item{gene_list}{filter by a list of gene names}
 }
+\value{
+a matrix of avg expression values
+}
 \description{
 Create a heatmap with signaling markers over clusters.
 }

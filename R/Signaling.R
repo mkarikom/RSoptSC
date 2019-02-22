@@ -6,67 +6,73 @@
 #'
 #' @param M a matrix of expression values for each cell (rows) and gene (columns)
 #' @param ids a vector of gene ids
-#' @param ligand a named list:
-#'     list(ligand1 = list(receptor1 = list(up = list(target1, target2),
-#'                                          down = list(target3, target4))))
+#' @param pathway a data frame with "ligands", "receptors", "direction", and "targets"
+#'                                          
+#' @return a list containing:
+#'     \item{P}{a list of the cell-cell signaling probabilities for all ligand/receptor pairs}
+#'     \item{P_agg}{the aggregate matrix of all ligand/receptor pairs}
+#'                                          
 #' @importFrom reshape2 melt
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate_all
 #' 
 #' @export
 #'
 GetSignalingPartners <- function(M,
-                                 ids,
-                                 ligand,
-                                 targets){
+                                  ids,
+                                  pathway){
   n_cells <- ncol(M)
   n_genes <- nrow(M)
-
-  # represent the pathway heirarchy as a data frame
-  pathway <- (melt(ligand)[,-2])[,c(4, 3, 2, 1)]
-  colnames(pathway) <- c('ligand', 'receptor', 'logic', 'target')
-
+  
+  # fix the names
+  ids <- tolower(ids)
+  pathway <- mutate_all(pathway, .funs = tolower)
+  
   # ligand-receptor pairs
-  LR_pairs <- unique(pathway[,1:2])
-
+  LR_pairs <- unique(pathway[c("ligand", "receptor")])
+  
   P <- list()
   for(pair in 1:nrow(LR_pairs)){
     # find alpha
-    lig_index <- which((LR_pairs[pair, 1]) == ids)
+    lig_index <- which(LR_pairs[pair, 1] == ids)
     lnsub <- NormalizeSubset(M, lig_index)
-
-    rec_index <- which((LR_pairs[pair, 2]) == ids)
+    
+    rec_index <- which(LR_pairs[pair, 2] == ids)
     rnsub <- NormalizeSubset(M, rec_index)
     alpha <- exp(-1/(matrix(lnsub,n_cells,1) %*%
                        matrix(rnsub,1,n_cells)))
-
+    
     # find beta
     targ_up <- filter(pathway,
                       ligand == LR_pairs[pair,1] &
                         receptor == LR_pairs[pair,2] &
-                        logic == 'up')
+                        direction == 'up')
     up_index <- match(targ_up[,4],ids)
+    up_index <- up_index[!is.na(up_index)]
     if(length(up_index) > 0){
       avg_up <- TargetAvg(M, up_index)
       beta <- exp(-1/avg_up)
     }else{
       beta <- rep(1, n_cells)
     }
-
+    
     # find gamma
     targ_down <- filter(pathway,
                         ligand == LR_pairs[pair,1] &
                           receptor == LR_pairs[pair,2] &
-                          logic == 'down')
+                          direction == 'down')
     down_index <-match(targ_down[,4],ids)
+    down_index <- down_index[!is.na(down_index)]
     if(length(down_index) > 0){
       avg_down <- TargetAvg(M, down_index)
       gamma <- exp(-avg_down)      
     }else{
       gamma <- rep(1, n_cells)
     }
-
+    
     gammaM <- t(replicate(n_cells, gamma))
     betaM <- t(replicate(n_cells, beta))
-
+    
     # find K
     if(length(up_index) > 0){
       K <- PenaltyCoeff(alpha = alpha, const = betaM, num = 'alpha', n_cells)
@@ -79,7 +85,7 @@ GetSignalingPartners <- function(M,
     }else{
       D <- matrix(rep(1, n_cells*n_cells), n_cells, n_cells)
     }
-
+    
     P_num <- alpha*K*betaM*D*gammaM
     # compute the normalizing factor
     tempMat <- replicate(n_cells, apply(P_num, 1, sum))
@@ -100,6 +106,8 @@ GetSignalingPartners <- function(M,
 #'
 #' @param M a matrix of expression values for each cell (rows) and gene (columns)
 #' @param ind a vector of row indexes corresponding to genes
+#' 
+#' @return avg expression over a list of ids
 #'
 TargetAvg <- function(M,
                       ids){
@@ -116,6 +124,8 @@ TargetAvg <- function(M,
 #'
 #' @param M a matrix of expression values for each cell (columns) and gene (rows)
 #' @param ind a vector of row indexes corresponding to genes
+#' 
+#' @return a normalized matrix of expression values
 #'
 NormalizeSubset <- function(M,
                             ids){
@@ -148,6 +158,8 @@ NormalizeSubset <- function(M,
 #' @param const either the normalized repression targets or the normalized expression targets
 #' @param num either alpha or const
 #' @param n_cells the number of cells (row-traversal of the alpha matrix)
+#' 
+#' @return the K or D penalty for a signaling matrix
 #'
 PenaltyCoeff <- function(alpha,
                          const,
@@ -165,14 +177,16 @@ PenaltyCoeff <- function(alpha,
   proper
 }
 
-#' Average cluster to cluster gene expression
+#' Average cluster to cluster signaling
 #'
-#' Average cluster to cluster gene expression.
+#' Average cluster to cluster signaling.
 #'
 #' @param P signaling probabilities cells x cells
 #' @param cluster_labels labels of cells 1:n
 #' @param remove_zeros boolean whether to remove zero rows from the P matrix
 #'
+#' @return a matrix of cluster to cluster signaling
+#' 
 #' @export
 #'
 ClusterSig <- function(P,
@@ -246,6 +260,8 @@ ClusterSig <- function(P,
 #' @param cell_order permutation of the labels of P, cells ordered by cluster
 #' @param cell_labels cluster labels of the permuted cells
 #' @param gene_list filter by a list of gene names
+#' 
+#' @return a matrix of avg expression values
 #'
 #' @export
 #'

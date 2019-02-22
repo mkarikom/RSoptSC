@@ -11,6 +11,9 @@ NormalizeSubset(M, ids)
 
 \item{ind}{a vector of row indexes corresponding to genes}
 }
+\value{
+a normalized matrix of expression values
+}
 \description{
 Normalize a Subset of the data.
 }
