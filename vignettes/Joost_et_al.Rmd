@@ -296,14 +296,23 @@ Violin Plot of Lor expression.  Note strong expression in clusters 3 and 5, whic
 
 We present a family of ligan-receptor pairs along with their up/down-regulated targets.  We compute the probability of intercellular interaction based on this pathway.
 
-```{r, results='hide', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, message=FALSE}
-  ligands <- list(Tgfb1 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')),
+```{r, echo=FALSE}
+ligands <- list(Tgfb1 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')),
                                Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'))),
                   Tgfb2 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')),
                                Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'))))
+pathway <- reshape2::melt(ligands)
+pathway <- pathway[,-c(2)]
+pathway <- pathway[,c(4, 3, 2, 1)]
+colnames(pathway) <- c("ligand", "receptor", "direction", "target")
+print(pathway)
+```
+
+```{r, results='hide', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, message=FALSE}
+  
   Pmats <- GetSignalingPartners(logdata,
                                   gene_names,
-                                  ligands)
+                                  pathway)
 ```
 
 ### Circos Plot of Intercellular Network
