@@ -191,7 +191,7 @@ PenaltyCoeff <- function(alpha,
 #'
 ClusterSig <- function(P,
                        cluster_labels,
-                       remove_zeros = TRUE){
+                       remove_zeros = FALSE){
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
   cell_order <- sorted_cell$ix
   cell_labels <- sorted_cell$x

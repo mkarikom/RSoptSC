@@ -295,6 +295,7 @@ SigPlot <- function(P,
                     rec_cells_per_cluster = 10,
                     rec_cells_total = 0,
                     zero_threshold = 0){
+  
   circos.clear()
   # compute
   # ordering: int vector of indices corresponding to the labels
@@ -310,6 +311,11 @@ SigPlot <- function(P,
   P <- P[ordering, ordering]
   nzrow <- which(rowSums(P) > zero_threshold)
   nzcol <- which(colSums(P) > zero_threshold)
+  
+  if(length(nzrow) < n_clusters | length(nzcol) < n_clusters){
+    print("number of nonzero cells is less than the number of clusters, reduce zero threshold")
+    break()
+  }
   
   # prune the ordering and labels for rows and cols
   nzordering_lig <- ordering[nzrow]
@@ -405,7 +411,14 @@ SigPlot <- function(P,
                grid.col = cols, 
                preAllocateTracks = list(list(track.height = 0.05), list(track.height = 0.05)))
   # apply highlighting to the ligand signaling cells
-  for(i in 1:n_clusters){
+  
+  # P_table only plots non-zero connections.  
+  # In case zero_threshold is negative, re-assign it here to find which clusters are being plotted
+  # Otherwise there will be too many cluster labels for the sectors on the plot
+  true_lig <- which(rowSums(P) > 0)
+  true_rec <- which(colSums(P) > 0)
+  
+  for(i in true_lig){
     lig_cells <- unique(P_table$lig_cell[which(P_table$lig_cluster_number == i)])
     highlight_col <- cluster_colors$hex.1.n.[i]
     cluster_name <- paste0("C", i)
@@ -416,7 +429,7 @@ SigPlot <- function(P,
                      niceFacing = TRUE, 
                      track.index = 2)
   }
-  for(i in 1:n_clusters){
+  for(i in true_rec){
     rec_cells <- unique(P_table$rec_cell[which(P_table$rec_cluster_number == i)])
     highlight_col <- cluster_colors$hex.1.n.[i]
     cluster_name <- paste0("C", i)
