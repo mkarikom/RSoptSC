@@ -285,17 +285,16 @@ ViolinPlotExpression <- function(data,
 #' @export
 #'
 SigPlot <- function(P,
-                    rgb_gap = 0.2,
-                    cluster_labels,
-                    lig_cells_per_cluster = 10,
-                    lig_cells_total = 0,
-                    lig_edge_per_cell = 0,
-                    lig_edge_per_cluster = 0,
-                    lig_edge_total = 0,
-                    rec_cells_per_cluster = 10,
-                    rec_cells_total = 0,
-                    zero_threshold = 0){
-  
+                     rgb_gap = 0.2,
+                     cluster_labels,
+                     lig_cells_per_cluster = 10,
+                     lig_cells_total = 0,
+                     lig_edge_per_cell = 0,
+                     lig_edge_per_cluster = 0,
+                     lig_edge_total = 0,
+                     rec_cells_per_cluster = 10,
+                     rec_cells_total = 0,
+                     zero_threshold = 0){
   circos.clear()
   # compute
   # ordering: int vector of indices corresponding to the labels
@@ -351,7 +350,7 @@ SigPlot <- function(P,
     filtered <- tab %>%
       group_by(label) %>%
       top_n(n = lig_cells_per_cluster,
-                   wt = sum)
+            wt = sum)
     P_ordered <- P_ordered[as.character(filtered$cell),]  
   }
   
@@ -364,7 +363,7 @@ SigPlot <- function(P,
     filtered <- tab %>%
       group_by(label) %>%
       top_n(n = rec_cells_per_cluster,
-                   wt = sum)
+            wt = sum)
     P_ordered <- P_ordered[,as.character(filtered$cell)]  
   }
   
@@ -412,13 +411,13 @@ SigPlot <- function(P,
                preAllocateTracks = list(list(track.height = 0.05), list(track.height = 0.05)))
   # apply highlighting to the ligand signaling cells
   
-  # P_table only plots non-zero connections.  
-  # In case zero_threshold is negative, re-assign it here to find which clusters are being plotted
-  # Otherwise there will be too many cluster labels for the sectors on the plot
-  true_lig <- which(rowSums(P) > 0)
-  true_rec <- which(colSums(P) > 0)
+  # Circlize only plots the P_table connections that are non-zero
+  # In case zero_threshold is <= 0, find which clusters are being plotted
   
-  for(i in true_lig){
+  nz_lig_clust <- unique(P_table$lig_cluster_number[-(which(P_table$link_weight == 0))])
+  nz_rec_clust <- unique(P_table$rec_cluster_number[-(which(P_table$link_weight == 0))])
+  
+  for(i in nz_lig_clust){
     lig_cells <- unique(P_table$lig_cell[which(P_table$lig_cluster_number == i)])
     highlight_col <- cluster_colors$hex.1.n.[i]
     cluster_name <- paste0("C", i)
@@ -429,7 +428,7 @@ SigPlot <- function(P,
                      niceFacing = TRUE, 
                      track.index = 2)
   }
-  for(i in true_rec){
+  for(i in nz_rec_clust){
     rec_cells <- unique(P_table$rec_cell[which(P_table$rec_cluster_number == i)])
     highlight_col <- cluster_colors$hex.1.n.[i]
     cluster_name <- paste0("C", i)

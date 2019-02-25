@@ -4,7 +4,7 @@
 \alias{ClusterSig}
 \title{Average cluster to cluster signaling}
 \usage{
-ClusterSig(P, cluster_labels, remove_zeros = TRUE)
+ClusterSig(P, cluster_labels, remove_zeros = FALSE)
 }
 \arguments{
 \item{P}{signaling probabilities cells x cells}

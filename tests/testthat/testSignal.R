@@ -11,7 +11,6 @@ test_that("signaling probability between cells is equal to matlab", {
     
     
     
-  browser()  
   Pmats <- GetSignalingPartners(JoostSignal$data,
                                   JoostSignal$genes,
                                   pathway)
