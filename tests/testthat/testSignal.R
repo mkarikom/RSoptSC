@@ -1,7 +1,6 @@
 context("signaling partners")
 library(RSoptSC)
 
-
 test_that("signaling probability between cells is equal to matlab", {
   # a list of ligands,
   # each of which contains a list of receptor targets,

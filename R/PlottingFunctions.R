@@ -414,8 +414,16 @@ SigPlot <- function(P,
   # Circlize only plots the P_table connections that are non-zero
   # In case zero_threshold is <= 0, find which clusters are being plotted
   
-  nz_lig_clust <- unique(P_table$lig_cluster_number[-(which(P_table$link_weight == 0))])
-  nz_rec_clust <- unique(P_table$rec_cluster_number[-(which(P_table$link_weight == 0))])
+  # find which rows are 0
+  zero_row <- which(P_table$link_weight == 0)
+  if(length(zero_row) > 0){
+    nz_lig_clust <- unique(P_table$lig_cluster_number[-(which(P_table$link_weight == 0))])
+    nz_rec_clust <- unique(P_table$rec_cluster_number[-(which(P_table$link_weight == 0))])
+  } else {
+    nz_lig_clust <- unique(P_table$lig_cluster_number)
+    nz_rec_clust <- unique(P_table$rec_cluster_number)
+  }
+  
   
   for(i in nz_lig_clust){
     lig_cells <- unique(P_table$lig_cell[which(P_table$lig_cluster_number == i)])
