@@ -37,6 +37,11 @@ GetDominatorTree <- function(predecessors, weighted_graph = NULL){
   edge_table <- cbind(i = predecessors, j = c(1:length(predecessors)))
   edge_table <- edge_table[-root,]
   
+  # recast the edge table if it has only one element
+  if(is.null(dim(edge_table))){
+    edge_table <- t(as.matrix(edge_table))
+  }
+  
   weights <- apply(edge_table, 1, function(x){
     id <- get.edge.ids(weighted_graph,x)
     E(weighted_graph)$weight[id]
