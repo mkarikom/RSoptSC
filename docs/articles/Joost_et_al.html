@@ -81,7 +81,7 @@
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2019-03-01</h4>
+            <h4 class="date">2019-03-07</h4>
       
       
       <div class="hidden name"><code>Joost_et_al.Rmd</code></div>
@@ -288,19 +288,19 @@
 <div id="plot-gene-expression-levels-in-cells-grouped-by-cluster" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-gene-expression-levels-in-cells-grouped-by-cluster" class="anchor"></a>Plot Gene Expression Levels in Cells Grouped by Cluster</h2>
-<p>Violin Plot of Krt14 expression. Note strong expression of the basal compartment (clusters 1 and 6):</p>
+<p>Violin Plot of Krt14 expression. Note strong expression of the basal compartment (clusters 2 and 7):</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb20-2" data-line-number="2">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
 <a class="sourceLine" id="cb20-3" data-line-number="3">                       <span class="dt">gene_names =</span> gene_names,</a>
 <a class="sourceLine" id="cb20-4" data-line-number="4">                       <span class="dt">labels =</span> labels,</a>
 <a class="sourceLine" id="cb20-5" data-line-number="5">                       <span class="dt">gene_name =</span> <span class="st">"Krt14"</span>)</a></code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-20-1.png" width="100%" height="100%"> Violin Plot of Krt10 expression. Note uniformly high expression in the IFE-DI/DII compartments (clusters 2, 4, 5, 7). Note that the mixed expression of Krt10 in cluster 3, which may indicate a population of cells whose global expression profile marks an intermediate state prior to the fully differentiated keratinized layer:</p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-20-1.png" width="100%" height="100%"> Violin Plot of Krt10 expression. Note uniformly high expression in the IFE-DI/DII compartments (clusters 6, 5, 1). Note that the mixed expression of Krt10 in clusters 3 and 4, which may indicate a population of cells whose global expression profile marks an intermediate state prior to the fully differentiated keratinized layer:</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb21-2" data-line-number="2">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
 <a class="sourceLine" id="cb21-3" data-line-number="3">                       <span class="dt">gene_names =</span> gene_names,</a>
 <a class="sourceLine" id="cb21-4" data-line-number="4">                       <span class="dt">labels =</span> labels,</a>
 <a class="sourceLine" id="cb21-5" data-line-number="5">                       <span class="dt">gene_name =</span> <span class="st">"Krt10"</span>)</a></code></pre></div>
-<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-21-1.png" width="100%" height="100%"> Violin Plot of Lor expression. Note strong expression in clusters 3 and 5, which encompass IFE-KI/KII compartments:</p>
+<p><img src="Joost_et_al_files/figure-html/unnamed-chunk-21-1.png" width="100%" height="100%"> Violin Plot of Lor expression. Note strong expression in clusters 1, 4, and 3, which fully encompass the terminally differentiated IFE-KI/KII compartments:</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/par">par</a></span>(<span class="dt">mar=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb22-2" data-line-number="2">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
 <a class="sourceLine" id="cb22-3" data-line-number="3">                       <span class="dt">gene_names =</span> gene_names,</a>

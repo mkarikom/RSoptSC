@@ -130,7 +130,7 @@
   <span class='kw'>lig_cells_total</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>lig_edge_per_cell</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>lig_edge_per_cluster</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>lig_edge_total</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>rec_cells_per_cluster</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>rec_cells_total</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>zero_threshold</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+  <span class='kw'>zero_threshold</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>cD_reduce</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>highlight_clusters</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -178,6 +178,14 @@
     <tr>
       <th>zero_threshold</th>
       <td><p>real value for zero cutoff (0 to keep all edges)</p></td>
+    </tr>
+    <tr>
+      <th>cD_reduce</th>
+      <td><p>ratio of the circlos plot grid element (cell or cluster) to the whole circle is less than this value, the item is omitted from the plot.  Default is zero, don't change unless you are inspecting an unhighlighted chord diagram, since it breaks highlighting if one or more pairs above the zero_threshold happen to have a low grid/circle ratio.</p></td>
+    </tr>
+    <tr>
+      <th>highlight_clusters</th>
+      <td><p>whether to label the plot with clusters.  Default is true.</p></td>
     </tr>
     </table>
     

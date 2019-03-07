@@ -277,7 +277,10 @@ ViolinPlotExpression <- function(data,
 #' @param rec_cells_per_cluster int 0 to keep all
 #' @param rec_cells_total int 0 to keep remaining cells per cluster
 #' @param zero_threshold real value for zero cutoff (0 to keep all edges)
-#'
+#' @param cD_reduce ratio of the circlos plot grid element (cell or cluster) to the whole circle is less than this value, the item is omitted from the plot.  Default is zero, don't change unless you are inspecting an unhighlighted chord diagram, since it breaks highlighting if one or more pairs above the zero_threshold happen to have a low grid/circle ratio.
+#' @param highlight_clusters whether to label the plot with clusters.  Default is true.
+#' 
+#' 
 #' @import dplyr
 #' @import circlize
 #' @importFrom reshape2 melt
@@ -285,16 +288,18 @@ ViolinPlotExpression <- function(data,
 #' @export
 #'
 SigPlot <- function(P,
-                     rgb_gap = 0.2,
-                     cluster_labels,
-                     lig_cells_per_cluster = 10,
-                     lig_cells_total = 0,
-                     lig_edge_per_cell = 0,
-                     lig_edge_per_cluster = 0,
-                     lig_edge_total = 0,
-                     rec_cells_per_cluster = 10,
-                     rec_cells_total = 0,
-                     zero_threshold = 0){
+                    rgb_gap = 0.2,
+                    cluster_labels,
+                    lig_cells_per_cluster = 10,
+                    lig_cells_total = 0,
+                    lig_edge_per_cell = 0,
+                    lig_edge_per_cluster = 0,
+                    lig_edge_total = 0,
+                    rec_cells_per_cluster = 10,
+                    rec_cells_total = 0,
+                    zero_threshold = 0,
+                    cD_reduce = 0,
+                    highlight_clusters = TRUE){
   circos.clear()
   # compute
   # ordering: int vector of indices corresponding to the labels
@@ -402,13 +407,14 @@ SigPlot <- function(P,
   
   # plot the chords
   circos.clear()
-  chordDiagram(P_table[,1:3], 
+  chordDiagram(P_table[which(P_table$link_weight > zero_threshold),1:3], 
                directional = TRUE, 
                direction.type = c("diffHeight", "arrows"), 
                link.arr.type = "big.arrow", 
                annotationTrack = "grid", 
                grid.col = cols, 
-               preAllocateTracks = list(list(track.height = 0.05), list(track.height = 0.05)))
+               preAllocateTracks = list(list(track.height = 0.05), list(track.height = 0.05)),
+               reduce = cD_reduce)
   # apply highlighting to the ligand signaling cells
   
   # Circlize only plots the P_table connections that are non-zero
@@ -417,35 +423,36 @@ SigPlot <- function(P,
   # find which rows are 0
   zero_row <- which(P_table$link_weight == 0)
   if(length(zero_row) > 0){
-    nz_lig_clust <- unique(P_table$lig_cluster_number[-(which(P_table$link_weight == 0))])
-    nz_rec_clust <- unique(P_table$rec_cluster_number[-(which(P_table$link_weight == 0))])
+    nz_lig_clust <- unique(P_table$lig_cluster_number[-(which(P_table$link_weight < zero_threshold))])
+    nz_rec_clust <- unique(P_table$rec_cluster_number[-(which(P_table$link_weight < zero_threshold))])
   } else {
     nz_lig_clust <- unique(P_table$lig_cluster_number)
     nz_rec_clust <- unique(P_table$rec_cluster_number)
   }
   
-  
-  for(i in nz_lig_clust){
-    lig_cells <- unique(P_table$lig_cell[which(P_table$lig_cluster_number == i)])
-    highlight_col <- cluster_colors$hex.1.n.[i]
-    cluster_name <- paste0("C", i)
-    highlight.sector(sector.index = lig_cells,
-                     col = highlight_col, 
-                     text = cluster_name, 
-                     text.vjust = -1, 
-                     niceFacing = TRUE, 
-                     track.index = 2)
-  }
-  for(i in nz_rec_clust){
-    rec_cells <- unique(P_table$rec_cell[which(P_table$rec_cluster_number == i)])
-    highlight_col <- cluster_colors$hex.1.n.[i]
-    cluster_name <- paste0("C", i)
-    highlight.sector(sector.index = rec_cells,
-                     col = highlight_col, 
-                     text = cluster_name, 
-                     text.vjust = -1, 
-                     niceFacing = TRUE, 
-                     track.index = 2)
+  if(highlight_clusters){
+    for(i in nz_lig_clust){
+      lig_cells <- unique(P_table$lig_cell[which(P_table$lig_cluster_number == i)])
+      highlight_col <- cluster_colors$hex.1.n.[i]
+      cluster_name <- paste0("C", i)
+      highlight.sector(sector.index = lig_cells,
+                       col = highlight_col, 
+                       text = cluster_name, 
+                       text.vjust = -1, 
+                       niceFacing = TRUE, 
+                       track.index = 2)
+    }
+    for(i in nz_rec_clust){
+      rec_cells <- unique(P_table$rec_cell[which(P_table$rec_cluster_number == i)])
+      highlight_col <- cluster_colors$hex.1.n.[i]
+      cluster_name <- paste0("C", i)
+      highlight.sector(sector.index = rec_cells,
+                       col = highlight_col, 
+                       text = cluster_name, 
+                       text.vjust = -1, 
+                       niceFacing = TRUE, 
+                       track.index = 2)
+    }  
   }
 }
 

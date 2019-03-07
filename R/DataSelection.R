@@ -39,7 +39,7 @@ SelectData <- function(M, gene_expression_threshold, n_features){
   eigenvector_order <- order(genes_pca$sdev, decreasing = TRUE)
   eigenvectors <- genes_pca$rotation[,eigenvector_order]
   max_coeffs <- apply(eigenvectors[,1:max_component], 1, function(x){
-    max(x)
+    max(abs(x))
   })
   ordered_max <- max_coeffs[order(max_coeffs, decreasing = TRUE)]
 

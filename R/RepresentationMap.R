@@ -5,6 +5,7 @@
 #' @param similarity_matrix the graphical embedding of the cells
 #' @param join_components boolean, whether or not to join disconnected components of the similarity matrix
 #' @param flat_embedding optionally provided low dim embedding, if not then 2d tsne will be used
+#' @param normalize_S whether or not to normalize the similarity matrix
 #' @param ... arguments to called functions
 #' @return a list containing:
 #'     \item{dist_flat}{distance matrix on flat embedding}
@@ -24,8 +25,13 @@
 #'
 RepresentationMap <- function(flat_embedding = NULL,
                               similarity_matrix, 
-                              join_components = TRUE, 
+                              join_components = TRUE,
+                              normalize_S = TRUE,
                               ...){
+  if(normalize_S){
+    similarity_matrix <- similarity_matrix / sum(similarity_matrix)
+  }
+  
   if(is.null(flat_embedding)){
     # set the seed for tsne
     set.seed(1)
