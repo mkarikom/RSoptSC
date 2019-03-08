@@ -183,19 +183,19 @@ PenaltyCoeff <- function(alpha,
 #'
 #' @param P signaling probabilities cells x cells
 #' @param cluster_labels labels of cells 1:n
-#' @param remove_zeros boolean whether to remove zero rows from the P matrix
+#' @param normalize_ligand_cluster boolean whether or not to show chord size for cluster-cluster pair relative to all the other cluster-cluster signaling pairs for that ligand bearing cluster
 #'
 #' @return a matrix of cluster to cluster signaling
 #' 
 #' @export
 #'
 ClusterSig <- function(P,
-                       cluster_labels,
-                       remove_zeros = FALSE){
+                        cluster_labels,
+                        normalize_ligand_cluster = TRUE){
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
   cell_order <- sorted_cell$ix
   cell_labels <- sorted_cell$x
-
+  
   n_clusters <- length(unique(cell_labels))
   n_cells <- length(cell_labels) 
   # for each cluster, get the location of the first and the last cell in the permutation of labels
@@ -221,7 +221,7 @@ ClusterSig <- function(P,
   # the following procedure will give normalized rows
   sums <- P[cell_order, cell_order] %*% summing_matrix
   
-  if(remove_zeros){
+  if(normalize_ligand_cluster){
     # get the nonzero rows of P
     nzrow <- which(rowSums(sums) > 0)
     # get the nonzero labels
@@ -232,7 +232,7 @@ ClusterSig <- function(P,
     nzcounts <- as.matrix(table(nzlabel))
     
     nzsums <- sums[nzrow,]
-    nzsums <- t(nzsums) %*% nzsumming_matrix
+    nzsums <-t(nzsums) %*% nzsumming_matrix
     avg_matrix <- apply(nzsums, 1, function(x){
       x/nzcounts
     })
@@ -248,8 +248,6 @@ ClusterSig <- function(P,
   colnames(avg_matrix) <- arclabs
   return(avg_matrix)
 }
-
-
 
 #' Create a heatmap with signaling markers over clusters
 #' 
