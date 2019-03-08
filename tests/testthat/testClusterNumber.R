@@ -7,6 +7,9 @@ test_that("components based on Laplacian L0 work for W", {
   expect_equal(comps$n_eigs, JoostCluster$No_cluster1)
 
   # test that the eigs are close enough
-  error <- GetError(comps$val, JoostCluster$ZZ)
-  expect_true(error < 10^(-1))
+  deviation <- abs(comps$val - JoostCluster$ZZ)
+  percentage <- deviation / JoostCluster$ZZ
+  avg_deviation_percentage <- mean(percentage)
+                                   
+  expect_true(avg_deviation_percentage < 10^(-1))
 })
