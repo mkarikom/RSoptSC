@@ -4,12 +4,14 @@
 \alias{SimilarityM}
 \title{Compute the similarity matrix}
 \usage{
-SimilarityM(lambda, data)
+SimilarityM(lambda = 0.5, data, pre_embed_method = "umap", ...)
 }
 \arguments{
-\item{lambda}{the balance term between the rank of Z and the error}
+\item{lambda}{the balance term between the rank of Z and the error, default is 0.5}
 
 \item{data}{the expression data, where each column is treated as a normalized vector}
+
+\item{pre_embed_method}{how the initial non-linear embedding is performed, default is 'umap'}
 }
 \value{
 a list containing the symetric cell to cell similarity matrix and

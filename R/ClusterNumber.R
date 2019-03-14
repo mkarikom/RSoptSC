@@ -17,7 +17,7 @@
 #'
 CountClusters <- function(data, tol = 0.01, range = 2:20, eigengap = TRUE, n_comp = 3){
   # compute the drop tolerance, enforcing parsimony of components
-  solo_count <- GetComponents(data, tol = 0.01)$n_eigs # without consensus get a pre-estimate
+  solo_count <- GetComponents(data, tol = tol)$n_eigs # without consensus get a pre-estimate
   if(solo_count <= 5){
     tau = 0.3
   } else if(solo_count <= 10){
@@ -26,7 +26,7 @@ CountClusters <- function(data, tol = 0.01, range = 2:20, eigengap = TRUE, n_com
     tau = 0.5
   }
   cmatrix <- GetEnsemble(data, tol, tau, n_comp = n_comp, range = range)
-  eigs <- GetComponents(cmatrix, tol = 0)
+  eigs <- GetComponents(cmatrix, tol = tol)
   # compute the largest eigengap
   gaps <- eigs$val[2:length(eigs$val)] - eigs$val[1:(length(eigs$val)-1)]
   upper_bound <- which(gaps == max(gaps))

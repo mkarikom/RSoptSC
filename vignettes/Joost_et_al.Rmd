@@ -54,8 +54,8 @@ filtered_data <- SelectData(logdata, gene_expression_threshold, n_features)
 
 Run L2R2 on the processed data, outputting the number of iterations and value of the objective.
 
-```{r, results='asis'}
-S <- SimilarityM(lambda = 0.05, data = filtered_data$M_variable, echo=FALSE,results='hide')
+```{r, results='asis', echo=FALSE,results='hide'}
+S <- SimilarityM(lambda = 0.05, data = filtered_data$M_variable)
 ```
 
 Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
@@ -66,15 +66,7 @@ Compute distances on the similarity matrix.  If the truncated graph has multiple
 #                                   pca_scale = TRUE,
 #                                   dims = 2
 low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
-                            join_components = FALSE,
-                            perplexity = 35,
-                            theta = 0.5,
-                            normalize = FALSE,
-                            pca = TRUE,
-                            pca_center = TRUE,
-                            pca_scale = TRUE,
-                            dims = 2,
-                            initial_dims = 2)
+                            join_components = TRUE)
 ```
 
 ## Cluster the Cells
@@ -82,8 +74,8 @@ low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
 Infer cluster number using spectra of the ensemble Laplacian.
 
 ```{r, results='asis'}
-clusters_evalues <- CountClusters(data = S$W)
-n_clusters <- clusters_evalues$n
+clusters_evalues <- CountClusters(data = S$W, n_comp = 15)
+n_clusters <- clusters$upper_bound
 ```
 
 In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap.  We take this value as the cluster number here.

@@ -5,7 +5,8 @@
 \title{Generate multiple representations}
 \usage{
 RepresentationMap(flat_embedding = NULL, similarity_matrix,
-  join_components = TRUE, normalize_S = TRUE, ...)
+  join_components = TRUE, normalize_S = TRUE,
+  flat_embedding_method = "umap", ...)
 }
 \arguments{
 \item{flat_embedding}{optionally provided low dim embedding, if not then 2d tsne will be used}
@@ -15,6 +16,8 @@ RepresentationMap(flat_embedding = NULL, similarity_matrix,
 \item{join_components}{boolean, whether or not to join disconnected components of the similarity matrix}
 
 \item{normalize_S}{whether or not to normalize the similarity matrix}
+
+\item{flat_embedding_method}{what method to use for flat embedding.  Use umap by default.  Can be umap or tsne.}
 
 \item{...}{arguments to called functions}
 }

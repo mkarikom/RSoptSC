@@ -4,7 +4,8 @@
 \alias{CountClusters}
 \title{Use clustering consensus to infer cluster number}
 \usage{
-CountClusters(data, tol = 0.01, range = 1:20, eigengap = TRUE)
+CountClusters(data, tol = 0.01, range = 2:20, eigengap = TRUE,
+  n_comp = 3)
 }
 \arguments{
 \item{data}{a symmetric nonnegative similarity matrix}
@@ -17,6 +18,8 @@ consensus matrix}
 
 \item{eigengap}{whether or not to use the max
 eigengap (upper bound) cluster count}
+
+\item{n_comp}{the number of similarity components to use for ensemble clustering}
 }
 \value{
 the number of clusters and the vector of eigenvalues
