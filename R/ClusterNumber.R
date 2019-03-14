@@ -4,6 +4,7 @@
 #'
 #' @param data a symmetric nonnegative similarity matrix
 #' @param tol  cutoff for lambda zero
+#' @param n_comp  the number of similarity components to use for ensemble clustering
 #' @param range a vector specifying the min and max
 #'     number of clusters to iteratively test when building the
 #'     consensus matrix
@@ -14,7 +15,7 @@
 #'
 #' @export
 #'
-CountClusters <- function(data, tol = 0.01, range = 2:20, eigengap = TRUE){
+CountClusters <- function(data, tol = 0.01, range = 2:20, eigengap = TRUE, n_comp = 3){
   # compute the drop tolerance, enforcing parsimony of components
   solo_count <- GetComponents(data, tol = 0.01)$n_eigs # without consensus get a pre-estimate
   if(solo_count <= 5){
@@ -24,7 +25,7 @@ CountClusters <- function(data, tol = 0.01, range = 2:20, eigengap = TRUE){
   } else {
     tau = 0.5
   }
-  cmatrix <- GetEnsemble(data, tol, tau, n_prcs = 3, range = range)
+  cmatrix <- GetEnsemble(data, tol, tau, n_comp = n_comp, range = range)
   eigs <- GetComponents(cmatrix, tol = 0)
   # compute the largest eigengap
   gaps <- eigs$val[2:length(eigs$val)] - eigs$val[1:(length(eigs$val)-1)]
@@ -32,12 +33,9 @@ CountClusters <- function(data, tol = 0.01, range = 2:20, eigengap = TRUE){
   
   # compute the number of zero eigenvalues
   lower_bound <- length(eigs$val[which(eigs$val <= tol)])
-  
-  if(eigengap){
-    return(list(n = upper_bound, eigs = eigs))
-  } else {
-    return(list(n = lower_bound, eigs = eigs))
-  }
+  return(list(upper_bound = upper_bound, 
+              lower_bound = lower_bound,
+              eigs = eigs))
 }
 
 #' Get graph components
@@ -68,7 +66,7 @@ GetComponents <- function(data,
 #'
 #' @param data a symmetric nonnegative similarity matrix
 #' @param tol  cutoff for lambda zero
-#' @param prcs_dim  the number of pcs to use for clustering method
+#' @param n_comp  the number of similarity components to use for ensemble clustering
 #' @param tau  the drop tolerance, controlling the sparsification
 #'     (uncoupling) of the consensus matrix
 #' @param range a vector specifying the min and max
@@ -81,10 +79,9 @@ GetComponents <- function(data,
 #'
 GetEnsemble <- function(data,
                         tol,
-                        n_prcs = 3,
+                        n_comp = 3,
                         tau,
-                        range = 2:20,
-                        method = 'kmeans'){
+                        range = 2:20){
   
   n_samples <- dim(data)[2]
   # reduce dimensionality
@@ -92,7 +89,7 @@ GetEnsemble <- function(data,
   
   # perform kmeans clustering over the range specified
   cluster_assign <- sapply(range, function(x){
-    pam(prcs$x[,1:n_prcs], k = x )$clustering
+    pam(prcs$x[,1:n_comp], k = x )$clustering
   })
   
   
