@@ -14,7 +14,7 @@
 #'
 #' @export
 #'
-CountClusters <- function(data, tol = 0.01, range = 1:20, eigengap = TRUE){
+CountClusters <- function(data, tol = 0.01, range = 2:20, eigengap = TRUE){
   # compute the drop tolerance, enforcing parsimony of components
   solo_count <- GetComponents(data, tol = 0.01)$n_eigs # without consensus get a pre-estimate
   if(solo_count <= 5){
@@ -24,9 +24,8 @@ CountClusters <- function(data, tol = 0.01, range = 1:20, eigengap = TRUE){
   } else {
     tau = 0.5
   }
-  cmatrix <- GetEnsemble(data, tol, tau, n_prcs = 3, range = range, method = 'kmeans')
-  eigs <- GetComponents(cmatrix, tol = 0.01)
-  
+  cmatrix <- GetEnsemble(data, tol, tau, n_prcs = 3, range = range)
+  eigs <- GetComponents(cmatrix, tol = 0)
   # compute the largest eigengap
   gaps <- eigs$val[2:length(eigs$val)] - eigs$val[1:(length(eigs$val)-1)]
   upper_bound <- which(gaps == max(gaps))
@@ -48,13 +47,16 @@ CountClusters <- function(data, tol = 0.01, range = 1:20, eigengap = TRUE){
 #' @param data a symmetric nonnegative similarity matrix
 #' @param tol  cutoff for lambda zero
 #'
+#' @importFrom expm sqrtm
+#'
 #' @return the number of components
 #'
 GetComponents <- function(data,
                           tol = 0.01){
   n = nrow(data) # number of data points
   D = diag(as.vector(data %*% matrix(1, n, 1))) # degree matrix, diagonal with i,i = sum of w_i,j for all j
-  Lsym = diag(1, n) - diag(diag(D)^(-1/2)) %*% data %*% diag(diag(D)^(-1/2)) # the symmetric normalized laplacian of the similarity matrix
+  DD <- solve(sqrtm(D))
+  Lsym = diag(1, n) - DD %*% data %*% DD # the symmetric normalized laplacian of the similarity matrix
   eigs <- abs(Re(eigen(Lsym, only.values = TRUE)$values))
   n_zeros <- length(eigs[which(eigs <= tol)])
   return(list(val = sort(eigs), n_eigs = n_zeros))
@@ -72,9 +74,8 @@ GetComponents <- function(data,
 #' @param range a vector specifying the min and max
 #'     number of clusters to iteratively test when building the
 #'     consensus matrix
-#' @param method the clustering method for building consensus clusters
 #'
-#' @importFrom parallel detectCores makeCluster clusterExport parLapply stopCluster
+#' @importFrom cluster pam
 #'
 #' @return a truncated ensemble consensus matrix
 #'
@@ -82,39 +83,32 @@ GetEnsemble <- function(data,
                         tol,
                         n_prcs = 3,
                         tau,
-                        range = 1:20,
+                        range = 2:20,
                         method = 'kmeans'){
-  no_cores <- detectCores() - 1
-  cl <- makeCluster(no_cores)
   
   n_samples <- dim(data)[2]
-  if(method == 'kmeans'){
-    # reduce dimensionality
-    prcs <- prcomp(t(data), center = TRUE)
-    
-    # perform kmeans clustering over the range specified
-    cluster_assign <- sapply(range, function(x){
-      kmeans(prcs$x[,1:n_prcs], centers = x)$cluster
-    })
-    
-    
-    # generate consensus matrices
-    parallel::clusterExport(cl, c("cluster_assign", "GetConsensus"), envir = environment())
-    consen_list <- parLapply(cl,
-                             split(cluster_assign, col(cluster_assign)),
-                             function(x){
-                               GetConsensus(x)
-                             })
-    stopCluster(cl)
-    # generate the ensemble
-    consen <- Reduce("+", consen_list)
-    
-    # truncate the ensemble consensus matrix
-    consen[which(consen <= length(range) * tau)] <- 0
-    
-    # normalize and make symmetric
-    consen <- (consen + t(consen))/2
+  # reduce dimensionality
+  prcs <- prcomp(t(data), center = TRUE)
+  
+  # perform kmeans clustering over the range specified
+  cluster_assign <- sapply(range, function(x){
+    pam(prcs$x[,1:n_prcs], k = x )$clustering
+  })
+  
+  
+  # generate consensus matrices
+  
+  consen <- matrix(0, n_samples, n_samples)
+  for(i in 1:ncol(cluster_assign)){
+    cons <- GetConsensus(cluster_assign[,i])
+    consen <- consen + cons
   }
+  
+  # truncate the ensemble consensus matrix
+  consen[which(consen <= length(range) * tau)] <- 0
+  
+  # normalize and make symmetric
+  consen <- (consen + t(consen))/2
 }
 
 #' Produce a consensus matrix

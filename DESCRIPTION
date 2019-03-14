@@ -25,7 +25,10 @@ Imports:
     circlize (>= 0.4.4),
     igraph (>= 1.2.2),
     RColorBrewer (>= 1.1-2),
-    tibble (>= 2.0.1)
+    tibble (>= 2.0.1),
+    umap (>= 0.2.0.0),
+    expm (>= 0.999-3),
+    cluster (>= 2.0.7-1)
 Suggests: testthat,
     rmarkdown, knitr, ClusterR, kableExtra
 RoxygenNote: 6.1.1

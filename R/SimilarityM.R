@@ -5,24 +5,25 @@
 #' unweighted adjacency matrix to compute a low rank approximation of the data.
 #'
 #' @param data the expression data, where each column is treated as a normalized vector
-#' @param lambda the balance term between the rank of Z and the error
+#' @param lambda the balance term between the rank of Z and the error, default is 0.5
+#' @param pre_embed_method how the initial non-linear embedding is performed, default is 'umap'
+#' 
 #' @return a list containing the symetric cell to cell similarity matrix and
 #'     manifold learning error
 #'
 #' @importFrom Rtsne Rtsne
 #' @importFrom FNN get.knnx
+#' @import umap
 #'
 #' @export
 #'
-
-SimilarityM <- function(lambda,data, ...){
-  
+SimilarityM <- function(lambda = 0.5, data, pre_embed_method = 'umap', ...){
   # make min = 0, max = 1, then divide by column vector norm
   m = nrow(data)
   n = ncol(data)
   
   X <- data - min(data)
-  X = X / max(X)
+  X <- X / max(X)
   
   for(i in 1:n){
     X[,i] <- X[,i] / norm(X[,i], "2")
@@ -31,15 +32,11 @@ SimilarityM <- function(lambda,data, ...){
   if (m >= 60){
     
     pca_data = prcomp(t(X))
-    coeff1 <- pca_data$rotation[,1:60]
-    X1 <- pca_data$x[,1:60]
-    pca_eigvalue1 <- pca_data$sdev
+    pca_eigvalue1 <- pca_data$sdev^2
     
   } else {
     pca_data = prcomp(t(X))
-    coeff1 <- pca_data$rotation[,1:m]
-    X1 <- pca_data$X1[,1:m]
-    pca_eigvalue1 <- pca_data$sdev
+    pca_eigvalue1 <- pca_data$sdev^2
   }
   
   eigengaps = abs(pca_eigvalue1[2:(length(pca_eigvalue1)-1)] - pca_eigvalue1[-(1:2)])
@@ -57,20 +54,25 @@ SimilarityM <- function(lambda,data, ...){
   } else {
     K = K1+1
   }
-  dim_init = 3
-  # InitY_data = prcomp(t(data))
-  # InitY = InitY_data$x[,1:dim_init]
-  # Currently this is not "Standardize" as in MATLAB tsne('Standardize', TRUE)
-  # Currently this is not "InitialY" as in MATLAB tsne('InitialY', InitY)
   
-  set.seed(1)
-  X2 <- Rtsne(X = t(X), ...)
-  D <- matrix(1, n, n)
-  if (No_Comps1>=1){
-    No_Comps1 = 1
+  if(pre_embed_method == 'tsne'){
+    set.seed(1)
+    X2 <- Rtsne(X = t(X), ...)
+    D <- matrix(1, n, n)
+    if (No_Comps1>=1){
+      No_Comps1 = 1
+    }
+    knn_object = get.knnx(X2$Y[,1:(No_Comps1+2)], X2$Y[,1:(No_Comps1+2)], k = K)
+    IDX = knn_object$nn.index
+    
+  } else if (pre_embed_method == 'umap'){
+    data.umap <- umap(t(data))
+    X2 <- data.umap$layout
+    
+    D <- matrix(1, n, n)
+    knn_object = get.knnx(X2[,1:2], X2[,1:2], k = K)
+    IDX = knn_object$nn.index
   }
-  knn_object = get.knnx(X2$Y[,1:(No_Comps1+2)], X2$Y[,1:(No_Comps1+2)], k = K)
-  IDX = knn_object$nn.index
   
   for (jj in 1:n){
     D[jj,IDX[jj,]] = 0
@@ -78,7 +80,7 @@ SimilarityM <- function(lambda,data, ...){
   Z <- computeM(D,X,lambda)
   Z$Z[Z$Z <= .Machine$double.eps] <- 0
   W <- 0.5*(abs(Z$Z)+abs(t(Z$Z)))
-  return(list(W = W, E = Z$E))
+  return(list(W = W, E = Z$E, nl_embedding = X2))
 }
 
 
@@ -166,7 +168,6 @@ computeM <- function(D,X,lambda){
     Z <- Z - (1/eta)*H
     Z[D>0] <- 0
     XXZ <- X-X%*%Z
-    
     
     # Update Dual variable
     Y1 <- Y1 + mu*(XXZ-E)
