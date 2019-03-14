@@ -21,6 +21,7 @@
 #'
 #' @importFrom igraph graph_from_adjacency_matrix components distances
 #' @importFrom Rtsne Rtsne
+#' @importFrom Matrix as.matrix which
 #'
 #' @export
 #'
@@ -39,13 +40,12 @@ RepresentationMap <- function(flat_embedding = NULL,
       # set the seed for tsne
       set.seed(1)
       # initialize with low dim embedding
-      flat_embedding <- Rtsne(X = similarity_matrix, ...)$Y
+      flat_embedding <- Rtsne(X = as.matrix(similarity_matrix), ...)$Y
       flat_embedding <- as.data.frame(flat_embedding)
       colnames(flat_embedding) <- c("C1", "C2")
     }else if(flat_embedding_method == 'umap'){
-      set.seed(1)
       # initialize with low dim embedding
-      data.umap <- umap(d = similarity_matrix, ...)
+      data.umap <- umap(d = as.matrix(similarity_matrix), ...)
       flat_embedding <- data.umap$layout
       flat_embedding <- as.data.frame(flat_embedding)
       colnames(flat_embedding) <- c("C1", "C2")
@@ -56,7 +56,7 @@ RepresentationMap <- function(flat_embedding = NULL,
   
   numcells <- dim(similarity_matrix)[1]
   adj_matrix <- matrix(0, nrow = numcells, ncol = numcells)
-  adj_matrix[similarity_matrix>0] <- 1
+  adj_matrix[which(similarity_matrix>0)] <- 1
   diag(adj_matrix) <- 0
   
   similarity_graph <- graph_from_adjacency_matrix(adj_matrix, mode = c("undirected"))

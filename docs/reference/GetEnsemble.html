@@ -126,8 +126,7 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>GetEnsemble</span>(<span class='no'>data</span>, <span class='no'>tol</span>, <span class='kw'>n_prcs</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='no'>tau</span>, <span class='kw'>range</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>20</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"kmeans"</span>)</pre>
+    <pre class="usage"><span class='fu'>GetEnsemble</span>(<span class='no'>data</span>, <span class='no'>tol</span>, <span class='kw'>n_comp</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='no'>tau</span>, <span class='kw'>range</span> <span class='kw'>=</span> <span class='fl'>2</span>:<span class='fl'>20</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -141,6 +140,10 @@
       <td><p>cutoff for lambda zero</p></td>
     </tr>
     <tr>
+      <th>n_comp</th>
+      <td><p>the number of similarity components to use for ensemble clustering</p></td>
+    </tr>
+    <tr>
       <th>tau</th>
       <td><p>the drop tolerance, controlling the sparsification
 (uncoupling) of the consensus matrix</p></td>
@@ -150,14 +153,6 @@
       <td><p>a vector specifying the min and max
 number of clusters to iteratively test when building the
 consensus matrix</p></td>
-    </tr>
-    <tr>
-      <th>method</th>
-      <td><p>the clustering method for building consensus clusters</p></td>
-    </tr>
-    <tr>
-      <th>prcs_dim</th>
-      <td><p>the number of pcs to use for clustering method</p></td>
     </tr>
     </table>
     

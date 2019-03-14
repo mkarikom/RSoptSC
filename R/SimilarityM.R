@@ -9,17 +9,20 @@
 #' @param pre_embed_method how the initial non-linear embedding is performed, default is 'umap'
 #' @param comps_knn number of components to use for knn, overrides eigengap-based inference
 #' @param k_neighbors the number of neighbors for knn, overrides zero eigenvalue-based inference
+#' @param use_umap_indices use the knn indices computed during umap embedding to impose sparsity on L2R2, instead of recomputing based on the layout.
+#' 
 #' 
 #' @return a list containing the symetric cell to cell similarity matrix and
 #'     manifold learning error
 #'
 #' @importFrom Rtsne Rtsne
+#' @importFrom Matrix as.matrix norm
 #' @importFrom FNN get.knnx
 #' @import umap
 #'
 #' @export
 #'
-SimilarityM <- function(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL, pre_embed_method = 'umap', ...){
+SimilarityM <- function(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL, use_umap_indices = FALSE, pre_embed_method = 'umap', ...){
   # make min = 0, max = 1, then divide by column vector norm
   m = nrow(data)
   n = ncol(data)
@@ -71,19 +74,21 @@ SimilarityM <- function(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL
   
   if(pre_embed_method == 'tsne'){
     set.seed(1)
-    X2 <- Rtsne(X = t(X), ...)
+    X2 <- Rtsne(X = t(as.matrix(X)), ...)
     D <- matrix(1, n, n)
     
     knn_object = get.knnx(X2$Y[,1:(No_Comps1)], X2$Y[,1:(No_Comps1)], k = K)
     IDX = knn_object$nn.index
-    
   } else if (pre_embed_method == 'umap'){
-    data.umap <- umap(d = t(data), n_neighbors = K, n_components = comps_knn, ...)
+    data.umap <- umap(d = t(as.matrix(data)), n_neighbors = K, n_components = comps_knn, ...)
     X2 <- data.umap$layout
     
     D <- matrix(1, n, n)
     knn_object = get.knnx(X2[,1:No_Comps1], X2[,1:No_Comps1], k = K)
-    IDX = knn_object$nn.index
+    IDX <- knn_object$nn.index
+    if(use_umap_indices){
+      IDX <- data.umap$knn$indexes
+    }
   }
   
   for (jj in 1:n){

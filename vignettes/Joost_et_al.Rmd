@@ -23,12 +23,16 @@ This is an example of clustering, marker identification and pseudotime inference
 
 ## Load and Preprocess Data
 
-Load and log transform the data
+A matrix of counts with rows as genes and columns as cells must be provided.  Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files.  Here we load example data from NCBI GEO (GSE67602) originally published in Joost et al 2016.
 
 ```{r, results='asis'}
 library(RSoptSC)
-data("GSE67602_Joost")
-data = GSE67602_Joost$data
+df <- system.file("extdata", "GSE67602_JoostData.csv.bz2", package = "RSoptSC")
+gf <- system.file("extdata", "GSE67602_JoostGenes.csv.bz2", package = "RSoptSC")
+cf <- system.file("extdata", "GSE67602_JoostCells.csv.bz2", package = "RSoptSC")
+af <- system.file("extdata", "GSE67602_JoostAnnotation.csv.bz2", package = "RSoptSC")
+
+GSE67602_Joost <- LoadData(df, gf, cf, af)
 ```
 
 ### Remove Spike-in RNA
@@ -36,7 +40,7 @@ data = GSE67602_Joost$data
 gene_names <- GSE67602_Joost$gene_names
 spikein <- grep('ERCC', gene_names)
 gene_names <- gene_names[-spikein]
-data <- data[-spikein,]
+data <- GSE67602_Joost$data[-spikein,]
 ```
 
 Apply number of features and exclusion threshold
@@ -103,7 +107,7 @@ plot(c(1:20),
 Factor the similarity matrix such that W = HxH', using the computed cluster number for the rank of H.
 
 ```{r, results='asis', warning=FALSE}
-output_NMF <- NMF::nmf(x = S$W,
+output_NMF <- NMF::nmf(x = Matrix::as.matrix(S$W),
               rank = n_clusters,
               method = 'lee',
               seed = 'nndsvd',
@@ -141,7 +145,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-DII, IFE-KI, IFE-KII were identified by standard techniques.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-true_labels <- RSoptSC::GSE67602_Joost$annotation
+true_labels <- GSE67602_Joost$annotation
 # plot clusters
 par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
@@ -296,27 +300,30 @@ Violin Plot of Lor expression.  Note strong expression in clusters 3 and 6 which
 
 ## Analyze Signaling Mediated by a Ligand-Receptor Family
 
-We present a family of ligan-receptor pairs along with their up/down-regulated targets.  The following table can be passed as a data frame to RSoptSC::GetSignalingPartners.  We compute the probability of intercellular interaction based on this pathway.
+In order to analyze signaling, we can load in tables which describe a pathay in detail.  There are two tables needed, one that specifies all unique ligand receptor combinations and another that specifies receptor/target/up|down combinations.  Example tables for the TgfB pathway are provided in extdata/ and loaded here for the current skin data set.  Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples.  We then compute the probability of intercellular interaction based on this pathway.
 
 ```{r, echo=FALSE}
 library(knitr)
 library(kableExtra)
-ligands <- list(Tgfb1 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')),
-                               Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'))),
-                  Tgfb2 = list(Tgfbr1 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')),
-                               Tgfbr2 = list(up = list('Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1'))))
-pathway <- reshape2::melt(ligands)
-pathway <- pathway[,-c(2)]
-pathway <- pathway[,c(4, 3, 2, 1)]
-colnames(pathway) <- c("ligand", "receptor", "direction", "target")
-pathway %>% kable() %>% kable_styling()
+
+lig_rec_path <- system.file("extdata", "tgfb_lig_rec.tsv", package = "RSoptSC")
+rec_target_path <- system.file("extdata", "tgfb_rec_target.tsv", package = "RSoptSC")
+pathway <- ImportPathway(lig_table_path = lig_rec_path,
+                         rec_table_path = rec_target_path,
+                         data = logdata,
+                         gene_names = gene_names)
+
+
+
+pathway$pathway %>% kable() %>% kable_styling()
 ```
+
 
 ```{r, results='hide', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, message=FALSE}
   
   Pmats <- GetSignalingPartners(logdata,
-                                  gene_names,
-                                  pathway)
+                                gene_names,
+                                pathway$pathway_removed)
 ```
 
 ### Circos Plot of Intercellular Network
