@@ -55,7 +55,7 @@ filtered_data <- SelectData(logdata, gene_expression_threshold, n_features)
 Run L2R2 on the processed data, outputting the number of iterations and value of the objective.
 
 ```{r, results='asis'}
-S <- SimilarityM(lambda = 0.05, data = filtered_data$M_variable)
+S <- SimilarityM(lambda = 0.05, data = filtered_data$M_variable, echo=FALSE,results='hide')
 ```
 
 Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
