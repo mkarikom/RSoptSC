@@ -7,6 +7,8 @@
 #' @param data the expression data, where each column is treated as a normalized vector
 #' @param lambda the balance term between the rank of Z and the error, default is 0.5
 #' @param pre_embed_method how the initial non-linear embedding is performed, default is 'umap'
+#' @param comps_knn number of components to use for knn, overrides eigengap-based inference
+#' @param k_neighbors the number of neighbors for knn, overrides zero eigenvalue-based inference
 #' 
 #' @return a list containing the symetric cell to cell similarity matrix and
 #'     manifold learning error
@@ -17,7 +19,7 @@
 #'
 #' @export
 #'
-SimilarityM <- function(lambda = 0.5, data, pre_embed_method = 'umap', ...){
+SimilarityM <- function(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL, pre_embed_method = 'umap', ...){
   # make min = 0, max = 1, then divide by column vector norm
   m = nrow(data)
   n = ncol(data)
@@ -41,6 +43,14 @@ SimilarityM <- function(lambda = 0.5, data, pre_embed_method = 'umap', ...){
   
   eigengaps = abs(pca_eigvalue1[2:(length(pca_eigvalue1)-1)] - pca_eigvalue1[-(1:2)])
   No_Comps1 = which(max(eigengaps)==eigengaps)
+  if (No_Comps1>=1){
+    No_Comps1 = 1
+  }
+  No_Comps1 = No_Comps1 + 2
+  
+  if(!is.null(comps_knn)){
+    No_Comps1 = comps_knn
+  }
   
   cc = cumsum(pca_eigvalue1[-(1)])
   dd = cc[-(1)]/sum(pca_eigvalue1[-(1)])
@@ -55,22 +65,24 @@ SimilarityM <- function(lambda = 0.5, data, pre_embed_method = 'umap', ...){
     K = K1+1
   }
   
+  if(!is.null(k_neighbors)){
+    K = k_neighbors
+  }
+  
   if(pre_embed_method == 'tsne'){
     set.seed(1)
     X2 <- Rtsne(X = t(X), ...)
     D <- matrix(1, n, n)
-    if (No_Comps1>=1){
-      No_Comps1 = 1
-    }
-    knn_object = get.knnx(X2$Y[,1:(No_Comps1+2)], X2$Y[,1:(No_Comps1+2)], k = K)
+    
+    knn_object = get.knnx(X2$Y[,1:(No_Comps1)], X2$Y[,1:(No_Comps1)], k = K)
     IDX = knn_object$nn.index
     
   } else if (pre_embed_method == 'umap'){
-    data.umap <- umap(t(data))
+    data.umap <- umap(d = t(data), n_neighbors = K, n_components = comps_knn, ...)
     X2 <- data.umap$layout
     
     D <- matrix(1, n, n)
-    knn_object = get.knnx(X2[,1:2], X2[,1:2], k = K)
+    knn_object = get.knnx(X2[,1:No_Comps1], X2[,1:No_Comps1], k = K)
     IDX = knn_object$nn.index
   }
   

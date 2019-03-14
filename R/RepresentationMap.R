@@ -45,7 +45,7 @@ RepresentationMap <- function(flat_embedding = NULL,
     }else if(flat_embedding_method == 'umap'){
       set.seed(1)
       # initialize with low dim embedding
-      data.umap <- umap(similarity_matrix)
+      data.umap <- umap(d = similarity_matrix, ...)
       flat_embedding <- data.umap$layout
       flat_embedding <- as.data.frame(flat_embedding)
       colnames(flat_embedding) <- c("C1", "C2")

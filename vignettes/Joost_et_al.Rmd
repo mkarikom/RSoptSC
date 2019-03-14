@@ -28,23 +28,21 @@ Load and log transform the data
 ```{r, results='asis'}
 library(RSoptSC)
 data("GSE67602_Joost")
-logdata <- log10(GSE67602_Joost$data + 1)
+data = GSE67602_Joost$data
 ```
 
 ### Remove Spike-in RNA
-```{r}
-# clean the gene names
+```{r, include=FALSE}
 gene_names <- GSE67602_Joost$gene_names
 spikein <- grep('ERCC', gene_names)
 gene_names <- gene_names[-spikein]
-
-# clean the data
-logdata <- logdata[-spikein,]
+data <- data[-spikein,]
 ```
 
 Apply number of features and exclusion threshold
 
 ```{r, results='asis'}
+logdata <- log10(data + 1)
 gene_expression_threshold <- 0.03
 n_features <- 3000
 filtered_data <- SelectData(logdata, gene_expression_threshold, n_features)
@@ -55,7 +53,13 @@ filtered_data <- SelectData(logdata, gene_expression_threshold, n_features)
 Run L2R2 on the processed data, outputting the number of iterations and value of the objective.
 
 ```{r, results='asis', echo=FALSE,results='hide'}
-S <- SimilarityM(lambda = 0.05, data = filtered_data$M_variable)
+S <- SimilarityM(lambda = 0.05, 
+                 data = filtered_data$M_variable,
+                 random_state = 0,
+                 knn.repeat = 3,
+                 min_dist = .1,
+                 k_neighbors = 30,
+                 comps_knn = 3)
 ```
 
 Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
@@ -65,8 +69,14 @@ Compute distances on the similarity matrix.  If the truncated graph has multiple
 #                                   pca_center = TRUE,
 #                                   pca_scale = TRUE,
 #                                   dims = 2
+
 low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
-                            join_components = TRUE)
+                            join_components = TRUE,
+                            input = 'data',
+                            random_state = 0,
+                            knn.repeat = 3,
+                            min_dist = 0.6,
+                            n_neighbors = 30)
 ```
 
 ## Cluster the Cells
@@ -74,7 +84,7 @@ low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
 Infer cluster number using spectra of the ensemble Laplacian.
 
 ```{r, results='asis'}
-clusters_evalues <- CountClusters(data = S$W, n_comp = 15)
+clusters <- CountClusters(data = S$W, n_comp = 15)
 n_clusters <- clusters$upper_bound
 ```
 
@@ -83,7 +93,7 @@ In this analysis, we obtain bounds on the number of clusters, where the lower bo
 ```{r, results='asis'}
 par(mar=c(1,1,1,1))
 plot(c(1:20), 
-     clusters_evalues$eigs$val[1:20],
+     clusters$eigs$val[1:20],
      xlab = NA,
      ylab = 'eigenvalues',
      main = 'Eigenvalues of the Graph Laplacian')
@@ -111,7 +121,7 @@ labels <- apply(H, 1, function(x){
 
 ### Visualize the Clusters
 
-Cells are labeled by cluster membership and plotted on low-dimensional embedding (t-SNE) of the similarity matrix.
+Cells are labeled by cluster membership and plotted on low-dimensional embedding (umap) of the similarity matrix.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 # define a scheme for the coloring.  This is a required parameter for plotting discrete (factor) data
@@ -123,7 +133,7 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = as.factor(labels),
                          title = "NMF Cluster Labeling",
-                         subtitle = "t-SNE Embedding",
+                         subtitle = "umap Embedding",
                          featurename = "Cluster ID",
                          colorscale = colorscale)
 ```
@@ -137,7 +147,7 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = as.factor(true_labels),
                          title = "True Labeling",
-                         subtitle = "t-SNE Embedding",
+                         subtitle = "umap Embedding",
                          featurename = "Annotated Cell Types")
 ```
 
@@ -147,17 +157,17 @@ Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the marker
 
 ```{r, fig.width=7, fig.height=7}
 
-markers <- GetMarkerTable(counts_data = logdata,
+markers <- GetMarkerTable(counts_data = log(data+1),
                           cluster_labels = labels,
                           H = H,
-                          gene_expression_threshold = 6,
+                          gene_expression_threshold = 3,
                           n_features = 20000)
 
-PlotTopN(data = logdata,
+PlotTopN(data = log(data+1),
          gene_names = gene_names,
          cluster_labels = labels,
          markers = markers,
-         n_features = 6)
+         n_features = 5)
 ```
 
 ## Pseudotime Inference
@@ -207,7 +217,7 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = pseudotime,
                          title = "Pseudotime Labeling",
-                         subtitle = "t-SNE Embedding",
+                         subtitle = "umap Embedding",
                          featurename = "Relative L2R2 Distance from Root")
 ```
 
@@ -224,7 +234,7 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                     feature = data_gene,
                     title = "Krt14 Expression",
-                    subtitle = "t-SNE Embedding",
+                    subtitle = "umap Embedding",
                     featurename = "Log Krt14 Expression")
 ```
 
@@ -237,7 +247,7 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                     feature = data_gene,
                     title = "Krt10 Expression",
-                    subtitle = "t-SNE Embedding",
+                    subtitle = "umap Embedding",
                     featurename = "Log Krt10 Expression")
 ```
 
@@ -250,13 +260,13 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                     feature = data_gene,
                     title = "Lor Expression",
-                    subtitle = "t-SNE Embedding",
+                    subtitle = "umap Embedding",
                     featurename = "Log Lor Expression")
 ```
 
 ## Plot Gene Expression Levels in Cells Grouped by Cluster
 
-Violin Plot of Krt14 expression.  Note strong expression of the basal compartment (clusters 2 and 7):
+Violin Plot of Krt14 expression.  Note strong expression of the basal compartment (clusters 4 and 5):
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
@@ -265,7 +275,7 @@ Violin Plot of Krt14 expression.  Note strong expression of the basal compartmen
                        labels = labels,
                        gene_name = "Krt14")
 ```
-Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/DII compartments (clusters 6, 5, 1).  Note that the mixed expression of Krt10 in clusters 3 and 4, which may indicate a population of cells whose global expression profile marks an intermediate state prior to the fully differentiated keratinized layer:
+Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/DII compartments (clusters 1, 2, 7).  Note that the mixed expression of Krt10 in cluster 5, which may indicate a population of transitioning basal cells:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
@@ -274,7 +284,7 @@ Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/D
                        labels = labels,
                        gene_name = "Krt10")
 ```
-Violin Plot of Lor expression.  Note strong expression in clusters 1, 4, and 3, which fully encompass the terminally differentiated IFE-KI/KII compartments:
+Violin Plot of Lor expression.  Note strong expression in clusters 3 and 6 which fully encompass the terminally differentiated IFE-KI/KII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
