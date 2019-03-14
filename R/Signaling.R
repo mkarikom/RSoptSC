@@ -190,8 +190,8 @@ PenaltyCoeff <- function(alpha,
 #' @export
 #'
 ClusterSig <- function(P,
-                        cluster_labels,
-                        normalize_ligand_cluster = TRUE){
+                       cluster_labels,
+                       normalize_ligand_cluster = TRUE){
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
   cell_order <- sorted_cell$ix
   cell_labels <- sorted_cell$x
