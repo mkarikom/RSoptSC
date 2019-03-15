@@ -18,6 +18,8 @@ knitr::opts_chunk$set(
 
 ## Updates
 
+SoptSC is also available as a MATLAB package [here](https://github.com/wangshuxiong/soptsc).
+
 * Demo SoptSC at [`vignette("Joost_et_al")`](https://mkarikom.github.io/RSoptSC/articles/Joost_et_al.html)
 
 * Read the SoptSC article in [NAR](https://doi.org/10.1093/nar/gkz204)
