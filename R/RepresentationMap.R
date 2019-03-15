@@ -22,6 +22,7 @@
 #' @importFrom igraph graph_from_adjacency_matrix components distances
 #' @importFrom Rtsne Rtsne
 #' @importFrom Matrix as.matrix which
+#' @importFrom umap umap
 #'
 #' @export
 #'
