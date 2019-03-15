@@ -20,6 +20,8 @@ knitr::include_graphics(path = "man/figures/logo.svg")
 
 RSoptSC is an R package for SoptSC: performing analysis and prediction on single-cell RNA sequencing (scRNA-seq) data. SoptSC can infer cell-cell communication between single cells, and completes multiple single-cell analysis tasks from a single coherent framework. This enables the reconstruction of complex lineage relationships alongside prediction of specific feedback or feedforward interactions. 
 
+SoptSC is also available as a MATLAB package [here](https://github.com/wangshuxiong/soptsc).
+
 * Demo SoptSC at [`vignette("Joost_et_al")`](https://mkarikom.github.io/RSoptSC/articles/Joost_et_al.html)
 
 * Read the SoptSC preprint on [bioRxiv](https://www.biorxiv.org/content/early/2018/05/12/168922)
