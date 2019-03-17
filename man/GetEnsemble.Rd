@@ -4,13 +4,14 @@
 \alias{GetEnsemble}
 \title{Produce consensus matrix}
 \usage{
-GetEnsemble(data, tol, n_prcs = 3, tau, range = 1:20,
-  method = "kmeans")
+GetEnsemble(data, tol, n_comp = 3, tau, range = 2:20)
 }
 \arguments{
 \item{data}{a symmetric nonnegative similarity matrix}
 
 \item{tol}{cutoff for lambda zero}
+
+\item{n_comp}{the number of similarity components to use for ensemble clustering}
 
 \item{tau}{the drop tolerance, controlling the sparsification
 (uncoupling) of the consensus matrix}
@@ -18,10 +19,6 @@ GetEnsemble(data, tol, n_prcs = 3, tau, range = 1:20,
 \item{range}{a vector specifying the min and max
 number of clusters to iteratively test when building the
 consensus matrix}
-
-\item{method}{the clustering method for building consensus clusters}
-
-\item{prcs_dim}{the number of pcs to use for clustering method}
 }
 \value{
 a truncated ensemble consensus matrix

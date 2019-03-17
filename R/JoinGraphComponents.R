@@ -61,13 +61,15 @@ JoinGraphComponents <- function(root_cell, adjacency_matrix, flat_distances, n_c
   ## get MST on remaining
   #
   while (length(unvis) >0){
+    if(is.null(nrow(unvisited_cells))){
+      unvisited_cells <- matrix(unvisited_cells, 1, 2)
+    }
     distance_to_next <- flat_distances[vis, unvis]
     new_edge <- which(distance_to_next == min(distance_to_next), arr.ind = TRUE)
     u <- vis[new_edge[1]]
     v<- unvis[new_edge[2]]
     adjacency_matrix[u, v] <- 2
     xy <- which(unvisited_cells == v, arr.ind = TRUE)[1]
-
     vv <- setdiff(unvisited_cells[xy,], v)
     vis <- sort(c(vis, v, vv))
     unvis <- sort(setdiff(unvis, c(v, vv)))

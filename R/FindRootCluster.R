@@ -24,7 +24,6 @@ FindRootCluster <- function(cluster_labels,
                             dist_graph, 
                             dist_flat, 
                             reverse = FALSE){
-  #browser()
   n_clusters <- length(unique(cluster_labels))
   cluster_adj_matrix <- matrix(0, nrow = n_clusters, ncol = n_clusters)
   for(i in 1:(n_clusters-1)){

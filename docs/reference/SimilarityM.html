@@ -130,18 +130,35 @@ unweighted adjacency matrix to compute a low rank approximation of the data.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>SimilarityM</span>(<span class='no'>lambda</span>, <span class='no'>data</span>)</pre>
+    <pre class="usage"><span class='fu'>SimilarityM</span>(<span class='kw'>lambda</span> <span class='kw'>=</span> <span class='fl'>0.5</span>, <span class='no'>data</span>, <span class='kw'>comps_knn</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>k_neighbors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>use_umap_indices</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>pre_embed_method</span> <span class='kw'>=</span> <span class='st'>"umap"</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>lambda</th>
-      <td><p>the balance term between the rank of Z and the error</p></td>
+      <td><p>the balance term between the rank of Z and the error, default is 0.5</p></td>
     </tr>
     <tr>
       <th>data</th>
       <td><p>the expression data, where each column is treated as a normalized vector</p></td>
+    </tr>
+    <tr>
+      <th>comps_knn</th>
+      <td><p>number of components to use for knn, overrides eigengap-based inference</p></td>
+    </tr>
+    <tr>
+      <th>k_neighbors</th>
+      <td><p>the number of neighbors for knn, overrides zero eigenvalue-based inference</p></td>
+    </tr>
+    <tr>
+      <th>use_umap_indices</th>
+      <td><p>use the knn indices computed during umap embedding to impose sparsity on L2R2, instead of recomputing based on the layout.</p></td>
+    </tr>
+    <tr>
+      <th>pre_embed_method</th>
+      <td><p>how the initial non-linear embedding is performed, default is 'umap'</p></td>
     </tr>
     </table>
     

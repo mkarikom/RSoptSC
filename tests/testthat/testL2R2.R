@@ -1,13 +1,15 @@
-context("similarity matrix based on L2R2 manifold embedding")
+context("ADMM result")
 library(RSoptSC)
 
 test_that("norm(X-X%*%Z,\"f\") is less than or equal to matlab", {
+  data <- Matrix::as.matrix(sparseJoostTest$data)
+  X <- data - min(data)
+  X <- X / max(X)
   
-  W <- SimilarityM(lambda = JoostL2R2$lambda, 
-                   data = JoostL2R2$data,
-                   perplexity = 25, 
-                   dims = 3, 
-                   pca = TRUE,
-                   theta = 0)
-  expect_true(W$E <= JoostL2R2$FNorm_XXZ_error)
+  for(i in 1:n){
+    X[,i] <- X[,i] / norm(X[,i], "2")
+  }
+  # computes the similarity matrix using a low rank representation of X subject to the adjacency constraint D
+  M <- computeM(lambda = 0.5, X = X, D = Matrix::as.matrix(sparseJoostTest$D))
+  expect_true(abs(M$E-16.7979) <= 1e-5)
 })

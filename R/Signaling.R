@@ -190,8 +190,8 @@ PenaltyCoeff <- function(alpha,
 #' @export
 #'
 ClusterSig <- function(P,
-                        cluster_labels,
-                        normalize_ligand_cluster = TRUE){
+                       cluster_labels,
+                       normalize_ligand_cluster = TRUE){
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
   cell_order <- sorted_cell$ix
   cell_labels <- sorted_cell$x
@@ -297,4 +297,144 @@ ClusterAvg <- function(M,
 
   return(avg_matrix[,match(gene_list, gene_names)])
   ## insert code for plot
+}
+
+#' Process siganling pathway data
+#'
+#' Given two tsv tables, one including ligand-receptor pairs, and the other including receptor-target pairs, and a data set, inner-join the two tables and make sure no ligands, receptors, or targets are missing from the data.  This function returns a summary table of all requested markers.  If the data is a subset of some larger study, genes may be reported (a column exists in the data matrix) for which zero copies were observed.  In this case, "dropout in subset" applies.  There are also known gene symbols which were not measured in the study (no corresponding row exists in the data matrix).  In this case, "missing from all subsets" applies.
+#'
+#' @param lig_table_path a tsv/csv file with "ligand" in column 1 and "receptor" in column 2
+#' @param rec_table_path a tsv/csv file with "receptor" in column 1, "target" in column 2, and up/down "direction" in column 3
+#' @param data a matrix of the data, with gene names as row names (required if no gene list provided)
+#' @param gene_names an optional list of gene names (required if rownames of data are null)
+#'                                           
+#' @return a list containing:
+#'     \item{lignames}{vector of all ligands}
+#'     \item{recnames}{vector of all receptors}
+#'     \item{targets}{vector of all targets}
+#'     \item{pathway}{a table with combined pathway information}
+#'     \item{pathway_removed}{a table with excluded markers}
+#'     \item{removed}{a table with the excluded markers}
+#'           
+#' @importFrom Matrix rowSums
+#' 
+#' @export
+#'
+ImportPathway <- function(lig_table_path,
+                          rec_table_path,
+                          data,
+                          gene_names = NULL){
+  if(is.null(rownames(data))){
+    genes <- gene_names
+  } else {
+    genes <- rownames(data)
+  }
+  tableRec <- read.delim(rec_table_path, stringsAsFactors=FALSE)
+  colnames(tableRec) <- tolower(sub('\\.', tolower(colnames(tableRec)), replacement = "_"))
+  
+  tableLig <- read.delim(lig_table_path, stringsAsFactors=FALSE)
+  colnames(tableLig) <- tolower(sub('\\.', tolower(colnames(tableLig)), replacement = "_"))
+  
+  # remove references and ambiguous targets
+  tableRec <- tableRec[which(tableRec$direction != "?"),
+                       which(names(tableRec) %in% c("receptor", "target", "direction"))]
+  
+  # make gene names systematic
+  tableRec$receptor <- unname(sapply(tableRec$receptor, SimpleCap))
+  tableRec$target <- unname(sapply(tableRec$target, SimpleCap))
+  tableLig$ligand <- unname(sapply(tableLig$ligand, SimpleCap))
+  tableLig$receptor <- unname(sapply(tableLig$receptor, SimpleCap))
+  genes <- unname(sapply(genes, SimpleCap))
+  
+  # find all the symbols in the pathway
+  lignames <- unique(tableLig$ligand)
+  recnames <- unique(tableLig$receptor)
+  targets <- unique(tableRec$target)
+  
+  # inner join the tables
+  pathway <- merge(tableLig, tableRec)
+  
+  # pathway elements for which we have no data
+  ms_lig_ind <- which(is.na(match(lignames, genes)))
+  ms_lig <- lignames[ms_lig_ind]
+  
+  ms_rec_ind <- which(is.na(match(recnames, genes)))
+  ms_rec <- recnames[ms_rec_ind]
+  
+  ms_targ_ind <- which(is.na(match(targets, genes)))
+  ms_targ <- targets[ms_targ_ind]
+  
+  # zeros across all cells in the time point
+  dropout_ind <- which(!(rowSums(data) > 0))
+  dropout_genes <- genes[dropout_ind]
+  
+  pathway_elements <- unique(c(lignames, recnames, targets))
+  
+  type_vec <- c()
+  dropvec <- c()
+  missingvec <- c()
+  for (i in 1:length(pathway_elements)){
+    elem <- pathway_elements[i]
+    if(elem %in% lignames & elem %in% targets){
+      type_vec[i] <- "lig, targ"
+    } else if(elem %in% recnames & elem %in% targets){
+      type_vec[i] <- "rec, targ"
+    } else if(elem %in% targets){
+      type_vec[i] <- "targ"
+    } else if(elem %in% recnames){
+      type_vec[i] <- "rec"
+    } else {
+      type_vec[i] <- "lig"
+    }
+    
+    if(elem %in% dropout_genes){
+      dropvec[i] <- "dropout"
+    } else {
+      dropvec[i] <- "observed"
+    }
+    
+    if(elem %in% genes){
+      missingvec[i] <- "observed"
+    }else {
+      missingvec[i] <- "missing"
+    }
+  }
+  
+  
+  # see function description for these table elements
+  removed_table <- cbind(pathway_elements, type_vec, dropvec, missingvec)
+  colnames(removed_table) <- c("gene name", "gene type", "dropout in subset", "missing from all subsets")
+  
+  # remove the excluded markers from the pathway table
+  msl <- which(pathway$ligand %in% ms_lig)
+  msr <- which(pathway$receptor %in% ms_rec)
+  mst <- which(pathway$target %in% ms_targ)
+  
+  if(length(msl) > 0 |  length(msr) > 0 | length(mst) > 0){
+    pathway_removed <- pathway[-c(msl, msr, mst),]
+  } else {
+    pathway_removed <- pathway
+  }
+  
+  return(list(lignames = lignames, 
+              recnames = recnames, 
+              targets = targets,
+              pathway = pathway,
+              pathway_removed = pathway_removed, 
+              removed = removed_table))
+}
+
+
+#' Capitalize the first letter of a string
+#' 
+#' Capitalize the first letter of a string.
+#'
+#' @param x the string to run
+#'
+#' @return a string
+#' 
+SimpleCap <- function(x) {
+  s <- strsplit(as.character(x), " ")[[1]]
+  paste(toupper(substring(s, 1,1)), substring(s, 2),
+        sep="", collapse=" ")
 }

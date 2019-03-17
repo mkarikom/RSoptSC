@@ -90,7 +90,6 @@ FeatureScatterPlot <- function(flat_embedding,
                                featurename,
                                colorscale = NULL){
   n_features <- length(unique(feature))
-  #p <- ggplot(flat_embedding, aes(x=V1, y=V2, color=feature))
 
   p <- ggplot(flat_embedding,
          aes_(x = as.name(colnames(flat_embedding)[1]),
@@ -129,6 +128,7 @@ FeatureScatterPlot <- function(flat_embedding,
 #' @import RColorBrewer
 #' @import gplots
 #' @importFrom tibble as_tibble
+#' @importFrom Matrix as.matrix
 #'
 #' @export
 #'
@@ -159,7 +159,7 @@ PlotTopN <- function(data,
   labeled_columns <- last_cells - offset
   clabs[labeled_columns] <- c(1:n_clusters)
 
-  p <- heatmap.2(plot_data,
+  p <- heatmap.2(as.matrix(plot_data),
                  col = rev(brewer.pal(11,"RdBu")),
                  trace = 'none',
                  dendrogram='none',
@@ -421,8 +421,13 @@ SigPlot <- function(P,
   # In case zero_threshold is <= 0, find which clusters are being plotted
   
   # find highlightable pairs
-  nz_lig_clust <- unique(P_table$lig_cluster_number[-(which(P_table$link_weight <= zero_threshold))])
-  nz_rec_clust <- unique(P_table$rec_cluster_number[-(which(P_table$link_weight <= zero_threshold))])
+  if(length(which(P_table$link_weight <= zero_threshold)) > 0){
+    nz_lig_clust <- unique(P_table$lig_cluster_number[-(which(P_table$link_weight <= zero_threshold))])
+    nz_rec_clust <- unique(P_table$rec_cluster_number[-(which(P_table$link_weight <= zero_threshold))])
+  } else {
+    nz_lig_clust <- unique(P_table$lig_cluster_number)
+    nz_rec_clust <- unique(P_table$rec_cluster_number)
+  }
   
   if(highlight_clusters){
     for(i in nz_lig_clust){

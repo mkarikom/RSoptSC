@@ -127,7 +127,8 @@
     </div>
 
     <pre class="usage"><span class='fu'>RepresentationMap</span>(<span class='kw'>flat_embedding</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>similarity_matrix</span>,
-  <span class='kw'>join_components</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>normalize_S</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>join_components</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>normalize_S</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>flat_embedding_method</span> <span class='kw'>=</span> <span class='st'>"umap"</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,6 +148,10 @@
     <tr>
       <th>normalize_S</th>
       <td><p>whether or not to normalize the similarity matrix</p></td>
+    </tr>
+    <tr>
+      <th>flat_embedding_method</th>
+      <td><p>what method to use for flat embedding.  Use umap by default.  Can be umap or tsne.</p></td>
     </tr>
     <tr>
       <th>...</th>

@@ -126,7 +126,8 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>CountClusters</span>(<span class='no'>data</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>0.01</span>, <span class='kw'>range</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>eigengap</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>CountClusters</span>(<span class='no'>data</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>0.01</span>, <span class='kw'>range</span> <span class='kw'>=</span> <span class='fl'>2</span>:<span class='fl'>20</span>, <span class='kw'>eigengap</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>n_comp</span> <span class='kw'>=</span> <span class='fl'>3</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,6 +150,10 @@ consensus matrix</p></td>
       <th>eigengap</th>
       <td><p>whether or not to use the max
 eigengap (upper bound) cluster count</p></td>
+    </tr>
+    <tr>
+      <th>n_comp</th>
+      <td><p>the number of similarity components to use for ensemble clustering</p></td>
     </tr>
     </table>
     

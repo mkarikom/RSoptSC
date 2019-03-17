@@ -9,7 +9,7 @@
 #'
 #' @return a table of features (rows) and samples (columns)
 #'
-#' @importFrom Matrix nnzero
+#' @importFrom Matrix nnzero t
 #'
 #' @export
 #'
