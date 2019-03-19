@@ -1,22 +1,21 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# RSoptSC
+# RSoptSC <img src="man/figures/logo.svg" align="right" alt="" width="320" />
 
-<img src="man/figures/logo.svg" width="60%" />
+[![Build
+Status](https://travis-ci.com/mkarikom/RSoptSC.svg?branch=master)](https://travis-ci.com/mkarikom/RSoptSC)
 
-RSoptSC is an R package for SoptSC: performing analysis and prediction
-on single-cell RNA sequencing (scRNA-seq) data. SoptSC can infer
-cell-cell communication between single cells, and completes multiple
-single-cell analysis tasks from a single coherent framework. This
-enables the reconstruction of complex lineage relationships alongside
-prediction of specific feedback or feedforward interactions.
+## Updates
 
   - Demo SoptSC at
     [`vignette("Joost_et_al")`](https://mkarikom.github.io/RSoptSC/articles/Joost_et_al.html)
 
   - Read the SoptSC preprint on
-    [bioRxiv](https://www.biorxiv.org/content/early/2018/05/12/168922)
+    [bioRxiv](https://www.biorxiv.org/content/10.1101/168922v3)
+
+  - SoptSC is also available as a MATLAB package
+    [here](https://github.com/wangshuxiong/soptsc)
 
 ## Installation
 

@@ -4,7 +4,9 @@ Title: Low-Rank Factorization for Subspace-clustering
 Version: 0.0.0.9000
 Authors@R: c(
     person("Matt", "Karikomi", email = "mattkarikomi@gmail.com", role = c("aut", "cre")),
-    person("Shuxiong", "Wang", email = "shuxiowa@uci.edu", role = c("aut")))
+    person("Shuxiong", "Wang", email = "shuxiowa@uci.edu", role = c("aut")),
+    person("Adam", "MacLean", email = "macleana@usc.edu", role = c("aut")),
+    person("Qing", "Nie", email = "nie@math.uci.edu", role = c("ths")))
 Maintainer: Matt Karikomi <mattkarikomi@gmail.com>
 Description: Clustering based on single-cell data. 
     Population signaling profiles based on expression pathway
@@ -16,7 +18,7 @@ LazyData: true
 Imports:
     FNN (>= 1.1.2.1),
     ggplot2 (>= 3.0.0),
-    Matrix (>= 1.2-14),
+    Matrix (>= 1.2-12),
     Rtsne (>= 0.13),
     NMF (>= 0.21.0),
     reshape2 (>= 1.4.3),
@@ -30,6 +32,6 @@ Imports:
     expm (>= 0.999-3),
     cluster (>= 2.0.7-1)
 Suggests: testthat,
-    rmarkdown, knitr, ClusterR, kableExtra
+    rmarkdown, knitr, kableExtra
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
