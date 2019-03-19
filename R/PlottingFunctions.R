@@ -464,6 +464,9 @@ SigPlot <- function(P,
 #' @param endhue real hue argument
 #' @param luminance the luminance of the hcl value
 #' @param chroma the chroma of the hcl value
+#' 
+#' @importFrom grDevices hcl
+#' 
 #' @export
 #'
 ColorHue <- function(n, starthue = 15, endhue = 360,

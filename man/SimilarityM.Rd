@@ -19,6 +19,8 @@ SimilarityM(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL,
 \item{use_umap_indices}{use the knn indices computed during umap embedding to impose sparsity on L2R2, instead of recomputing based on the layout.}
 
 \item{pre_embed_method}{how the initial non-linear embedding is performed, default is 'umap'}
+
+\item{...}{extra arguments passed to umap or Rtsne}
 }
 \value{
 a list containing the symetric cell to cell similarity matrix and
