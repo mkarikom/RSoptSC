@@ -53,7 +53,7 @@ GetDominatorTree <- function(predecessors, weighted_graph = NULL){
 
 #' Get a weighted, directed graph from a table of edges and weights
 #'
-#' @param edge_table a numeric matrix whose rows are edges, col 1 is v1, col2 is v2, col3 is weight
+#' @param directed_edge_table a numeric matrix whose rows are edges, col 1 is v1, col2 is v2, col3 is weight
 #'
 #' @return a directed igraph object
 #' 

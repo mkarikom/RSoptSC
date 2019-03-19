@@ -24,6 +24,7 @@ knitr::opts_chunk$set(
 
 * SoptSC is also available as a MATLAB package [here](https://github.com/wangshuxiong/soptsc)
 
+
 ## Installation
 
 ```{r, eval = FALSE, echo = TRUE}

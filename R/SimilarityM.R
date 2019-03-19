@@ -10,6 +10,7 @@
 #' @param comps_knn number of components to use for knn, overrides eigengap-based inference
 #' @param k_neighbors the number of neighbors for knn, overrides zero eigenvalue-based inference
 #' @param use_umap_indices use the knn indices computed during umap embedding to impose sparsity on L2R2, instead of recomputing based on the layout.
+#' @param ... extra arguments passed to umap or Rtsne
 #' 
 #' 
 #' @return a list containing the symetric cell to cell similarity matrix and

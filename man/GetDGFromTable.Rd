@@ -7,7 +7,7 @@
 GetDGFromTable(directed_edge_table)
 }
 \arguments{
-\item{edge_table}{a numeric matrix whose rows are edges, col 1 is v1, col2 is v2, col3 is weight}
+\item{directed_edge_table}{a numeric matrix whose rows are edges, col 1 is v1, col2 is v2, col3 is weight}
 }
 \value{
 a directed igraph object

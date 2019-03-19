@@ -1,0 +1,10 @@
+* using log directory ‘/home/au/mkarikom/Software/RSoptSC/..Rcheck’
+* using R version 3.5.2 (2018-12-20)
+* using platform: x86_64-redhat-linux-gnu (64-bit)
+* using session charset: UTF-8
+* using option ‘--no-vignettes’
+* checking for file ‘./DESCRIPTION’ ... ERROR
+Required field missing or empty:
+  ‘Author’
+* DONE
+Status: 1 ERROR

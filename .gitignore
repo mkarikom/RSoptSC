@@ -9,3 +9,5 @@ doc
 inst/doc
 .DS_Store
 *.class
+inst/doc
+docs

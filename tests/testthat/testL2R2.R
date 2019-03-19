@@ -1,7 +1,8 @@
 context("ADMM result")
 library(RSoptSC)
 
-test_that("norm(X-X%*%Z,\"f\") is less than or equal to matlab", {
+test_that("norm(X-X%*%Z,\"f\") is correct", {
+  skip_on_travis()
   data <- Matrix::as.matrix(joostTest$data)
   X <- data - min(data)
   X <- X / max(X)

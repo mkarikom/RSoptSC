@@ -318,7 +318,7 @@ SigPlot <- function(P,
   
   if(length(nzrow) < n_clusters | length(nzcol) < n_clusters){
     print("number of nonzero cells is less than the number of clusters, reduce zero threshold")
-    break()
+    return()
   }
   
   # prune the ordering and labels for rows and cols
