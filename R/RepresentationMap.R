@@ -23,7 +23,8 @@
 #' @importFrom Rtsne Rtsne
 #' @importFrom Matrix as.matrix which
 #' @importFrom umap umap
-#'
+#' @importFrom stats dist
+#' 
 #' @export
 #'
 RepresentationMap <- function(flat_embedding = NULL,

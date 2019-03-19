@@ -19,6 +19,7 @@
 #' @importFrom Rtsne Rtsne
 #' @importFrom Matrix as.matrix norm
 #' @importFrom FNN get.knnx
+#' @importFrom stats prcomp
 #' @import umap
 #'
 #' @export

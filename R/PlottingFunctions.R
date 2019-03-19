@@ -48,6 +48,10 @@ PlotLineage <- function(network, node_color = NULL, alpha_color = 1,
 #' @param outputdir the output directory, relative to getwd()
 #' @param outputfile the output file
 #'
+#' @importFrom grDevices pdf dev.off
+#' @importFrom graphics plot
+#' @importFrom igraph plot.igraph layout_with_kk
+#' 
 #' @return an igraph representation of the tree
 #'
 PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfile = NULL){
@@ -137,6 +141,7 @@ PlotTopN <- function(data,
                  cluster_labels, 
                  markers,
                  n_features){
+  clusterId = geneScore = NULL # r cmd check pass
   n_cells <- ncol(data)
   n_clusters <- length(unique(cluster_labels))
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
@@ -253,7 +258,7 @@ ViolinPlotExpression <- function(data,
 
   #reorder the color scale so that ascending-mean factor order is retained
   colorscale <- colorscale[as.numeric(levels(plot_data$cluster))]
-  print(ggplot(plot_data, aes(x = cluster, y = exp, fill = cluster)) +
+  print(ggplot(plot_data, aes_string(x = 'cluster', y = 'exp', fill = 'cluster')) +
           geom_violin(alpha = 0.6) +
           theme(legend.position = 'none') +
           labs(title = paste0("Expression of ", gene_name), x = "Cluster", y = "Relative Target Expression") +
@@ -300,6 +305,7 @@ SigPlot <- function(P,
                     zero_threshold = 0,
                     cD_reduce = 0,
                     highlight_clusters = TRUE){
+  label = lig_cluster_number = lig_cell = NULL # r cmd check pass
   circos.clear()
   # compute
   # ordering: int vector of indices corresponding to the labels

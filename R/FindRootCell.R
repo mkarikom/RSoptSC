@@ -61,6 +61,7 @@ FindRootCell <- function(use_flat_dist = TRUE,
 #' @param root_cluster the id of the root cluster on the cluster-cluster graph
 #'
 #' @importFrom igraph shortest.paths
+#' @importFrom stats cor
 #'
 #' @return tau score of rank correlation
 #'

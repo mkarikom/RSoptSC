@@ -67,9 +67,7 @@ GetDGFromTable <- function(directed_edge_table){
     adj_matrix[directed_edge_table[i,1], directed_edge_table[i,2]] <- directed_edge_table[i,3]
   }
   tree <- graph_from_adjacency_matrix(adjmatrix = adj_matrix,
-                                      weighted = TRU
-                                      
-                                      ,
+                                      weighted = TRUE,
                                       mode = 'directed')
 }
 
@@ -86,9 +84,7 @@ ProcessMatlabDTree <- function(edge_table, predecessors){
   # make a directed edge list
   directed_edges <- cbind(c(predecessors), 1:length(predecessors), rep(0, length(predecessors)))
   # remove the null edge leading to root
-  directed_edges <- directed_edges[-(which(directed_edges[,1] == 0, arr.ind = TRU
-                                           
-                                           )),]
+  directed_edges <- directed_edges[-(which(directed_edges[,1] == 0, arr.ind = TRUE)),]
 
   n_edges <- nrow(edge_table)
   for(i in 1:n_edges){

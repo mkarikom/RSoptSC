@@ -21,6 +21,7 @@
 GetSignalingPartners <- function(M,
                                   ids,
                                   pathway){
+  receptor = ligand = direction = NULL   # r cmd check pass
   n_cells <- ncol(as.matrix(M))
   n_genes <- nrow(as.matrix(M))
   
@@ -344,6 +345,7 @@ ClusterAvg <- function(M,
 #'     \item{removed}{a table with the excluded markers}
 #'           
 #' @importFrom Matrix rowSums
+#' @importFrom utils read.delim
 #' 
 #' @export
 #'

@@ -74,6 +74,7 @@ GetComponents <- function(data,
 #'     consensus matrix
 #'
 #' @importFrom cluster pam
+#' @importFrom stats prcomp
 #'
 #' @return a truncated ensemble consensus matrix
 #'

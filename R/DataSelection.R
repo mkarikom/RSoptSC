@@ -10,7 +10,8 @@
 #' @return a table of features (rows) and samples (columns)
 #'
 #' @importFrom Matrix nnzero t
-#'
+#' @importFrom stats prcomp
+#' 
 #' @export
 #'
 SelectData <- function(M, gene_expression_threshold, n_features){
@@ -55,6 +56,8 @@ SelectData <- function(M, gene_expression_threshold, n_features){
 #' We want a matrix whose values are standard deviations from the mean and which are centered at zero.
 #'
 #' @param M a matrix of expression values for each gene (rows) and cell (columns)
+#' 
+#' @importFrom stats sd
 #'
 #' @return a scaled and centered matrix of expression values
 #'

@@ -63,6 +63,8 @@ FindRootCluster <- function(cluster_labels,
 #' @param feature a feature id, usually a gene name
 #' @param feature_list the names of the features represented by rows of M
 #'
+#' @importFrom stats var
+#'
 #' @return a vector of feature expression for each cluster
 #'
 #' @export
