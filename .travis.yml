@@ -6,6 +6,4 @@ cache: packages
 
 #  added to allow vignette to complete
 script: 
-  - |
-  R CMD build .
-travis_wait 60 R CMD check RSoptSC*tar.gz
+  - R CMD build . travis_wait 60 R CMD check RSoptSC*tar.gz
