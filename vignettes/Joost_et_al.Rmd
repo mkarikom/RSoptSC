@@ -11,9 +11,12 @@ vignette: >
 
 ```{r setup, include = FALSE}
 rm(list = ls())
+LOCAL <- identical(Sys.getenv("LOCAL"), "true") # don't try to build on cran or travis (see: http://www.lyzander.com/r/2017/01/30/cran_travis.html)
+
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  purl = TRAVIS
 )
 set.seed(13)
 par(mar=c(1,1,1,1))
@@ -25,7 +28,7 @@ This is an example of clustering, marker identification and pseudotime inference
 
 A matrix of counts with rows as genes and columns as cells must be provided.  Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files.  Here we load example data from NCBI GEO (GSE67602) originally published in Joost et al 2016.
 
-```{r, results='asis'}
+```{r, results='asis', eval = LOCAL}
 library(RSoptSC)
 df <- system.file("extdata", "GSE67602_JoostData.csv.bz2", package = "RSoptSC")
 gf <- system.file("extdata", "GSE67602_JoostGenes.csv.bz2", package = "RSoptSC")
@@ -36,7 +39,7 @@ GSE67602_Joost <- LoadData(df, gf, cf, af)
 ```
 
 ### Remove Spike-in RNA
-```{r, include=FALSE}
+```{r, include=FALSE, eval=LOCAL}
 gene_names <- GSE67602_Joost$gene_names
 spikein <- grep('ERCC', gene_names)
 gene_names <- gene_names[-spikein]
@@ -45,7 +48,7 @@ data <- GSE67602_Joost$data[-spikein,]
 
 Apply number of features and exclusion threshold
 
-```{r, results='asis'}
+```{r, results='asis', eval=LOCAL}
 logdata <- log10(data + 1)
 gene_expression_threshold <- 0.03
 n_features <- 3000
@@ -56,7 +59,7 @@ filtered_data <- SelectData(logdata, gene_expression_threshold, n_features)
 
 Run L2R2 on the processed data, outputting the number of iterations and value of the objective.
 
-```{r, results='asis', echo=FALSE,results='hide'}
+```{r, results='asis', echo=FALSE,results='hide', eval=LOCAL}
 S <- SimilarityM(lambda = 0.05, 
                  data = filtered_data$M_variable,
                  random_state = 0,
@@ -68,7 +71,7 @@ S <- SimilarityM(lambda = 0.05,
 
 Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
 
-```{r, results='asis'}
+```{r, results='asis', eval=LOCAL}
 low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
                             join_components = TRUE,
                             input = 'data',
@@ -82,14 +85,14 @@ low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
 
 Infer cluster number using spectra of the ensemble Laplacian.
 
-```{r, results='asis'}
+```{r, results='asis', eval=LOCAL}
 clusters <- CountClusters(data = S$W, n_comp = 15)
 n_clusters <- clusters$upper_bound
 ```
 
 In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap.  We take this value as the cluster number here.
 
-```{r, results='asis'}
+```{r, results='asis', eval=LOCAL}
 par(mar=c(1,1,1,1))
 plot(c(1:20), 
      clusters$eigs$val[1:20],
@@ -101,7 +104,7 @@ plot(c(1:20),
 
 Factor the similarity matrix such that W = HxH', using the computed cluster number for the rank of H.
 
-```{r, results='asis', warning=FALSE}
+```{r, results='asis', warning=FALSE, eval=LOCAL}
 output_NMF <- NMF::nmf(x = Matrix::as.matrix(S$W),
               rank = n_clusters,
               method = 'lee',
@@ -112,7 +115,7 @@ H <- NMF::basis(output_NMF)
 
 Assign cluster labels to the cells.
 
-```{r, results='asis'}
+```{r, results='asis', eval=LOCAL}
 labels <- apply(H, 1, function(x){
   which(x == max(x))})
 ```
@@ -122,7 +125,7 @@ labels <- apply(H, 1, function(x){
 
 Cells are labeled by cluster membership and plotted on low-dimensional embedding (umap) of the similarity matrix.
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
 # define a scheme for the coloring.  This is a required parameter for plotting discrete (factor) data
 colorscale <- ColorHue(n = length(unique(labels)))
 colorscale <- colorscale$hex.1.n.
@@ -139,7 +142,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 
 As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-DII, IFE-KI, IFE-KII were identified by standard techniques.
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
 true_labels <- GSE67602_Joost$annotation
 # plot clusters
 par(mar=c(1,1,1,1))
@@ -154,7 +157,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 
 Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters.  We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters.  The top six markers selected as described in Wang et. al.  As expected, markers Krt14, Krt10, and Lor are inferred for clusters overlapping with IHC-based Basal, Differentiated (IFE-DI, IFE-DII), and Keratinized (IFE-KI, IFE-KII) cell annotations.   
 
-```{r, fig.width=7, fig.height=7}
+```{r, fig.width=7, fig.height=7, eval=LOCAL}
 
 markers <- GetMarkerTable(counts_data = log(data+1),
                           cluster_labels = labels,
@@ -173,7 +176,7 @@ PlotTopN(data = log(data+1),
 
 Compute cluster-cluster graph and find the root cluster.
 
-```{r, results='asis'}
+```{r, results='asis', eval=LOCAL}
 cluster_ptime <- FindRootCluster(cluster_labels = labels,
                                  flat_embedding = low_dim_mapping$flat_embedding,
                                  dist_graph = low_dim_mapping$dist_graph,
@@ -183,7 +186,7 @@ cluster_ptime <- FindRootCluster(cluster_labels = labels,
 
 Compute the cell-cell graph and find the root cell.
 
-```{r, results='asis'}
+```{r, results='asis', eval=LOCAL}
 root_cell <- FindRootCell(use_flat_dist = FALSE,
                           cluster_order_by = "distance",
                           cell_order_by = "distance",
@@ -198,7 +201,7 @@ root_cell <- FindRootCell(use_flat_dist = FALSE,
 
 Compute the directional minimum spanning tree on the cluster-cluster graph for visualization.
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
 par(mar=c(1,1,1,1))
 cluster_predecessors <- GetPredecessors(cluster_ptime$cluster_mst, cluster_ptime$root_cluster)
 cluster_dtree <- GetDominatorTree(cluster_predecessors, cluster_ptime$graph_cluster)
@@ -208,7 +211,7 @@ PlotLineage(cluster_dtree)
 
 Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
 pseudotime <- low_dim_mapping$dist_graph[root_cell,]
 
 # plot pseudotime
@@ -224,7 +227,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 
 Plot Expression of Krt14, Krt10, and Lor in t-SNE Space:
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
 gene_index <- which(gene_names == 'Krt14')
 data_gene <- logdata[gene_index,]
 
@@ -237,7 +240,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                     featurename = "Log Krt14 Expression")
 ```
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
 gene_index <- which(gene_names == 'Krt10')
 data_gene <- logdata[gene_index,]
 
@@ -250,7 +253,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                     featurename = "Log Krt10 Expression")
 ```
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
 gene_index <- which(gene_names == 'Lor')
 data_gene <- logdata[gene_index,]
 
@@ -267,7 +270,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 
 Violin Plot of Krt14 expression.  Note strong expression of the basal compartment (clusters 4 and 5):
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
   par(mar=c(1,1,1,1))
   ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
@@ -276,7 +279,7 @@ Violin Plot of Krt14 expression.  Note strong expression of the basal compartmen
 ```
 Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/DII compartments (clusters 1, 2, 7).  Note that the mixed expression of Krt10 in cluster 5, which may indicate a population of transitioning basal cells:
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
   par(mar=c(1,1,1,1))
   ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
@@ -285,7 +288,7 @@ Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/D
 ```
 Violin Plot of Lor expression.  Note strong expression in clusters 3 and 6 which fully encompass the terminally differentiated IFE-KI/KII compartments:
 
-```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
   par(mar=c(1,1,1,1))
   ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
@@ -297,7 +300,7 @@ Violin Plot of Lor expression.  Note strong expression in clusters 3 and 6 which
 
 In order to analyze signaling, we can load in tables which describe a pathay in detail.  There are two tables needed, one that specifies all unique ligand receptor combinations and another that specifies receptor/target/up|down combinations.  Example tables for the TgfB pathway are provided in extdata/ and loaded here for the current skin data set.  Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples.  We then compute the probability of intercellular interaction based on this pathway.
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, eval=LOCAL}
 library(knitr)
 library(kableExtra)
 
@@ -314,7 +317,7 @@ pathway$pathway %>% kable() %>% kable_styling()
 ```
 
 
-```{r, results='hide', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, message=FALSE}
+```{r, results='hide', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, message=FALSE, eval=LOCAL}
   
   Pmats <- GetSignalingPartners(logdata,
                                 gene_names,
@@ -324,7 +327,7 @@ pathway$pathway %>% kable() %>% kable_styling()
 ### Circos Plot of Intercellular Network
 Now plot the previous result as a circos plot on the top five ligand-producing and top five receptor-bearing cells from every cluster.  The upper hemisphere of the plot shows receptor-bearing cells.  The chords of the plot are colored by the ligand-producing cells in the lower hemisphere.
 
-```{r, out.height='100%', out.width='100%'}
+```{r, out.height='100%', out.width='100%', eval=LOCAL}
   par(mar=c(1,1,1,1))
 
 SigPlot(P = Pmats$P_agg,
@@ -337,7 +340,7 @@ SigPlot(P = Pmats$P_agg,
 ### Circos Plot of Intercluster Network
 Directional plot of cluster-to-cluster signaling.  The root of the directional chord is raised.
 
-```{r, out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
   cluster_P <- ClusterSig(Pmats$P_agg,
                           cluster_labels = labels)
   SigPlot(P = cluster_P,
@@ -349,7 +352,7 @@ Directional plot of cluster-to-cluster signaling.  The root of the directional c
 
 Visualize the expression of ligand/receptor and up/down target expression across clusters
 
-```{r, results='asis', warning=FALSE, message= FALSE, out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', warning=FALSE, message= FALSE, out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, eval=LOCAL}
   par(mar=c(1,1,1,1))
 
   gene_list = c('Tgfb1', 'Tgfb2', 
