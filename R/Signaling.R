@@ -29,152 +29,177 @@ GetSignalingPartners <- function(M,
   pathway <- mutate_all(pathway, .funs = tolower)
   
   # ligand-receptor pairs
-  LR_pairs <- unique(pathway[c("ligand", "receptor")])
+  LR_pairs <- unique(pathway[c("receptor", "ligand")])
+  
+  # version of model
+  target <- targupdown <- targdown <- targup <- FALSE
+  if('target' %in% colnames(pathway)){
+    target <- TRUE
+    if('up' %in% pathway$direction & 'down' %in% pathway$direction){
+      targupdown <- TRUE
+    } else if('up' %in% pathway$direction){
+      targup <- TRUE
+    } else {
+      targdown <- TRUE
+    }
+  }
   
   P <- list()
   for(pair in 1:nrow(LR_pairs)){
-    # find alpha
-    lig_index <- which(LR_pairs[pair, 1] == ids)
-    lnsub <- NormalizeSubset(M, lig_index)
+    P[[pair]] <- matrix(0, nrow = n_cells, ncol = n_cells)
+    rec_index <- which(ids == LR_pairs[pair, 1])
+    lig_index <- which(ids == LR_pairs[pair, 2])
+    ldata <- NormalizeGene(M[lig_index,])
+    rdata <- NormalizeGene(M[rec_index,])
     
-    rec_index <- which(LR_pairs[pair, 2] == ids)
-    rnsub <- NormalizeSubset(M, rec_index)
-    alpha <- exp(-1/(matrix(lnsub,n_cells,1) %*%
-                       matrix(rnsub,1,n_cells)))
-    
-    # find beta
-    targ_up <- filter(pathway,
-                      ligand == LR_pairs[pair,1] &
-                        receptor == LR_pairs[pair,2] &
-                        direction == 'up')
-    up_index <- match(targ_up[,4],ids)
-    up_index <- up_index[!is.na(up_index)]
-    if(length(up_index) > 0){
-      avg_up <- TargetAvg(M, up_index)
-      beta <- exp(-1/avg_up)
-    }else{
-      beta <- rep(1, n_cells)
+    alpha <- matrix(0, nrow = n_cells, ncol = n_cells)
+    for(i in 1:n_cells){
+      for(j in 1:n_cells){
+        alpha[i,j] <- exp(-1/(ldata[i] * rdata[j]))
+      }
     }
-    
-    # find gamma
-    targ_down <- filter(pathway,
-                        ligand == LR_pairs[pair,1] &
-                          receptor == LR_pairs[pair,2] &
-                          direction == 'down')
-    down_index <-match(targ_down[,4],ids)
-    down_index <- down_index[!is.na(down_index)]
-    if(length(down_index) > 0){
-      avg_down <- TargetAvg(M, down_index)
-      gamma <- exp(-avg_down)      
-    }else{
-      gamma <- rep(1, n_cells)
+    if(target){
+      # note the following may require at least 2 targets of up/down, up, or down
+      pathsubset <- pathway %>% filter(receptor == LR_pairs[pair, 1] &
+                                         ligand == LR_pairs[pair, 2])
+      targets <- pathsubset$target 
+      if(targupdown){
+        upsubset <- pathsubset %>% filter(direction == 'up')
+        updata <- M[match(upsubset$target,ids),]
+        for(targind in 1:nrow(updata)){
+          updata[targind,] <- NormalizeGene(updata[targind,])
+        }
+        updata <- colMeans(updata)          
+        beta <- exp(-1/updata)
+        
+        downsubset <- pathsubset %>% filter(direction == 'down')
+        downdata <- M[match(downsubset$target,ids),]
+        for(targind in 1:nrow(downdata)){
+          downdata[targind,] <- NormalizeGene(downdata[targind,])
+        }
+        downdata <- colMeans(downdata)          
+        gamma <- exp(-downdata)
+        K <- D <- alpha
+        for(i in 1:n_cells){
+          for(j in 1:n_cells){
+            if(beta[j] <= 0){
+              K[i,j] <- 0
+            } else {
+              K[i,j] <- alpha[i,j] / (alpha[i,j] + beta[j])
+            }
+            if(gamma[j] <= 0){
+              D[i,j] <- 0
+            } else {
+              D[i,j] <- alpha[i,j] / (alpha[i,j] + gamma[j])
+            }
+          }
+        }
+        for(ii in 1:n_cells){
+          b <- sum(alpha[ii,] * beta * K[ii,] * gamma * D[ii,])
+          for(kk in 1:n_cells){
+            a <- alpha[ii,kk] * beta[kk] * K[ii,kk] * gamma[kk] * D[ii,kk]
+            if(b == 0){
+              P[[pair]][ii,kk] <- 0
+            }else{
+              P[[pair]][ii,kk] <- a/b
+            }
+          }
+        }
+      } else if(targup){
+        upsubset <- pathsubset %>% filter(direction == 'up')
+        updata <- M[match(upsubset$target,ids),]
+        for(targind in 1:nrow(updata)){
+          updata[targind,] <- NormalizeGene(updata[targind,])
+        }
+        updata <- base::colMeans(updata)          
+        beta <- exp(-1/updata)
+        K <- alpha
+        for(i in 1:n_cells){
+          for(j in 1:n_cells){
+            if(beta[j] <= 0){
+              K[i,j] <- 0
+            } else {
+              K[i,j] <- alpha[i,j] / (alpha[i,j] + beta[j])
+            }
+          }
+        }
+        for(ii in 1:n_cells){
+          b <- sum(alpha[ii,] * beta * K[ii,])
+          for(kk in 1:n_cells){
+            a <- alpha[ii,kk] * beta[kk] * K[ii,kk]
+            if(b == 0){
+              P[[pair]][ii,kk] <- 0
+            }else{
+              P[[pair]][ii,kk] <- a/b
+            }
+          }
+        }
+      } else {
+        downsubset <- pathsubset %>% filter(direction == 'down')
+        downdata <- M[match(downsubset$target,ids),]
+        for(targind in 1:nrow(downdata)){
+          downdata[targind,] <- NormalizeGene(downdata[targind,])
+        }
+        downdata <- colMeans(downdata)          
+        gamma <- exp(-downdata)
+        D <- alpha
+        for(i in 1:n_cells){
+          for(j in 1:n_cells){
+            if(gamma[j] <= 0){
+              D[i,j] <- 0
+            } else {
+              D[i,j] <- alpha[i,j] / (alpha[i,j] + gamma[j])
+            }
+          }
+        }
+        for(ii in 1:n_cells){
+          b <- sum(alpha[ii,] * gamma * K[ii,])
+          for(kk in 1:n_cells){
+            a <- alpha[ii,kk] * gamma[kk] * K[ii,kk]
+            if(b == 0){
+              P[[pair]][ii,kk] <- 0
+            }else{
+              P[[pair]][ii,kk] <- a/b
+            }
+          }
+        }      
+      }
+    } else {
+      # no targets were provided
+      for(ii in 1:n_cells){
+        b <- sum(alpha[ii,])
+        for(kk in 1:n_cells){
+          a <- alpha[ii,kk]
+          if(b == 0){
+            P[[pair]][ii,kk] <- 0
+          }else{
+            P[[pair]][ii,kk] <- a/b
+          }
+        }
+      }      
     }
-    
-    gammaM <- t(replicate(n_cells, gamma))
-    betaM <- t(replicate(n_cells, beta))
-    
-    # find K
-    if(length(up_index) > 0){
-      K <- PenaltyCoeff(alpha = alpha, const = betaM, num = 'alpha', n_cells)
-    }else{
-      K <- matrix(rep(1, n_cells*n_cells), n_cells, n_cells)
-    }
-    # find D
-    if(length(down_index) > 0){
-      D <- PenaltyCoeff(alpha = alpha, const = gammaM, num = 'alpha', n_cells)
-    }else{
-      D <- matrix(rep(1, n_cells*n_cells), n_cells, n_cells)
-    }
-    
-    P_num <- alpha*K*betaM*D*gammaM
-    # compute the normalizing factor
-    tempMat <- replicate(n_cells, apply(P_num, 1, sum))
-    non_zero_entries <- which(tempMat > 0)
-    denom_Mat <- matrix(0, n_cells, n_cells)
-    updateNonZero <- 1/tempMat[non_zero_entries]
-    denom_Mat[non_zero_entries] <- updateNonZero
-    P[[pair]] <- P_num * denom_Mat
     P[[pair]][P[[pair]] <= 1e-6] <- 0
   }
+  
   P_agg <- Reduce('+', P)/length(P)
   return(list(P = P, P_agg = P_agg))
 }
 
-#' Get target expression
+#' Normalize signal across cells
 #' 
-#' Get average target expression for each cell.
+#' Normalize signal across cells
 #'
-#' @param M a matrix of expression values for each cell (rows) and gene (columns)
-#' @param ind a vector of row indexes corresponding to genes
+#' @param M a vector of expression values for each cell (columns) and gene (rows)
 #' 
-#' @return avg expression over a list of ids
+#' @return a normalized vector of expression values
 #'
-TargetAvg <- function(M,
-                      ids){
+NormalizeGene <- function(M){
   # normalize expression values by max cell expression
-  norm <- NormalizeSubset(M, ids)
-  avg <- apply(norm, 2, function(x){
-    mean(x)
-  })
-}
-
-#' Normalize a Subset of the data
-#' 
-#' Normalize a Subset of the data.
-#'
-#' @param M a matrix of expression values for each cell (columns) and gene (rows)
-#' @param ind a vector of row indexes corresponding to genes
-#' 
-#' @return a normalized matrix of expression values
-#'
-NormalizeSubset <- function(M,
-                            ids){
-  # normalize expression values by max cell expression
-  M <- M[ids, ]
-  if(is.null(nrow(M))){
-    # convert to matrix so apply works
-    M <- matrix(M, nrow = 1)
+  M_norm <- M
+  if(max(M_norm) > 0){
+    M_norm <- M_norm/max(M_norm)
   }
-  row_max <- apply(M, 1, function(x){
-    if(max(x) > 0){
-      max_adj <- max(x)
-    } else {
-      # if the gene is not expressed, we will divide by 1 so that the normalized expression is 0
-      max_adj <- 1
-    }
-    max_adj
-  })
-  M_norm <- apply(M, 2, function(x){
-    x/row_max
-  })
   return(M_norm)
-}
-
-#' Generate the divergence penalty coefficient
-#'
-#' This will approach 1 as the difference between alpha and \code{const} approaches 0.
-#'
-#' @param alpha a matrix of normalized LR expression values for each cell (columns) and gene (rows)
-#' @param const either the normalized repression targets or the normalized expression targets
-#' @param num either alpha or const
-#' @param n_cells the number of cells (row-traversal of the alpha matrix)
-#' 
-#' @return the K or D penalty for a signaling matrix
-#'
-PenaltyCoeff <- function(alpha,
-                         const,
-                         num = 'alpha',
-                         n_cells){
-  proper <- matrix(0, n_cells, n_cells)
-  ind <- which(alpha + const > 0)
-  if(num == 'alpha'){
-    numerator <- alpha
-  } else {
-    numerator <- const
-  }
-  nonzero <- numerator[ind]/(alpha[ind]+const[ind])
-  proper[ind] <- nonzero
-  proper
 }
 
 #' Average cluster to cluster signaling
@@ -303,6 +328,8 @@ ClusterAvg <- function(M,
 #'
 #' Given two tsv tables, one including ligand-receptor pairs, and the other including receptor-target pairs, and a data set, inner-join the two tables and make sure no ligands, receptors, or targets are missing from the data.  This function returns a summary table of all requested markers.  If the data is a subset of some larger study, genes may be reported (a column exists in the data matrix) for which zero copies were observed.  In this case, "dropout in subset" applies.  There are also known gene symbols which were not measured in the study (no corresponding row exists in the data matrix).  In this case, "missing from all subsets" applies.
 #'
+#' @param lig_table a data frame with "ligand" in column 1 and "receptor" in column 2
+#' @param rec_table a data frame with "receptor" in column 1, "target" in column 2, and up/down "direction"
 #' @param lig_table_path a tsv/csv file with "ligand" in column 1 and "receptor" in column 2
 #' @param rec_table_path a tsv/csv file with "receptor" in column 1, "target" in column 2, and up/down "direction" in column 3
 #' @param data a matrix of the data, with gene names as row names (required if no gene list provided)
@@ -313,116 +340,195 @@ ClusterAvg <- function(M,
 #'     \item{recnames}{vector of all receptors}
 #'     \item{targets}{vector of all targets}
 #'     \item{pathway}{a table with combined pathway information}
-#'     \item{pathway_removed}{a table with excluded markers}
+#'     \item{pathway_removed}{a table with markers excluded}
 #'     \item{removed}{a table with the excluded markers}
 #'           
 #' @importFrom Matrix rowSums
 #' 
 #' @export
 #'
-ImportPathway <- function(lig_table_path,
-                          rec_table_path,
-                          data,
-                          gene_names = NULL){
+ImportPathway <- function(lig_table = NULL,
+                           rec_table = NULL,
+                           lig_table_path,
+                           rec_table_path = NULL,
+                           data,
+                           gene_names = NULL){
   if(is.null(rownames(data))){
     genes <- gene_names
   } else {
     genes <- rownames(data)
   }
-  tableRec <- read.delim(rec_table_path, stringsAsFactors=FALSE)
-  colnames(tableRec) <- tolower(sub('\\.', tolower(colnames(tableRec)), replacement = "_"))
   
-  tableLig <- read.delim(lig_table_path, stringsAsFactors=FALSE)
-  colnames(tableLig) <- tolower(sub('\\.', tolower(colnames(tableLig)), replacement = "_"))
-  
-  # remove references and ambiguous targets
-  tableRec <- tableRec[which(tableRec$direction != "?"),
-                       which(names(tableRec) %in% c("receptor", "target", "direction"))]
-  
-  # make gene names systematic
-  tableRec$receptor <- unname(sapply(tableRec$receptor, SimpleCap))
-  tableRec$target <- unname(sapply(tableRec$target, SimpleCap))
-  tableLig$ligand <- unname(sapply(tableLig$ligand, SimpleCap))
-  tableLig$receptor <- unname(sapply(tableLig$receptor, SimpleCap))
-  genes <- unname(sapply(genes, SimpleCap))
-  
-  # find all the symbols in the pathway
-  lignames <- unique(tableLig$ligand)
-  recnames <- unique(tableLig$receptor)
-  targets <- unique(tableRec$target)
-  
-  # inner join the tables
-  pathway <- merge(tableLig, tableRec)
-  
-  # pathway elements for which we have no data
-  ms_lig_ind <- which(is.na(match(lignames, genes)))
-  ms_lig <- lignames[ms_lig_ind]
-  
-  ms_rec_ind <- which(is.na(match(recnames, genes)))
-  ms_rec <- recnames[ms_rec_ind]
-  
-  ms_targ_ind <- which(is.na(match(targets, genes)))
-  ms_targ <- targets[ms_targ_ind]
-  
-  # zeros across all cells in the time point
-  dropout_ind <- which(!(rowSums(data) > 0))
-  dropout_genes <- genes[dropout_ind]
-  
-  pathway_elements <- unique(c(lignames, recnames, targets))
-  
-  type_vec <- c()
-  dropvec <- c()
-  missingvec <- c()
-  for (i in 1:length(pathway_elements)){
-    elem <- pathway_elements[i]
-    if(elem %in% lignames & elem %in% targets){
-      type_vec[i] <- "lig, targ"
-    } else if(elem %in% recnames & elem %in% targets){
-      type_vec[i] <- "rec, targ"
-    } else if(elem %in% targets){
-      type_vec[i] <- "targ"
-    } else if(elem %in% recnames){
-      type_vec[i] <- "rec"
-    } else {
-      type_vec[i] <- "lig"
-    }
-    
-    if(elem %in% dropout_genes){
-      dropvec[i] <- "dropout"
-    } else {
-      dropvec[i] <- "observed"
-    }
-    
-    if(elem %in% genes){
-      missingvec[i] <- "observed"
-    }else {
-      missingvec[i] <- "missing"
-    }
-  }
-  
-  
-  # see function description for these table elements
-  removed_table <- cbind(pathway_elements, type_vec, dropvec, missingvec)
-  colnames(removed_table) <- c("gene name", "gene type", "dropout in subset", "missing from all subsets")
-  
-  # remove the excluded markers from the pathway table
-  msl <- which(pathway$ligand %in% ms_lig)
-  msr <- which(pathway$receptor %in% ms_rec)
-  mst <- which(pathway$target %in% ms_targ)
-  
-  if(length(msl) > 0 |  length(msr) > 0 | length(mst) > 0){
-    pathway_removed <- pathway[-c(msl, msr, mst),]
+  if(is.null(lig_table)){
+    tableLig <- read.delim(lig_table_path, stringsAsFactors=FALSE)
+    colnames(tableLig) <- tolower(sub('\\.', tolower(colnames(tableLig)), replacement = "_"))
   } else {
-    pathway_removed <- pathway
+    tableLig <- lig_table
+    colnames(tableLig) <- tolower(sub('\\.', tolower(colnames(tableLig)), replacement = "_"))
+  }
+  if(is.null(rec_table)){
+    if(is.null(rec_table_path)){
+      targets = FALSE
+    } else {
+      targets = TRUE
+      tableRec <- read.delim(rec_table_path, stringsAsFactors=FALSE)
+      colnames(tableRec) <- tolower(sub('\\.', tolower(colnames(tableRec)), replacement = "_"))
+    }
+  } else {
+    targets = TRUE
+    tableRec <- rec_table
+    colnames(tableRec) <- tolower(sub('\\.', tolower(colnames(tableRec)), replacement = "_"))
+  }
+  if(targets){
+    # remove references and ambiguous targets
+    tableRec <- tableRec[which(tableRec$direction != "?"),
+                         which(names(tableRec) %in% c("receptor", "target", "direction"))]
+    
+    # make gene names systematic
+    tableRec$receptor <- unname(sapply(tableRec$receptor, SimpleCap))
+    tableRec$target <- unname(sapply(tableRec$target, SimpleCap))
+    tableLig$ligand <- unname(sapply(tableLig$ligand, SimpleCap))
+    tableLig$receptor <- unname(sapply(tableLig$receptor, SimpleCap))
+    genes <- unname(sapply(genes, SimpleCap))
+    
+    # find all the symbols in the pathway
+    lignames <- unique(tableLig$ligand)
+    recnames <- unique(tableLig$receptor)
+    targets <- unique(tableRec$target)
+    
+    # inner join the tables
+    pathway <- merge(tableLig, tableRec)
+    
+    # pathway elements for which we have no data
+    ms_lig_ind <- which(is.na(match(lignames, genes)))
+    ms_lig <- lignames[ms_lig_ind]
+    
+    ms_rec_ind <- which(is.na(match(recnames, genes)))
+    ms_rec <- recnames[ms_rec_ind]
+    
+    ms_targ_ind <- which(is.na(match(targets, genes)))
+    ms_targ <- targets[ms_targ_ind]
+    
+    # zeros across all cells in the time point
+    dropout_ind <- which(!(rowSums(data) > 0))
+    dropout_genes <- genes[dropout_ind]
+    
+    pathway_elements <- unique(c(lignames, recnames, targets))
+    
+    type_vec <- c()
+    dropvec <- c()
+    missingvec <- c()
+    for (i in 1:length(pathway_elements)){
+      elem <- pathway_elements[i]
+      if(elem %in% lignames & elem %in% targets){
+        type_vec[i] <- "lig, targ"
+      } else if(elem %in% recnames & elem %in% targets){
+        type_vec[i] <- "rec, targ"
+      } else if(elem %in% targets){
+        type_vec[i] <- "targ"
+      } else if(elem %in% recnames){
+        type_vec[i] <- "rec"
+      } else {
+        type_vec[i] <- "lig"
+      }
+      
+      if(elem %in% dropout_genes){
+        dropvec[i] <- "dropout"
+      } else {
+        dropvec[i] <- "observed"
+      }
+      
+      if(elem %in% genes){
+        missingvec[i] <- "observed"
+      }else {
+        missingvec[i] <- "missing"
+      }
+    }
+    
+    
+    # see function description for these table elements
+    removed_table <- cbind(pathway_elements, type_vec, dropvec, missingvec)
+    colnames(removed_table) <- c("gene name", "gene type", "dropout in subset", "missing from all subsets")
+    
+    # remove the excluded markers from the pathway table
+    msl <- which(pathway$ligand %in% ms_lig)
+    msr <- which(pathway$receptor %in% ms_rec)
+    mst <- which(pathway$target %in% ms_targ)
+    
+    if(length(msl) > 0 |  length(msr) > 0 | length(mst) > 0){
+      pathway_removed <- pathway[-c(msl, msr, mst),]
+    } else {
+      pathway_removed <- pathway
+    }
+  } else {
+    # make gene names systematic
+    tableLig$ligand <- unname(sapply(tableLig$ligand, SimpleCap))
+    tableLig$receptor <- unname(sapply(tableLig$receptor, SimpleCap))
+    genes <- unname(sapply(genes, SimpleCap))
+    
+    # find all the symbols in the pathway
+    lignames <- unique(tableLig$ligand)
+    recnames <- unique(tableLig$receptor)
+    
+    # inner join the tables
+    pathway <- tableLig
+    
+    # pathway elements for which we have no data
+    ms_lig_ind <- which(is.na(match(lignames, genes)))
+    ms_lig <- lignames[ms_lig_ind]
+    
+    ms_rec_ind <- which(is.na(match(recnames, genes)))
+    ms_rec <- recnames[ms_rec_ind]
+    
+    # zeros across all cells in the time point
+    dropout_ind <- which(!(rowSums(data) > 0))
+    dropout_genes <- genes[dropout_ind]
+    
+    pathway_elements <- unique(c(lignames, recnames))
+    
+    type_vec <- c()
+    dropvec <- c()
+    missingvec <- c()
+    for (i in 1:length(pathway_elements)){
+      elem <- pathway_elements[i]
+      if(elem %in% recnames){
+        type_vec[i] <- "rec"
+      } else {
+        type_vec[i] <- "lig"
+      }
+      if(elem %in% dropout_genes){
+        dropvec[i] <- "dropout"
+      } else {
+        dropvec[i] <- "observed"
+      }
+      if(elem %in% genes){
+        missingvec[i] <- "observed"
+      }else {
+        missingvec[i] <- "missing"
+      }
+    }
+    # see function description for these table elements
+    removed_table <- cbind(pathway_elements, type_vec, dropvec, missingvec)
+    colnames(removed_table) <- c("gene name", "gene type", "dropout in subset", "missing from all subsets")
+    
+    # remove the excluded markers from the pathway table
+    msl <- which(pathway$ligand %in% ms_lig)
+    msr <- which(pathway$receptor %in% ms_rec)
+    if(length(msl) > 0 |  length(msr) > 0){
+      pathway_removed <- pathway[-c(msl, msr),]
+    } else {
+      pathway_removed <- pathway
+    }
   }
   
   return(list(lignames = lignames, 
               recnames = recnames, 
-              targets = targets,
+              targets = NULL,
               pathway = pathway,
               pathway_removed = pathway_removed, 
               removed = removed_table))
 }
+
 
 
 #' Capitalize the first letter of a string

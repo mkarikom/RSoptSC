@@ -4,9 +4,14 @@
 \alias{ImportPathway}
 \title{Process siganling pathway data}
 \usage{
-ImportPathway(lig_table_path, rec_table_path, data, gene_names = NULL)
+ImportPathway(lig_table = NULL, rec_table = NULL, lig_table_path,
+  rec_table_path = NULL, data, gene_names = NULL)
 }
 \arguments{
+\item{lig_table}{a data frame with "ligand" in column 1 and "receptor" in column 2}
+
+\item{rec_table}{a data frame with "receptor" in column 1, "target" in column 2, and up/down "direction"}
+
 \item{lig_table_path}{a tsv/csv file with "ligand" in column 1 and "receptor" in column 2}
 
 \item{rec_table_path}{a tsv/csv file with "receptor" in column 1, "target" in column 2, and up/down "direction" in column 3}
@@ -21,7 +26,7 @@ a list containing:
     \item{recnames}{vector of all receptors}
     \item{targets}{vector of all targets}
     \item{pathway}{a table with combined pathway information}
-    \item{pathway_removed}{a table with excluded markers}
+    \item{pathway_removed}{a table with markers excluded}
     \item{removed}{a table with the excluded markers}
 }
 \description{
