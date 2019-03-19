@@ -3,5 +3,5 @@ library(RSoptSC)
 
 test_that("initial components are correct", {
   comps <- GetComponents(data = joostTest$S, tol = 0.01)
-  expect_equal(comps$n_eigs, 19)
+  expect_equal(comps$n_eigs, 6)
 })

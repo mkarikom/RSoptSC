@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Process siganling pathway data — ImportPathway • RSoptSC</title>
+<title>Normalize signal across cells — NormalizeGene • RSoptSC</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Process siganling pathway data — ImportPathway" />
+<meta property="og:title" content="Normalize signal across cells — NormalizeGene" />
 
-<meta property="og:description" content="Given two tsv tables, one including ligand-receptor pairs, and the other including receptor-target pairs, and a data set, inner-join the two tables and make sure no ligands, receptors, or targets are missing from the data.  This function returns a summary table of all requested markers.  If the data is a subset of some larger study, genes may be reported (a column exists in the data matrix) for which zero copies were observed.  In this case, &quot;dropout in subset&quot; applies.  There are also known gene symbols which were not measured in the study (no corresponding row exists in the data matrix).  In this case, &quot;missing from all subsets&quot; applies." />
+<meta property="og:description" content="Normalize signal across cells" />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -115,59 +115,31 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Process siganling pathway data</h1>
+    <h1>Normalize signal across cells</h1>
     
-    <div class="hidden name"><code>ImportPathway.Rd</code></div>
+    <div class="hidden name"><code>NormalizeGene.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Given two tsv tables, one including ligand-receptor pairs, and the other including receptor-target pairs, and a data set, inner-join the two tables and make sure no ligands, receptors, or targets are missing from the data.  This function returns a summary table of all requested markers.  If the data is a subset of some larger study, genes may be reported (a column exists in the data matrix) for which zero copies were observed.  In this case, "dropout in subset" applies.  There are also known gene symbols which were not measured in the study (no corresponding row exists in the data matrix).  In this case, "missing from all subsets" applies.</p>
+    <p>Normalize signal across cells</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>ImportPathway</span>(<span class='kw'>lig_table</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>rec_table</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>lig_table_path</span>,
-  <span class='kw'>rec_table_path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>data</span>, <span class='kw'>gene_names</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>NormalizeGene</span>(<span class='no'>M</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>lig_table</th>
-      <td><p>a data frame with "ligand" in column 1 and "receptor" in column 2</p></td>
-    </tr>
-    <tr>
-      <th>rec_table</th>
-      <td><p>a data frame with "receptor" in column 1, "target" in column 2, and up/down "direction"</p></td>
-    </tr>
-    <tr>
-      <th>lig_table_path</th>
-      <td><p>a tsv/csv file with "ligand" in column 1 and "receptor" in column 2</p></td>
-    </tr>
-    <tr>
-      <th>rec_table_path</th>
-      <td><p>a tsv/csv file with "receptor" in column 1, "target" in column 2, and up/down "direction" in column 3</p></td>
-    </tr>
-    <tr>
-      <th>data</th>
-      <td><p>a matrix of the data, with gene names as row names (required if no gene list provided)</p></td>
-    </tr>
-    <tr>
-      <th>gene_names</th>
-      <td><p>an optional list of gene names (required if rownames of data are null)</p></td>
+      <th>M</th>
+      <td><p>a vector of expression values for each cell (columns) and gene (rows)</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a list containing:</p>
-<dt>lignames</dt><dd><p>vector of all ligands</p></dd>
-    <dt>recnames</dt><dd><p>vector of all receptors</p></dd>
-    <dt>targets</dt><dd><p>vector of all targets</p></dd>
-    <dt>pathway</dt><dd><p>a table with combined pathway information</p></dd>
-    <dt>pathway_removed</dt><dd><p>a table with markers excluded</p></dd>
-    <dt>removed</dt><dd><p>a table with the excluded markers</p></dd>
-
+    <p>a normalized vector of expression values</p>
     
 
   </div>

@@ -13,16 +13,16 @@
 #'     \item{P_agg}{the aggregate matrix of all ligand/receptor pairs}
 #'                                          
 #' @importFrom reshape2 melt
-#' @importFrom dplyr filter
-#' @importFrom dplyr mutate_all
+#' @importFrom dplyr filter mutate_all
+#' @importFrom Matrix as.matrix rowSums colMeans
 #' 
 #' @export
 #'
 GetSignalingPartners <- function(M,
                                   ids,
                                   pathway){
-  n_cells <- ncol(M)
-  n_genes <- nrow(M)
+  n_cells <- ncol(as.matrix(M))
+  n_genes <- nrow(as.matrix(M))
   
   # fix the names
   ids <- tolower(ids)
@@ -66,7 +66,7 @@ GetSignalingPartners <- function(M,
       if(targupdown){
         upsubset <- pathsubset %>% filter(direction == 'up')
         updata <- M[match(upsubset$target,ids),]
-        for(targind in 1:nrow(updata)){
+        for(targind in 1:nrow(as.matrix(updata))){
           updata[targind,] <- NormalizeGene(updata[targind,])
         }
         updata <- colMeans(updata)          
@@ -74,7 +74,7 @@ GetSignalingPartners <- function(M,
         
         downsubset <- pathsubset %>% filter(direction == 'down')
         downdata <- M[match(downsubset$target,ids),]
-        for(targind in 1:nrow(downdata)){
+        for(targind in 1:nrow(as.matrix(downdata))){
           downdata[targind,] <- NormalizeGene(downdata[targind,])
         }
         downdata <- colMeans(downdata)          
@@ -108,7 +108,7 @@ GetSignalingPartners <- function(M,
       } else if(targup){
         upsubset <- pathsubset %>% filter(direction == 'up')
         updata <- M[match(upsubset$target,ids),]
-        for(targind in 1:nrow(updata)){
+        for(targind in 1:nrow(as.matrix(updata))){
           updata[targind,] <- NormalizeGene(updata[targind,])
         }
         updata <- base::colMeans(updata)          
@@ -137,7 +137,7 @@ GetSignalingPartners <- function(M,
       } else {
         downsubset <- pathsubset %>% filter(direction == 'down')
         downdata <- M[match(downsubset$target,ids),]
-        for(targind in 1:nrow(downdata)){
+        for(targind in 1:nrow(as.matrix(downdata))){
           downdata[targind,] <- NormalizeGene(downdata[targind,])
         }
         downdata <- colMeans(downdata)          

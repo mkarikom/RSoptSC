@@ -5,8 +5,7 @@ test_that("norm(X-X%*%Z,\"f\") is less than or equal to matlab", {
   data <- Matrix::as.matrix(joostTest$data)
   X <- data - min(data)
   X <- X / max(X)
-  
-  for(i in 1:n){
+  for(i in 1:ncol(data)){
     X[,i] <- X[,i] / norm(X[,i], "2")
   }
   # computes the similarity matrix using a low rank representation of X subject to the adjacency constraint D

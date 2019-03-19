@@ -81,7 +81,7 @@
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2019-03-17</h4>
+            <h4 class="date">2019-03-19</h4>
       
       
       <div class="hidden name"><code>Joost_et_al.Rmd</code></div>
@@ -305,7 +305,7 @@
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(kableExtra)</a>
 <a class="sourceLine" id="cb21-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb21-4" data-line-number="4">lig_rec_path &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"tgfb_lig_rec.tsv"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb21-5" data-line-number="5">rec_target_path &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"tgfb_rec_target.tsv"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb21-5" data-line-number="5">rec_target_path &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"tgfb_rec_target_both.tsv"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
 <a class="sourceLine" id="cb21-6" data-line-number="6">pathway &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ImportPathway.html">ImportPathway</a></span>(<span class="dt">lig_table_path =</span> lig_rec_path,</a>
 <a class="sourceLine" id="cb21-7" data-line-number="7">                         <span class="dt">rec_table_path =</span> rec_target_path,</a>
 <a class="sourceLine" id="cb21-8" data-line-number="8">                         <span class="dt">data =</span> logdata,</a>
@@ -433,6 +433,34 @@ up
 Tgfbr1
 </td>
 <td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Dnmt3b
+</td>
+<td style="text-align:left;">
+down
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Dnmt1
+</td>
+<td style="text-align:left;">
+down
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
 Tgfb2
 </td>
 <td style="text-align:left;">
@@ -528,16 +556,30 @@ up
 </tr>
 <tr>
 <td style="text-align:left;">
-Tgfbr2
+Tgfbr1
 </td>
 <td style="text-align:left;">
-Tgfb1
+Tgfb2
 </td>
 <td style="text-align:left;">
-Zeb2
+Dnmt3b
 </td>
 <td style="text-align:left;">
-up
+down
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfbr1
+</td>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Dnmt1
+</td>
+<td style="text-align:left;">
+down
 </td>
 </tr>
 <tr>
@@ -563,6 +605,48 @@ Tgfb1
 </td>
 <td style="text-align:left;">
 Wnt4
+</td>
+<td style="text-align:left;">
+up
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Zeb2
+</td>
+<td style="text-align:left;">
+up
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Sox9
+</td>
+<td style="text-align:left;">
+up
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+Tgfb1
+</td>
+<td style="text-align:left;">
+Notch1
 </td>
 <td style="text-align:left;">
 up
@@ -604,10 +688,10 @@ Tgfbr2
 Tgfb1
 </td>
 <td style="text-align:left;">
-Sox9
+Dnmt1
 </td>
 <td style="text-align:left;">
-up
+down
 </td>
 </tr>
 <tr>
@@ -618,7 +702,35 @@ Tgfbr2
 Tgfb1
 </td>
 <td style="text-align:left;">
-Notch1
+Dnmt3b
+</td>
+<td style="text-align:left;">
+down
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Smad2
+</td>
+<td style="text-align:left;">
+up
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tgfbr2
+</td>
+<td style="text-align:left;">
+Tgfb2
+</td>
+<td style="text-align:left;">
+Wnt4
 </td>
 <td style="text-align:left;">
 up
@@ -646,7 +758,7 @@ Tgfbr2
 Tgfb2
 </td>
 <td style="text-align:left;">
-Smad2
+Sox9
 </td>
 <td style="text-align:left;">
 up
@@ -660,7 +772,7 @@ Tgfbr2
 Tgfb2
 </td>
 <td style="text-align:left;">
-Wnt4
+Notch1
 </td>
 <td style="text-align:left;">
 up
@@ -702,10 +814,10 @@ Tgfbr2
 Tgfb2
 </td>
 <td style="text-align:left;">
-Sox9
+Dnmt1
 </td>
 <td style="text-align:left;">
-up
+down
 </td>
 </tr>
 <tr>
@@ -716,10 +828,10 @@ Tgfbr2
 Tgfb2
 </td>
 <td style="text-align:left;">
-Notch1
+Dnmt3b
 </td>
 <td style="text-align:left;">
-up
+down
 </td>
 </tr>
 </tbody>

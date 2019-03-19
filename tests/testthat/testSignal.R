@@ -28,7 +28,7 @@ test_that("signaling is accurate when up and down targs are used", {
   Pmats <- GetSignalingPartners(data,
                                  gene_names,
                                  pathway$pathway_removed)
-  print(dim(sparseJoostTest$signal_all_both))
+  print(dim(joostTest$signal_all_both))
   expect_true(sum(abs(Pmats$P_agg - as.matrix(joostTest$signal_all_both))) <= 1e-15)
 })
 
