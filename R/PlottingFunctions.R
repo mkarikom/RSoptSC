@@ -293,18 +293,18 @@ ViolinPlotExpression <- function(data,
 #' @export
 #'
 SigPlot <- function(P,
-                    rgb_gap = 0.2,
-                    cluster_labels,
-                    lig_cells_per_cluster = 10,
-                    lig_cells_total = 0,
-                    lig_edge_per_cell = 0,
-                    lig_edge_per_cluster = 0,
-                    lig_edge_total = 0,
-                    rec_cells_per_cluster = 10,
-                    rec_cells_total = 0,
-                    zero_threshold = 0,
-                    cD_reduce = 0,
-                    highlight_clusters = TRUE){
+                     rgb_gap = 0.2,
+                     cluster_labels,
+                     lig_cells_per_cluster = 10,
+                     lig_cells_total = 0,
+                     lig_edge_per_cell = 0,
+                     lig_edge_per_cluster = 0,
+                     lig_edge_total = 0,
+                     rec_cells_per_cluster = 10,
+                     rec_cells_total = 0,
+                     zero_threshold = 0,
+                     cD_reduce = 0,
+                     highlight_clusters = TRUE){
   label = lig_cluster_number = lig_cell = NULL # r cmd check pass
   circos.clear()
   # compute
@@ -396,6 +396,13 @@ SigPlot <- function(P,
   
   P_table <- arrange(P_table, lig_cluster_number, lig_cell)
   
+  # get the ordering of the receptors
+  lig_cell_order <- unique(P_table$lig_cell[which(P_table$link_weight > zero_threshold)])
+  P_tab <- arrange(P_table[which(P_table$link_weight > zero_threshold),], rec_cluster_number, rec_cell)
+  rec_cell_unique <- unique(P_tab$rec_cell)
+  rec_cell_unique <- paste(rec_cell_unique, "R", sep = "_")
+  chord_plot_sector_order <- c(lig_cell_order, rec_cell_unique)
+  
   # add a prefix to make the rec cells unique for sector highlighting
   P_table$rec_cell <- paste(P_table$rec_cell, "R", sep = "_")
   
@@ -413,7 +420,8 @@ SigPlot <- function(P,
   
   # plot the chords
   circos.clear()
-  chordDiagram(P_table[which(P_table$link_weight > zero_threshold),1:3], 
+  chordDiagram(P_table[which(P_table$link_weight > zero_threshold),1:3],
+               order = chord_plot_sector_order,
                directional = TRUE, 
                direction.type = c("diffHeight", "arrows"), 
                link.arr.type = "big.arrow", 
