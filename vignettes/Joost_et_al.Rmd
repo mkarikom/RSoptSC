@@ -59,23 +59,27 @@ Run L2R2 on the processed data, outputting the number of iterations and value of
 ```{r, results='asis', echo=FALSE,results='hide'}
 S <- SimilarityM(lambda = 0.05, 
                  data = filtered_data$M_variable,
-                 random_state = 0,
-                 knn.repeat = 3,
-                 min_dist = .1,
-                 k_neighbors = 30,
-                 comps_knn = 3)
+                 dims = 3,
+                 pre_embed_method = 'tsne',
+                 perplexity = 20, 
+                 pca_center = TRUE, 
+                 pca_scale = TRUE)
 ```
 
 Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
 
 ```{r, results='asis'}
 low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
-                            join_components = TRUE,
-                            input = 'data',
-                            random_state = 0,
-                            knn.repeat = 3,
-                            min_dist = 0.6,
-                            n_neighbors = 30)
+                            flat_embedding_method = 'tsne',
+                            join_components = FALSE,
+                            perplexity = 35,
+                            theta = 0.5,
+                            normalize = FALSE,
+                            pca = TRUE,
+                            pca_center = TRUE,
+                            pca_scale = TRUE,
+                            dims = 2,
+                            initial_dims = 2)
 ```
 
 ## Cluster the Cells
@@ -132,7 +136,7 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = as.factor(labels),
                          title = "NMF Cluster Labeling",
-                         subtitle = "umap Embedding",
+                         subtitle = "t-SNE Embedding",
                          featurename = "Cluster ID",
                          colorscale = colorscale)
 ```
@@ -146,7 +150,7 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = as.factor(true_labels),
                          title = "True Labeling",
-                         subtitle = "umap Embedding",
+                         subtitle = "t-SNE Embedding",
                          featurename = "Annotated Cell Types")
 ```
 
@@ -178,7 +182,7 @@ cluster_ptime <- FindRootCluster(cluster_labels = labels,
                                  flat_embedding = low_dim_mapping$flat_embedding,
                                  dist_graph = low_dim_mapping$dist_graph,
                                  dist_flat = low_dim_mapping$dist_flat,
-                                 reverse = TRUE)
+                                 reverse = FALSE)
 ```
 
 Compute the cell-cell graph and find the root cell.
@@ -216,8 +220,8 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = pseudotime,
                          title = "Pseudotime Labeling",
-                         subtitle = "umap Embedding",
-                         featurename = "Relative L2R2 Distance from Root")
+                         subtitle = "t-SNE Embedding",
+                         featurename = "Pseudotime Distance")
 ```
 
 ## Plot Gene Expression on the Flat Embedding
@@ -233,8 +237,8 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                     feature = data_gene,
                     title = "Krt14 Expression",
-                    subtitle = "umap Embedding",
-                    featurename = "Log Krt14 Expression")
+                    subtitle = "t-SNE Embedding",
+                    featurename = "Log Expression")
 ```
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
@@ -246,8 +250,8 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                     feature = data_gene,
                     title = "Krt10 Expression",
-                    subtitle = "umap Embedding",
-                    featurename = "Log Krt10 Expression")
+                    subtitle = "t-SNE Embedding",
+                    featurename = "Log Expression")
 ```
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
@@ -259,13 +263,13 @@ par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                     feature = data_gene,
                     title = "Lor Expression",
-                    subtitle = "umap Embedding",
-                    featurename = "Log Lor Expression")
+                    subtitle = "t-SNE Embedding",
+                    featurename = "Log Expression")
 ```
 
 ## Plot Gene Expression Levels in Cells Grouped by Cluster
 
-Violin Plot of Krt14 expression.  Note strong expression of the basal compartment (clusters 4 and 5):
+Violin Plot of Krt14 expression.  Note strong expression of the basal compartment (clusters 2 and 7):
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
@@ -274,7 +278,7 @@ Violin Plot of Krt14 expression.  Note strong expression of the basal compartmen
                        labels = labels,
                        gene_name = "Krt14")
 ```
-Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/DII compartments (clusters 1, 2, 7).  Note that the mixed expression of Krt10 in cluster 5, which may indicate a population of transitioning basal cells:
+Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/DII compartments (clusters 5, 1, 4):
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
@@ -283,7 +287,7 @@ Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/D
                        labels = labels,
                        gene_name = "Krt10")
 ```
-Violin Plot of Lor expression.  Note strong expression in clusters 3 and 6 which fully encompass the terminally differentiated IFE-KI/KII compartments:
+Violin Plot of Lor expression.  Note strong expression in cluster 3 which encompass the terminally differentiated IFE-KI/KII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))

@@ -305,7 +305,8 @@ SigPlot <- function(P,
                      zero_threshold = 0,
                      cD_reduce = 0,
                      highlight_clusters = TRUE){
-  label = lig_cluster_number = lig_cell = NULL # r cmd check pass
+  label = lig_cluster_number = lig_cell = rec_cell = 
+    rec_cluster_number = NULL # r cmd check pass
   circos.clear()
   # compute
   # ordering: int vector of indices corresponding to the labels
