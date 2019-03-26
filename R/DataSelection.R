@@ -75,3 +75,60 @@ ScaleCenterData <- function(M){
   })
   adjM
 }
+
+#' Remove rare and ubiquitous genes
+#' 
+#' This is based on Kiselev et al 2017 (SC3).  We remove genes where we observe at least countL copies in less than X% of cells or at least countU copies in more than 100 - X% of cells.  Adjust countL down and countU up in order to get more permissive filters.
+#'
+#' @param M a matrix of expression values for each gene (rows) and cell (columns)
+#' @param countL the definition of "expressed" raw counts for lower threshold
+#' @param countU the definition of "expressed" raw counts for upper threshold
+#' @param X the threshold percentage: lower = X%, upper = 100-X%
+#' 
+#' @return indices of genes to keep
+#' 
+#' @export
+#'
+ApplyCountThreshold <- function(M, countL = 1, countU = 3, X = 3){
+  n_cells <- ncol(M)
+  
+  upper <- apply(M, 1, function(x){
+    !((length(which(x >= countU)) / n_cells) >= (100-X)*0.01)
+  })
+  
+  lower <- apply(M, 1, function(x){
+    (length(which(x >= countL)) / n_cells) >= X*0.01
+  })
+  
+  keep <- which(as.logical(upper * lower))
+}
+
+#' Scale and center a data matrix
+#' 
+#' This function normalizes the data across cells, scales it and log transforms it
+#'
+#' @param M a matrix of expression values for each gene (rows) and cell (columns)
+#' @param scale the scaling factor
+#' @param normalize a boolean whether to normalize the data
+#' 
+#' @return a log normalized matrix of data
+#' 
+#' @export
+#'
+LogNormalize <- function(M, scale = 1e4, normalize = TRUE){
+  if(normalize){
+    MM <- apply(M, 2, function(x){
+      if(max(x) > 0){
+        x/max(x)
+      }else{
+        x
+      }
+    })
+  } else {
+    MM <- M
+  }
+  
+  MM <- scale * MM
+  
+  MM <- log10(MM + 1)
+}
