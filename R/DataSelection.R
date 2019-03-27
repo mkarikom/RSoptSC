@@ -83,7 +83,7 @@ ScaleCenterData <- function(M){
 #' @param M a matrix of expression values for each gene (rows) and cell (columns)
 #' @param countL the definition of "expressed" raw counts for lower threshold
 #' @param countU the definition of "expressed" raw counts for upper threshold
-#' @param X the threshold percentage: lower = X%, upper = 100-X%
+#' @param X the threshold percentage: lower = X\%, upper = 100-X\%
 #' 
 #' @return indices of genes to keep
 #' 

@@ -13,7 +13,7 @@ ApplyCountThreshold(M, countL = 1, countU = 3, X = 3)
 
 \item{countU}{the definition of "expressed" raw counts for upper threshold}
 
-\item{X}{the threshold percentage: lower = X%, upper = 100-X%}
+\item{X}{the threshold percentage: lower = X\%, upper = 100-X\%}
 }
 \value{
 indices of genes to keep
