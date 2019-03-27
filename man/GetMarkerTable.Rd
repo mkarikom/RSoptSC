@@ -4,8 +4,8 @@
 \alias{GetMarkerTable}
 \title{Get the marker genes for each cluster}
 \usage{
-GetMarkerTable(counts_data, cluster_labels, H, gene_expression_threshold,
-  n_features)
+GetMarkerTable(counts_data, cluster_labels, H, n_sorted = 50, gene_names,
+  gene_expression_threshold, n_features)
 }
 \arguments{
 \item{counts_data}{a matrix of expression values for each cell (rows) and gene (columns)}
@@ -15,13 +15,19 @@ GetMarkerTable(counts_data, cluster_labels, H, gene_expression_threshold,
 \item{H}{a nonnegative matrix such that W = H*t(H), H_{i,j} is the cells_weight
 by which cell i belongs to the jth cluster}
 
+\item{n_sorted}{the number of markers to report in the n_sorted table}
+
+\item{gene_names}{gene symbols corresponding to rows in counts_data}
+
 \item{gene_expression_threshold}{for n cells, for \code{gene_expression_threshold} = m, dont consider genes
 expressed in more than n-m cells or genes expressed in less than m cells}
 
 \item{n_features}{number of marker genes per cluster to retrieve}
 }
 \value{
-a table of marker genes
+a list containing 
+    \item{all}{all the markers listed by gene index, cluster, and score}
+    \item{n_sorted}{a subset of the sorted marker table with gene symbols}
 }
 \description{
 Get the marker genes for each cluster and report their 1-normalized expression value.

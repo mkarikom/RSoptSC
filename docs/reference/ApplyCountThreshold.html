@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get the marker genes for each cluster — GetMarkerTable • RSoptSC</title>
+<title>Remove rare and ubiquitous genes — ApplyCountThreshold • RSoptSC</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Get the marker genes for each cluster — GetMarkerTable" />
+<meta property="og:title" content="Remove rare and ubiquitous genes — ApplyCountThreshold" />
 
-<meta property="og:description" content="Get the marker genes for each cluster and report their 1-normalized expression value." />
+<meta property="og:description" content="This is based on Kiselev et al 2017 (SC3).  We remove genes where we observe at least countL copies in less than X" />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -115,61 +115,43 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get the marker genes for each cluster</h1>
+    <h1>Remove rare and ubiquitous genes</h1>
     
-    <div class="hidden name"><code>GetMarkerTable.Rd</code></div>
+    <div class="hidden name"><code>ApplyCountThreshold.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Get the marker genes for each cluster and report their 1-normalized expression value.</p>
+    <p>This is based on Kiselev et al 2017 (SC3).  We remove genes where we observe at least countL copies in less than X<!-- % of cells or at least countU copies in more than 100 - X% of cells.  Adjust countL down and countU up in order to get more permissive filters. --></p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>GetMarkerTable</span>(<span class='no'>counts_data</span>, <span class='no'>cluster_labels</span>, <span class='no'>H</span>, <span class='kw'>n_sorted</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='no'>gene_names</span>,
-  <span class='no'>gene_expression_threshold</span>, <span class='no'>n_features</span>)</pre>
+    <pre class="usage"><span class='fu'>ApplyCountThreshold</span>(<span class='no'>M</span>, <span class='kw'>countL</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>countU</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>X</span> <span class='kw'>=</span> <span class='fl'>3</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>counts_data</th>
-      <td><p>a matrix of expression values for each cell (rows) and gene (columns)</p></td>
+      <th>M</th>
+      <td><p>a matrix of expression values for each gene (rows) and cell (columns)</p></td>
     </tr>
     <tr>
-      <th>cluster_labels</th>
-      <td><p>a vector of cluster labels</p></td>
+      <th>countL</th>
+      <td><p>the definition of "expressed" raw counts for lower threshold</p></td>
     </tr>
     <tr>
-      <th>H</th>
-      <td><p>a nonnegative matrix such that W = H*t(H), H_i,j is the cells_weight
-by which cell i belongs to the jth cluster</p></td>
+      <th>countU</th>
+      <td><p>the definition of "expressed" raw counts for upper threshold</p></td>
     </tr>
     <tr>
-      <th>n_sorted</th>
-      <td><p>the number of markers to report in the n_sorted table</p></td>
-    </tr>
-    <tr>
-      <th>gene_names</th>
-      <td><p>gene symbols corresponding to rows in counts_data</p></td>
-    </tr>
-    <tr>
-      <th>gene_expression_threshold</th>
-      <td><p>for n cells, for <code>gene_expression_threshold</code> = m, dont consider genes
-expressed in more than n-m cells or genes expressed in less than m cells</p></td>
-    </tr>
-    <tr>
-      <th>n_features</th>
-      <td><p>number of marker genes per cluster to retrieve</p></td>
+      <th>X</th>
+      <td><p>the threshold percentage: lower = X%, upper = 100-X%</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a list containing</p>
-<dt>all</dt><dd><p>all the markers listed by gene index, cluster, and score</p></dd>
-    <dt>n_sorted</dt><dd><p>a subset of the sorted marker table with gene symbols</p></dd>
-
+    <p>indices of genes to keep</p>
     
 
   </div>

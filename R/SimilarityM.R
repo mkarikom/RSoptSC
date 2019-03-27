@@ -12,9 +12,10 @@
 #' @param use_umap_indices use the knn indices computed during umap embedding to impose sparsity on L2R2, instead of recomputing based on the layout.
 #' @param ... extra arguments passed to umap or Rtsne
 #' 
-#' 
-#' @return a list containing the symetric cell to cell similarity matrix and
-#'     manifold learning error
+#' @return a list containing 
+#'     \item{W}{the similarity matrix}
+#'     \item{E}{the error of the ADMM step}
+#'     \item{nl_embedding}{the KNN sparsity constraint is based on this embedding}
 #'
 #' @importFrom Rtsne Rtsne
 #' @importFrom Matrix as.matrix norm

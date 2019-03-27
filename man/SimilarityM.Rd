@@ -23,8 +23,10 @@ SimilarityM(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL,
 \item{...}{extra arguments passed to umap or Rtsne}
 }
 \value{
-a list containing the symetric cell to cell similarity matrix and
-    manifold learning error
+a list containing 
+    \item{W}{the similarity matrix}
+    \item{E}{the error of the ADMM step}
+    \item{nl_embedding}{the KNN sparsity constraint is based on this embedding}
 }
 \description{
 Computes low dim embedding, constructs KNN graph on the embedding -> unweighted adjacency

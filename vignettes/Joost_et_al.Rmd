@@ -163,13 +163,15 @@ Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the marker
 markers <- GetMarkerTable(counts_data = log(data+1),
                           cluster_labels = labels,
                           H = H,
+                          n_sorted = 25,
+                          gene_names = gene_names,
                           gene_expression_threshold = 3,
                           n_features = 20000)
 
 PlotTopN(data = log(data+1),
          gene_names = gene_names,
          cluster_labels = labels,
-         markers = markers,
+         markers = markers$all,
          n_features = 5)
 ```
 

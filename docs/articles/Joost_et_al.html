@@ -81,7 +81,7 @@
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2019-03-25</h4>
+            <h4 class="date">2019-03-26</h4>
       
       
       <div class="hidden name"><code>Joost_et_al.Rmd</code></div>
@@ -190,14 +190,16 @@
 <a class="sourceLine" id="cb10-2" data-line-number="2">markers &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetMarkerTable.html">GetMarkerTable</a></span>(<span class="dt">counts_data =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log</a></span>(data<span class="op">+</span><span class="dv">1</span>),</a>
 <a class="sourceLine" id="cb10-3" data-line-number="3">                          <span class="dt">cluster_labels =</span> labels,</a>
 <a class="sourceLine" id="cb10-4" data-line-number="4">                          <span class="dt">H =</span> H,</a>
-<a class="sourceLine" id="cb10-5" data-line-number="5">                          <span class="dt">gene_expression_threshold =</span> <span class="dv">3</span>,</a>
-<a class="sourceLine" id="cb10-6" data-line-number="6">                          <span class="dt">n_features =</span> <span class="dv">20000</span>)</a>
-<a class="sourceLine" id="cb10-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="kw"><a href="../reference/PlotTopN.html">PlotTopN</a></span>(<span class="dt">data =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log</a></span>(data<span class="op">+</span><span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb10-9" data-line-number="9">         <span class="dt">gene_names =</span> gene_names,</a>
-<a class="sourceLine" id="cb10-10" data-line-number="10">         <span class="dt">cluster_labels =</span> labels,</a>
-<a class="sourceLine" id="cb10-11" data-line-number="11">         <span class="dt">markers =</span> markers,</a>
-<a class="sourceLine" id="cb10-12" data-line-number="12">         <span class="dt">n_features =</span> <span class="dv">5</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb10-5" data-line-number="5">                          <span class="dt">n_sorted =</span> <span class="dv">25</span>,</a>
+<a class="sourceLine" id="cb10-6" data-line-number="6">                          <span class="dt">gene_names =</span> gene_names,</a>
+<a class="sourceLine" id="cb10-7" data-line-number="7">                          <span class="dt">gene_expression_threshold =</span> <span class="dv">3</span>,</a>
+<a class="sourceLine" id="cb10-8" data-line-number="8">                          <span class="dt">n_features =</span> <span class="dv">20000</span>)</a>
+<a class="sourceLine" id="cb10-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="kw"><a href="../reference/PlotTopN.html">PlotTopN</a></span>(<span class="dt">data =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log</a></span>(data<span class="op">+</span><span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb10-11" data-line-number="11">         <span class="dt">gene_names =</span> gene_names,</a>
+<a class="sourceLine" id="cb10-12" data-line-number="12">         <span class="dt">cluster_labels =</span> labels,</a>
+<a class="sourceLine" id="cb10-13" data-line-number="13">         <span class="dt">markers =</span> markers<span class="op">$</span>all,</a>
+<a class="sourceLine" id="cb10-14" data-line-number="14">         <span class="dt">n_features =</span> <span class="dv">5</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-12-1.png" width="672"></p>
 </div>
 <div id="pseudotime-inference" class="section level2">
