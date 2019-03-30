@@ -56,7 +56,7 @@ filtered_data <- SelectData(logdata, gene_expression_threshold, n_features)
 
 Run L2R2 on the processed data, outputting the number of iterations and value of the objective.
 
-```{r, results='asis', echo=FALSE,results='hide'}
+```{r, results='asis', results='hide'}
 S <- SimilarityM(lambda = 0.05, 
                  data = filtered_data$M_variable,
                  dims = 3,
@@ -124,7 +124,7 @@ labels <- apply(H, 1, function(x){
 
 ### Visualize the Clusters
 
-Cells are labeled by cluster membership and plotted on low-dimensional embedding (umap) of the similarity matrix.
+Cells are labeled by cluster membership and plotted on low-dimensional embedding (t-SNE) of the similarity matrix.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 # define a scheme for the coloring.  This is a required parameter for plotting discrete (factor) data
@@ -184,7 +184,7 @@ cluster_ptime <- FindRootCluster(cluster_labels = labels,
                                  flat_embedding = low_dim_mapping$flat_embedding,
                                  dist_graph = low_dim_mapping$dist_graph,
                                  dist_flat = low_dim_mapping$dist_flat,
-                                 reverse = FALSE)
+                                 reverse = TRUE)
 ```
 
 Compute the cell-cell graph and find the root cell.
@@ -271,7 +271,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 
 ## Plot Gene Expression Levels in Cells Grouped by Cluster
 
-Violin Plot of Krt14 expression.  Note strong expression of the basal compartment (clusters 2 and 7):
+Violin Plot of Krt14 expression.  Note strong expression of the basal compartment:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
@@ -280,7 +280,7 @@ Violin Plot of Krt14 expression.  Note strong expression of the basal compartmen
                        labels = labels,
                        gene_name = "Krt14")
 ```
-Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/DII compartments (clusters 5, 1, 4):
+Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/DII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
@@ -289,7 +289,7 @@ Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/D
                        labels = labels,
                        gene_name = "Krt10")
 ```
-Violin Plot of Lor expression.  Note strong expression in cluster 3 which encompass the terminally differentiated IFE-KI/KII compartments:
+Violin Plot of Lor expression.  Note strong expression in the terminally differentiated IFE-KI/KII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
