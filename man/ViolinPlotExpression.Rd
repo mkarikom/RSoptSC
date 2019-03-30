@@ -19,7 +19,7 @@ ViolinPlotExpression(data, gene_names, labels, gene_name,
 \item{colorscale}{optionally provided color scale}
 }
 \value{
-nothing
+a violin plot
 }
 \description{
 Produce a violin plot of gene expression.

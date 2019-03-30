@@ -275,28 +275,28 @@ Violin Plot of Krt14 expression.  Note strong expression of the basal compartmen
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
-  ViolinPlotExpression(data = logdata,
+  plot(ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
                        labels = labels,
-                       gene_name = "Krt14")
+                       gene_name = "Krt14"))
 ```
 Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/DII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
-  ViolinPlotExpression(data = logdata,
+  plot(ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
                        labels = labels,
-                       gene_name = "Krt10")
+                       gene_name = "Krt10"))
 ```
 Violin Plot of Lor expression.  Note strong expression in the terminally differentiated IFE-KI/KII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
   par(mar=c(1,1,1,1))
-  ViolinPlotExpression(data = logdata,
+  plot(ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
                        labels = labels,
-                       gene_name = "Lor")
+                       gene_name = "Lor"))
 ```
 
 ## Analyze Signaling Mediated by a Ligand-Receptor Family

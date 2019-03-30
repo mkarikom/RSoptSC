@@ -235,7 +235,7 @@ PlotClusterExpression <- function(data,
 #' @param gene_name the name of the gene to plot
 #' @param colorscale optionally provided color scale
 #'
-#' @return nothing
+#' @return a violin plot
 #'
 #' @import ggplot2
 #'
@@ -258,13 +258,13 @@ ViolinPlotExpression <- function(data,
 
   #reorder the color scale so that ascending-mean factor order is retained
   colorscale <- colorscale[as.numeric(levels(plot_data$cluster))]
-  print(ggplot(plot_data, aes_string(x = 'cluster', y = 'exp', fill = 'cluster')) +
+  p <- ggplot(plot_data, aes_string(x = 'cluster', y = 'exp', fill = 'cluster')) +
           geom_violin(alpha = 0.6) +
           theme(legend.position = 'none') +
           labs(title = paste0("Expression of ", gene_name), x = "Cluster", y = "Relative Target Expression") +
           geom_jitter(shape=16, position=position_jitter(0.2)) +
           scale_fill_manual(values = colorscale) + 
-          theme_minimal())
+          theme_minimal()
 }
 
 #' Circos plot of signaling score
