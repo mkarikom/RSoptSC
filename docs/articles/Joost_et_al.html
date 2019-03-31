@@ -79,7 +79,7 @@
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2019-03-29</h4>
+            <h4 class="date">2019-03-31</h4>
       
       
       <div class="hidden name"><code>Joost_et_al.Rmd</code></div>
@@ -141,12 +141,11 @@
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">clusters &lt;-<span class="st"> </span><span class="kw"><a href="../reference/CountClusters.html">CountClusters</a></span>(<span class="dt">data =</span> S<span class="op">$</span>W, <span class="dt">n_comp =</span> <span class="dv">15</span>)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">n_clusters &lt;-<span class="st"> </span>clusters<span class="op">$</span>upper_bound</a></code></pre></div>
 <p>In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap. We take this value as the cluster number here.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="kw">plot</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>), </a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">     clusters<span class="op">$</span>eigs<span class="op">$</span>val[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>],</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">     <span class="dt">xlab =</span> <span class="ot">NA</span>,</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">     <span class="dt">ylab =</span> <span class="st">'eigenvalues'</span>,</a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">     <span class="dt">main =</span> <span class="st">'Eigenvalues of the Graph Laplacian'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">plot</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>), </a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">     clusters<span class="op">$</span>eigs<span class="op">$</span>val[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>],</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">     <span class="dt">xlab =</span> <span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">     <span class="dt">ylab =</span> <span class="st">'eigenvalues'</span>,</a>
+<a class="sourceLine" id="cb6-5" data-line-number="5">     <span class="dt">main =</span> <span class="st">'Eigenvalues of the Graph Laplacian'</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <p>Factor the similarity matrix such that W = HxH’, using the computed cluster number for the rank of H.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">output_NMF &lt;-<span class="st"> </span>NMF<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/NMF/topics/nmf">nmf</a></span>(<span class="dt">x =</span> Matrix<span class="op">::</span><span class="kw">as.matrix</span>(S<span class="op">$</span>W),</a>
@@ -167,23 +166,21 @@
 <a class="sourceLine" id="cb9-3" data-line-number="3">colorscale &lt;-<span class="st"> </span>colorscale<span class="op">$</span>hex.<span class="fl">1.</span>n.</a>
 <a class="sourceLine" id="cb9-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co"># plot clusters</span></a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb9-8" data-line-number="8">                         <span class="dt">feature =</span> <span class="kw">as.factor</span>(labels),</a>
-<a class="sourceLine" id="cb9-9" data-line-number="9">                         <span class="dt">title =</span> <span class="st">"NMF Cluster Labeling"</span>,</a>
-<a class="sourceLine" id="cb9-10" data-line-number="10">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
-<a class="sourceLine" id="cb9-11" data-line-number="11">                         <span class="dt">featurename =</span> <span class="st">"Cluster ID"</span>,</a>
-<a class="sourceLine" id="cb9-12" data-line-number="12">                         <span class="dt">colorscale =</span> colorscale)</a></code></pre></div>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
+<a class="sourceLine" id="cb9-7" data-line-number="7">                         <span class="dt">feature =</span> <span class="kw">as.factor</span>(labels),</a>
+<a class="sourceLine" id="cb9-8" data-line-number="8">                         <span class="dt">title =</span> <span class="st">"NMF Cluster Labeling"</span>,</a>
+<a class="sourceLine" id="cb9-9" data-line-number="9">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
+<a class="sourceLine" id="cb9-10" data-line-number="10">                         <span class="dt">featurename =</span> <span class="st">"Cluster ID"</span>,</a>
+<a class="sourceLine" id="cb9-11" data-line-number="11">                         <span class="dt">colorscale =</span> colorscale)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-10-1.png" width="100%" height="100%"></p>
 <p>As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-DII, IFE-KI, IFE-KII were identified by standard techniques.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">true_labels &lt;-<span class="st"> </span>GSE67602_Joost<span class="op">$</span>annotation</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co"># plot clusters</span></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb10-5" data-line-number="5">                         <span class="dt">feature =</span> <span class="kw">as.factor</span>(true_labels),</a>
-<a class="sourceLine" id="cb10-6" data-line-number="6">                         <span class="dt">title =</span> <span class="st">"True Labeling"</span>,</a>
-<a class="sourceLine" id="cb10-7" data-line-number="7">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
-<a class="sourceLine" id="cb10-8" data-line-number="8">                         <span class="dt">featurename =</span> <span class="st">"Annotated Cell Types"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">                         <span class="dt">feature =</span> <span class="kw">as.factor</span>(true_labels),</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">                         <span class="dt">title =</span> <span class="st">"True Labeling"</span>,</a>
+<a class="sourceLine" id="cb10-6" data-line-number="6">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
+<a class="sourceLine" id="cb10-7" data-line-number="7">                         <span class="dt">featurename =</span> <span class="st">"Annotated Cell Types"</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-11-1.png" width="100%" height="100%"></p>
 </div>
 </div>
@@ -230,21 +227,19 @@
 <h2 class="hasAnchor">
 <a href="#pseudotime-visualization" class="anchor"></a>Pseudotime Visualization</h2>
 <p>Compute the directional minimum spanning tree on the cluster-cluster graph for visualization.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb14-2" data-line-number="2">cluster_predecessors &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetPredecessors.html">GetPredecessors</a></span>(cluster_ptime<span class="op">$</span>cluster_mst, cluster_ptime<span class="op">$</span>root_cluster)</a>
-<a class="sourceLine" id="cb14-3" data-line-number="3">cluster_dtree &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetDominatorTree.html">GetDominatorTree</a></span>(cluster_predecessors, cluster_ptime<span class="op">$</span>graph_cluster)</a>
-<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="kw"><a href="../reference/PlotLineage.html">PlotLineage</a></span>(cluster_dtree)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">cluster_predecessors &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetPredecessors.html">GetPredecessors</a></span>(cluster_ptime<span class="op">$</span>cluster_mst, cluster_ptime<span class="op">$</span>root_cluster)</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">cluster_dtree &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetDominatorTree.html">GetDominatorTree</a></span>(cluster_predecessors, cluster_ptime<span class="op">$</span>graph_cluster)</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="kw"><a href="../reference/PlotLineage.html">PlotLineage</a></span>(cluster_dtree)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-15-1.png" width="100%" height="100%"></p>
 <p>Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">pseudotime &lt;-<span class="st"> </span>low_dim_mapping<span class="op">$</span>dist_graph[root_cell,]</a>
 <a class="sourceLine" id="cb15-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb15-3" data-line-number="3"><span class="co"># plot pseudotime</span></a>
-<a class="sourceLine" id="cb15-4" data-line-number="4"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb15-5" data-line-number="5"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb15-6" data-line-number="6">                         <span class="dt">feature =</span> pseudotime,</a>
-<a class="sourceLine" id="cb15-7" data-line-number="7">                         <span class="dt">title =</span> <span class="st">"Pseudotime Labeling"</span>,</a>
-<a class="sourceLine" id="cb15-8" data-line-number="8">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
-<a class="sourceLine" id="cb15-9" data-line-number="9">                         <span class="dt">featurename =</span> <span class="st">"Pseudotime Distance"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb15-4" data-line-number="4"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
+<a class="sourceLine" id="cb15-5" data-line-number="5">                         <span class="dt">feature =</span> pseudotime,</a>
+<a class="sourceLine" id="cb15-6" data-line-number="6">                         <span class="dt">title =</span> <span class="st">"Pseudotime Labeling"</span>,</a>
+<a class="sourceLine" id="cb15-7" data-line-number="7">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
+<a class="sourceLine" id="cb15-8" data-line-number="8">                         <span class="dt">featurename =</span> <span class="st">"Pseudotime Distance"</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-16-1.png" width="100%" height="100%"></p>
 </div>
 <div id="plot-gene-expression-on-the-flat-embedding" class="section level2">
@@ -255,57 +250,51 @@
 <a class="sourceLine" id="cb16-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>logdata[gene_index,]</a>
 <a class="sourceLine" id="cb16-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb16-4" data-line-number="4"><span class="co"># plot features</span></a>
-<a class="sourceLine" id="cb16-5" data-line-number="5"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb16-6" data-line-number="6"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb16-7" data-line-number="7">                    <span class="dt">feature =</span> data_gene,</a>
-<a class="sourceLine" id="cb16-8" data-line-number="8">                    <span class="dt">title =</span> <span class="st">"Krt14 Expression"</span>,</a>
-<a class="sourceLine" id="cb16-9" data-line-number="9">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
-<a class="sourceLine" id="cb16-10" data-line-number="10">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb16-5" data-line-number="5"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
+<a class="sourceLine" id="cb16-6" data-line-number="6">                    <span class="dt">feature =</span> data_gene,</a>
+<a class="sourceLine" id="cb16-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Krt14 Expression"</span>,</a>
+<a class="sourceLine" id="cb16-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
+<a class="sourceLine" id="cb16-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-17-1.png" width="100%" height="100%"></p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw">which</span>(gene_names <span class="op">==</span><span class="st"> 'Krt10'</span>)</a>
 <a class="sourceLine" id="cb17-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>logdata[gene_index,]</a>
 <a class="sourceLine" id="cb17-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb17-4" data-line-number="4"><span class="co"># plot features</span></a>
-<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb17-6" data-line-number="6"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb17-7" data-line-number="7">                    <span class="dt">feature =</span> data_gene,</a>
-<a class="sourceLine" id="cb17-8" data-line-number="8">                    <span class="dt">title =</span> <span class="st">"Krt10 Expression"</span>,</a>
-<a class="sourceLine" id="cb17-9" data-line-number="9">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
-<a class="sourceLine" id="cb17-10" data-line-number="10">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
+<a class="sourceLine" id="cb17-6" data-line-number="6">                    <span class="dt">feature =</span> data_gene,</a>
+<a class="sourceLine" id="cb17-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Krt10 Expression"</span>,</a>
+<a class="sourceLine" id="cb17-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
+<a class="sourceLine" id="cb17-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-18-1.png" width="100%" height="100%"></p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw">which</span>(gene_names <span class="op">==</span><span class="st"> 'Lor'</span>)</a>
 <a class="sourceLine" id="cb18-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>logdata[gene_index,]</a>
 <a class="sourceLine" id="cb18-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb18-4" data-line-number="4"><span class="co"># plot features</span></a>
-<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb18-6" data-line-number="6"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb18-7" data-line-number="7">                    <span class="dt">feature =</span> data_gene,</a>
-<a class="sourceLine" id="cb18-8" data-line-number="8">                    <span class="dt">title =</span> <span class="st">"Lor Expression"</span>,</a>
-<a class="sourceLine" id="cb18-9" data-line-number="9">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
-<a class="sourceLine" id="cb18-10" data-line-number="10">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
+<a class="sourceLine" id="cb18-6" data-line-number="6">                    <span class="dt">feature =</span> data_gene,</a>
+<a class="sourceLine" id="cb18-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Lor Expression"</span>,</a>
+<a class="sourceLine" id="cb18-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
+<a class="sourceLine" id="cb18-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-19-1.png" width="100%" height="100%"></p>
 </div>
 <div id="plot-gene-expression-levels-in-cells-grouped-by-cluster" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-gene-expression-levels-in-cells-grouped-by-cluster" class="anchor"></a>Plot Gene Expression Levels in Cells Grouped by Cluster</h2>
 <p>Violin Plot of Krt14 expression. Note strong expression of the basal compartment:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">  <span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb19-2" data-line-number="2">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
-<a class="sourceLine" id="cb19-3" data-line-number="3">                       <span class="dt">gene_names =</span> gene_names,</a>
-<a class="sourceLine" id="cb19-4" data-line-number="4">                       <span class="dt">labels =</span> labels,</a>
-<a class="sourceLine" id="cb19-5" data-line-number="5">                       <span class="dt">gene_name =</span> <span class="st">"Krt14"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">  <span class="kw">plot</span>(<span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
+<a class="sourceLine" id="cb19-2" data-line-number="2">                       <span class="dt">gene_names =</span> gene_names,</a>
+<a class="sourceLine" id="cb19-3" data-line-number="3">                       <span class="dt">labels =</span> labels,</a>
+<a class="sourceLine" id="cb19-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Krt14"</span>))</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-20-1.png" width="100%" height="100%"> Violin Plot of Krt10 expression. Note uniformly high expression in the IFE-DI/DII compartments:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">  <span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb20-2" data-line-number="2">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
-<a class="sourceLine" id="cb20-3" data-line-number="3">                       <span class="dt">gene_names =</span> gene_names,</a>
-<a class="sourceLine" id="cb20-4" data-line-number="4">                       <span class="dt">labels =</span> labels,</a>
-<a class="sourceLine" id="cb20-5" data-line-number="5">                       <span class="dt">gene_name =</span> <span class="st">"Krt10"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">  <span class="kw">plot</span>(<span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">                       <span class="dt">gene_names =</span> gene_names,</a>
+<a class="sourceLine" id="cb20-3" data-line-number="3">                       <span class="dt">labels =</span> labels,</a>
+<a class="sourceLine" id="cb20-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Krt10"</span>))</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-21-1.png" width="100%" height="100%"> Violin Plot of Lor expression. Note strong expression in the terminally differentiated IFE-KI/KII compartments:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">  <span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb21-2" data-line-number="2">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
-<a class="sourceLine" id="cb21-3" data-line-number="3">                       <span class="dt">gene_names =</span> gene_names,</a>
-<a class="sourceLine" id="cb21-4" data-line-number="4">                       <span class="dt">labels =</span> labels,</a>
-<a class="sourceLine" id="cb21-5" data-line-number="5">                       <span class="dt">gene_name =</span> <span class="st">"Lor"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">  <span class="kw">plot</span>(<span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">                       <span class="dt">gene_names =</span> gene_names,</a>
+<a class="sourceLine" id="cb21-3" data-line-number="3">                       <span class="dt">labels =</span> labels,</a>
+<a class="sourceLine" id="cb21-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Lor"</span>))</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-22-1.png" width="100%" height="100%"></p>
 </div>
 <div id="analyze-signaling-mediated-by-a-ligand-receptor-family" class="section level2">
@@ -855,13 +844,11 @@ down
 <h3 class="hasAnchor">
 <a href="#circos-plot-of-intercellular-network" class="anchor"></a>Circos Plot of Intercellular Network</h3>
 <p>Now plot the previous result as a circos plot on the top five ligand-producing and top five receptor-bearing cells from every cluster. The upper hemisphere of the plot shows receptor-bearing cells. The chords of the plot are colored by the ligand-producing cells in the lower hemisphere.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">  <span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb24-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="kw"><a href="../reference/SigPlot.html">SigPlot</a></span>(<span class="dt">P =</span> Pmats<span class="op">$</span>P_agg,</a>
-<a class="sourceLine" id="cb24-4" data-line-number="4">        <span class="dt">cluster_labels =</span> labels,</a>
-<a class="sourceLine" id="cb24-5" data-line-number="5">        <span class="dt">lig_cells_per_cluster =</span> <span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb24-6" data-line-number="6">        <span class="dt">rec_cells_per_cluster =</span> <span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb24-7" data-line-number="7">        <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw"><a href="../reference/SigPlot.html">SigPlot</a></span>(<span class="dt">P =</span> Pmats<span class="op">$</span>P_agg,</a>
+<a class="sourceLine" id="cb24-2" data-line-number="2">        <span class="dt">cluster_labels =</span> labels,</a>
+<a class="sourceLine" id="cb24-3" data-line-number="3">        <span class="dt">lig_cells_per_cluster =</span> <span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb24-4" data-line-number="4">        <span class="dt">rec_cells_per_cluster =</span> <span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb24-5" data-line-number="5">        <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-25-1.png" width="100%" height="100%"></p>
 </div>
 <div id="circos-plot-of-intercluster-network" class="section level3">
@@ -879,16 +866,14 @@ down
 <h3 class="hasAnchor">
 <a href="#heatmap-of-signaling-marker-expression" class="anchor"></a>Heatmap of Signaling Marker Expression</h3>
 <p>Visualize the expression of ligand/receptor and up/down target expression across clusters</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">  <span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb26-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb26-3" data-line-number="3">  gene_list =<span class="st"> </span><span class="kw">c</span>(<span class="st">'Tgfb1'</span>, <span class="st">'Tgfb2'</span>, </a>
-<a class="sourceLine" id="cb26-4" data-line-number="4">                <span class="st">'Tgfbr1'</span>, <span class="st">'Tgfbr2'</span>,</a>
-<a class="sourceLine" id="cb26-5" data-line-number="5">                <span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>)</a>
-<a class="sourceLine" id="cb26-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb26-7" data-line-number="7">  <span class="kw"><a href="../reference/PlotClusterExpression.html">PlotClusterExpression</a></span>(<span class="dt">data =</span> logdata,</a>
-<a class="sourceLine" id="cb26-8" data-line-number="8">                        <span class="dt">gene_names =</span> gene_names,</a>
-<a class="sourceLine" id="cb26-9" data-line-number="9">                        <span class="dt">cluster_labels =</span> labels, </a>
-<a class="sourceLine" id="cb26-10" data-line-number="10">                        <span class="dt">markers =</span> gene_list)</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">  gene_list =<span class="st"> </span><span class="kw">c</span>(<span class="st">'Tgfb1'</span>, <span class="st">'Tgfb2'</span>, </a>
+<a class="sourceLine" id="cb26-2" data-line-number="2">                <span class="st">'Tgfbr1'</span>, <span class="st">'Tgfbr2'</span>,</a>
+<a class="sourceLine" id="cb26-3" data-line-number="3">                <span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>)</a>
+<a class="sourceLine" id="cb26-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb26-5" data-line-number="5">  <span class="kw"><a href="../reference/PlotClusterExpression.html">PlotClusterExpression</a></span>(<span class="dt">data =</span> logdata,</a>
+<a class="sourceLine" id="cb26-6" data-line-number="6">                        <span class="dt">gene_names =</span> gene_names,</a>
+<a class="sourceLine" id="cb26-7" data-line-number="7">                        <span class="dt">cluster_labels =</span> labels, </a>
+<a class="sourceLine" id="cb26-8" data-line-number="8">                        <span class="dt">markers =</span> gene_list)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-27-1.png" width="100%" height="100%"></p>
 </div>
 </div>

@@ -245,26 +245,25 @@ ViolinPlotExpression <- function(data,
                                  gene_names,
                                  labels,
                                  gene_name,
-                                 colorscale = NULL){
+                                 colorscale = NULL,
+                                 jitsize = 0.2){
   n_features <- length(unique(labels))
   if(is.null(colorscale)){
     colorscale <- ColorHue(n = n_features)
     colorscale <- colorscale$hex.1.n.
   }
-  gene_index <- which(gene_names == gene_name)
+  gene_index <- which(tolower(gene_names) == tolower(gene_name))
   expression <- data[gene_index,]
   plot_data <- as.data.frame(cbind(exp = expression, cluster = labels))
-  plot_data$cluster = with(plot_data, reorder(cluster, exp, mean))
-
-  #reorder the color scale so that ascending-mean factor order is retained
-  colorscale <- colorscale[as.numeric(levels(plot_data$cluster))]
+  plot_data$cluster <- as.factor(plot_data$cluster)
+  colors <- colorscale[sort(unique(labels))];
   p <- ggplot(plot_data, aes_string(x = 'cluster', y = 'exp', fill = 'cluster')) +
-          geom_violin(alpha = 0.6) +
-          theme(legend.position = 'none') +
-          labs(title = paste0("Expression of ", gene_name), x = "Cluster", y = "Relative Target Expression") +
-          geom_jitter(shape=16, position=position_jitter(0.2)) +
-          scale_fill_manual(values = colorscale) + 
-          theme_minimal()
+    geom_violin(alpha = 0.6) +
+    theme(legend.position = 'none') +
+    labs(title = paste0("Expression of ", gene_name), x = "Cluster", y = "Relative Target Expression") +
+    geom_jitter(shape=16, position=position_jitter(jitsize)) +
+    scale_fill_manual(values = colors) + 
+    theme_minimal()
 }
 
 #' Circos plot of signaling score

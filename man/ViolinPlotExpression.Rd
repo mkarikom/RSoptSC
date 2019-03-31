@@ -5,7 +5,7 @@
 \title{Violin plot of gene expression}
 \usage{
 ViolinPlotExpression(data, gene_names, labels, gene_name,
-  colorscale = NULL)
+  colorscale = NULL, jitsize = 0.2)
 }
 \arguments{
 \item{data}{a matrix with genes in rows and cells in columns}

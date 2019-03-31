@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 set.seed(13)
-par(mar=c(1,1,1,1))
 ```
 
 This is an example of clustering, marker identification and pseudotime inference on a set of skin cells.
@@ -94,7 +93,6 @@ n_clusters <- clusters$upper_bound
 In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap.  We take this value as the cluster number here.
 
 ```{r, results='asis'}
-par(mar=c(1,1,1,1))
 plot(c(1:20), 
      clusters$eigs$val[1:20],
      xlab = NA,
@@ -132,7 +130,6 @@ colorscale <- ColorHue(n = length(unique(labels)))
 colorscale <- colorscale$hex.1.n.
 
 # plot clusters
-par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = as.factor(labels),
                          title = "NMF Cluster Labeling",
@@ -146,7 +143,6 @@ As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 true_labels <- GSE67602_Joost$annotation
 # plot clusters
-par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = as.factor(true_labels),
                          title = "True Labeling",
@@ -205,7 +201,6 @@ root_cell <- FindRootCell(use_flat_dist = FALSE,
 Compute the directional minimum spanning tree on the cluster-cluster graph for visualization.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-par(mar=c(1,1,1,1))
 cluster_predecessors <- GetPredecessors(cluster_ptime$cluster_mst, cluster_ptime$root_cluster)
 cluster_dtree <- GetDominatorTree(cluster_predecessors, cluster_ptime$graph_cluster)
 PlotLineage(cluster_dtree)
@@ -218,7 +213,6 @@ Compute the path-length vector from root, and plot the cells in the previously c
 pseudotime <- low_dim_mapping$dist_graph[root_cell,]
 
 # plot pseudotime
-par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                          feature = pseudotime,
                          title = "Pseudotime Labeling",
@@ -235,7 +229,6 @@ gene_index <- which(gene_names == 'Krt14')
 data_gene <- logdata[gene_index,]
 
 # plot features
-par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                     feature = data_gene,
                     title = "Krt14 Expression",
@@ -248,7 +241,6 @@ gene_index <- which(gene_names == 'Krt10')
 data_gene <- logdata[gene_index,]
 
 # plot features
-par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                     feature = data_gene,
                     title = "Krt10 Expression",
@@ -261,7 +253,6 @@ gene_index <- which(gene_names == 'Lor')
 data_gene <- logdata[gene_index,]
 
 # plot features
-par(mar=c(1,1,1,1))
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
                     feature = data_gene,
                     title = "Lor Expression",
@@ -274,7 +265,6 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 Violin Plot of Krt14 expression.  Note strong expression of the basal compartment:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-  par(mar=c(1,1,1,1))
   plot(ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
                        labels = labels,
@@ -283,7 +273,6 @@ Violin Plot of Krt14 expression.  Note strong expression of the basal compartmen
 Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/DII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-  par(mar=c(1,1,1,1))
   plot(ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
                        labels = labels,
@@ -292,7 +281,6 @@ Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/D
 Violin Plot of Lor expression.  Note strong expression in the terminally differentiated IFE-KI/KII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-  par(mar=c(1,1,1,1))
   plot(ViolinPlotExpression(data = logdata,
                        gene_names = gene_names,
                        labels = labels,
@@ -331,8 +319,6 @@ pathway$pathway %>% kable() %>% kable_styling()
 Now plot the previous result as a circos plot on the top five ligand-producing and top five receptor-bearing cells from every cluster.  The upper hemisphere of the plot shows receptor-bearing cells.  The chords of the plot are colored by the ligand-producing cells in the lower hemisphere.
 
 ```{r, out.height='100%', out.width='100%'}
-  par(mar=c(1,1,1,1))
-
 SigPlot(P = Pmats$P_agg,
         cluster_labels = labels,
         lig_cells_per_cluster = 5,
@@ -356,8 +342,6 @@ Directional plot of cluster-to-cluster signaling.  The root of the directional c
 Visualize the expression of ligand/receptor and up/down target expression across clusters
 
 ```{r, results='asis', warning=FALSE, message= FALSE, out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-  par(mar=c(1,1,1,1))
-
   gene_list = c('Tgfb1', 'Tgfb2', 
                 'Tgfbr1', 'Tgfbr2',
                 'Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')
