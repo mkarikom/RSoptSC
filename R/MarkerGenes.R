@@ -28,7 +28,6 @@ GetMarkerTable <- function(counts_data,
                             gene_expression_threshold,
                             n_features){
   # filter the data according to desired samples (cells) and features (genes)
-  browser()
   clusterId = geneScore = NULL # get r cmd check to pass
   M <- counts_data
   Mnorm <- LogNormalize(M$M_variable)
