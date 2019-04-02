@@ -79,7 +79,7 @@
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2019-03-31</h4>
+            <h4 class="date">2019-04-01</h4>
       
       
       <div class="hidden name"><code>Joost_et_al.Rmd</code></div>
@@ -189,19 +189,40 @@
 <a href="#find-cluster-marker-genes-" class="anchor"></a>Find cluster marker genes.</h2>
 <p>Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters. We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters. The top six markers selected as described in Wang et. al. As expected, markers Krt14, Krt10, and Lor are inferred for clusters overlapping with IHC-based Basal, Differentiated (IFE-DI, IFE-DII), and Keratinized (IFE-KI, IFE-KII) cell annotations.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"></a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">markers &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetMarkerTable.html">GetMarkerTable</a></span>(<span class="dt">counts_data =</span> <span class="kw">log</span>(data<span class="op">+</span><span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">markers &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetMarkerTable.html">GetMarkerTable</a></span>(<span class="dt">counts_data =</span> filtered_data,</a>
 <a class="sourceLine" id="cb11-3" data-line-number="3">                          <span class="dt">cluster_labels =</span> labels,</a>
 <a class="sourceLine" id="cb11-4" data-line-number="4">                          <span class="dt">H =</span> H,</a>
 <a class="sourceLine" id="cb11-5" data-line-number="5">                          <span class="dt">n_sorted =</span> <span class="dv">25</span>,</a>
 <a class="sourceLine" id="cb11-6" data-line-number="6">                          <span class="dt">gene_names =</span> gene_names,</a>
 <a class="sourceLine" id="cb11-7" data-line-number="7">                          <span class="dt">gene_expression_threshold =</span> <span class="dv">3</span>,</a>
 <a class="sourceLine" id="cb11-8" data-line-number="8">                          <span class="dt">n_features =</span> <span class="dv">20000</span>)</a>
-<a class="sourceLine" id="cb11-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb11-10" data-line-number="10"><span class="kw"><a href="../reference/PlotTopN.html">PlotTopN</a></span>(<span class="dt">data =</span> <span class="kw">log</span>(data<span class="op">+</span><span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb11-11" data-line-number="11">         <span class="dt">gene_names =</span> gene_names,</a>
-<a class="sourceLine" id="cb11-12" data-line-number="12">         <span class="dt">cluster_labels =</span> labels,</a>
-<a class="sourceLine" id="cb11-13" data-line-number="13">         <span class="dt">markers =</span> markers<span class="op">$</span>all,</a>
-<a class="sourceLine" id="cb11-14" data-line-number="14">         <span class="dt">n_features =</span> <span class="dv">5</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt; Called from: GetMarkerTable(counts_data = filtered_data, cluster_labels = labels, </span></a>
+<a class="sourceLine" id="cb11-10" data-line-number="10"><span class="co">#&gt;     H = H, n_sorted = 25, gene_names = gene_names, gene_expression_threshold = 3, </span></a>
+<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="co">#&gt;     n_features = 20000)</span></a>
+<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#32: clusterId = geneScore = NULL</span></a>
+<a class="sourceLine" id="cb11-13" data-line-number="13"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#33: M &lt;- counts_data</span></a>
+<a class="sourceLine" id="cb11-14" data-line-number="14"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#34: Mnorm &lt;- LogNormalize(M$M_variable)</span></a>
+<a class="sourceLine" id="cb11-15" data-line-number="15"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#38: gene_cluster_scores &lt;- Mnorm %*% H</span></a>
+<a class="sourceLine" id="cb11-16" data-line-number="16"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#41: gene_assignments &lt;- apply(gene_cluster_scores, 1, function(x) {</span></a>
+<a class="sourceLine" id="cb11-17" data-line-number="17"><span class="co">#&gt;     c(which(x == max(x)), max(x))</span></a>
+<a class="sourceLine" id="cb11-18" data-line-number="18"><span class="co">#&gt; })</span></a>
+<a class="sourceLine" id="cb11-19" data-line-number="19"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#46: marker_table &lt;- cbind(M$gene_use, t(gene_assignments))</span></a>
+<a class="sourceLine" id="cb11-20" data-line-number="20"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#47: colnames(marker_table) &lt;- c("geneID", "clusterId", "geneScore")</span></a>
+<a class="sourceLine" id="cb11-21" data-line-number="21"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#49: sorted_table &lt;- arrange(as.data.frame(marker_table), clusterId, </span></a>
+<a class="sourceLine" id="cb11-22" data-line-number="22"><span class="co">#&gt;     desc(geneScore))</span></a>
+<a class="sourceLine" id="cb11-23" data-line-number="23"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#50: sorted_table &lt;- as_tibble(sorted_table) %&gt;% group_by(clusterId) %&gt;% </span></a>
+<a class="sourceLine" id="cb11-24" data-line-number="24"><span class="co">#&gt;     top_n(n_sorted, geneScore)</span></a>
+<a class="sourceLine" id="cb11-25" data-line-number="25"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#51: sorted_table$geneSymbol &lt;- gene_names[sorted_table$geneID]</span></a>
+<a class="sourceLine" id="cb11-26" data-line-number="26"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#53: output &lt;- list()</span></a>
+<a class="sourceLine" id="cb11-27" data-line-number="27"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#54: output$all &lt;- marker_table</span></a>
+<a class="sourceLine" id="cb11-28" data-line-number="28"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#55: output$n_sorted &lt;- sorted_table</span></a>
+<a class="sourceLine" id="cb11-29" data-line-number="29"><span class="co">#&gt; debug at /home/au/mkarikom/Software/RSoptSC/R/MarkerGenes.R#56: return(output)</span></a>
+<a class="sourceLine" id="cb11-30" data-line-number="30"></a>
+<a class="sourceLine" id="cb11-31" data-line-number="31"><span class="kw"><a href="../reference/PlotTopN.html">PlotTopN</a></span>(<span class="dt">data =</span> <span class="kw">log</span>(data<span class="op">+</span><span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb11-32" data-line-number="32">         <span class="dt">gene_names =</span> gene_names,</a>
+<a class="sourceLine" id="cb11-33" data-line-number="33">         <span class="dt">cluster_labels =</span> labels,</a>
+<a class="sourceLine" id="cb11-34" data-line-number="34">         <span class="dt">markers =</span> markers<span class="op">$</span>all,</a>
+<a class="sourceLine" id="cb11-35" data-line-number="35">         <span class="dt">n_features =</span> <span class="dv">5</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-12-1.png" width="672"></p>
 </div>
 <div id="pseudotime-inference" class="section level2">
