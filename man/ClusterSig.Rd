@@ -4,14 +4,12 @@
 \alias{ClusterSig}
 \title{Average cluster to cluster signaling}
 \usage{
-ClusterSig(P, cluster_labels, normalize_ligand_cluster = TRUE)
+ClusterSig(P, cluster_labels)
 }
 \arguments{
 \item{P}{signaling probabilities cells x cells}
 
 \item{cluster_labels}{labels of cells 1:n}
-
-\item{normalize_ligand_cluster}{boolean whether or not to show chord size for cluster-cluster pair relative to all the other cluster-cluster signaling pairs for that ligand bearing cluster}
 }
 \value{
 a matrix of cluster to cluster signaling

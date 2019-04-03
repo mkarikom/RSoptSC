@@ -209,15 +209,13 @@ NormalizeGene <- function(M){
 #'
 #' @param P signaling probabilities cells x cells
 #' @param cluster_labels labels of cells 1:n
-#' @param normalize_ligand_cluster boolean whether or not to show chord size for cluster-cluster pair relative to all the other cluster-cluster signaling pairs for that ligand bearing cluster
 #'
 #' @return a matrix of cluster to cluster signaling
 #' 
 #' @export
 #'
 ClusterSig <- function(P,
-                       cluster_labels,
-                       normalize_ligand_cluster = TRUE){
+                       cluster_labels){
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
   cell_order <- sorted_cell$ix
   cell_labels <- sorted_cell$x
@@ -242,37 +240,36 @@ ClusterSig <- function(P,
       summing_matrix <- cbind(summing_matrix, new_col)
     }
   }
-  
   # collapse the colums by summing, note that because each row is normalized,
   # the following procedure will give normalized rows
   sums <- P[cell_order, cell_order] %*% summing_matrix
+  nzrow <- which(rowSums(sums) > 0)
+  nzlabel <- cell_labels[nzrow]
+  nzcounts <- matrix(0, nrow = n_clusters, ncol = 1)
+  rownames(nzcounts) <- as.character(c(1:n_clusters))  
+  sums <- t(sums) %*% summing_matrix
   
-  if(normalize_ligand_cluster){
-    # get the nonzero rows of P
-    nzrow <- which(rowSums(sums) > 0)
-    # get the nonzero labels
-    nzlabel <- cell_labels[nzrow]
-    # adjust the summing matrix to handle non-zero rows only
-    nzsumming_matrix <- summing_matrix[nzrow,]
-    # get the counts of nonzero cells from each cluster
-    nzcounts <- as.matrix(table(nzlabel))
-    
-    nzsums <- sums[nzrow,]
-    nzsums <-t(nzsums) %*% nzsumming_matrix
-    avg_matrix <- apply(nzsums, 1, function(x){
-      x/nzcounts
-    })
-  } else {
-    sums <- t(sums) %*% summing_matrix
-    avg_matrix <- apply(sums, 1, function(x){
-      x/counts
-    })
+  sums <- t(sums)
+  
+
+  for(c in 1:n_clusters){
+    nzcounts[c,1] <- length(which(nzlabel == c))
   }
   
+  for(col in 1:ncol(sums)){
+    for(row in 1:nrow(sums)){
+      if(nzcounts[row,1] > 0){
+        sums[row,col] <- sums[row,col]/nzcounts[row,1]
+      }else{
+        sums[row,col] <- 0
+      }
+    }
+  }
+
   arclabs <- paste0("C", c(1:n_clusters))
-  rownames(avg_matrix) <- arclabs
-  colnames(avg_matrix) <- arclabs
-  return(avg_matrix)
+  rownames(sums) <- arclabs
+  colnames(sums) <- arclabs
+  return(sums)
 }
 
 #' Create a heatmap with signaling markers over clusters

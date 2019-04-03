@@ -8,7 +8,8 @@ SigPlot(P, rgb_gap = 0.2, cluster_labels, lig_cells_per_cluster = 10,
   lig_cells_total = 0, lig_edge_per_cell = 0,
   lig_edge_per_cluster = 0, lig_edge_total = 0,
   rec_cells_per_cluster = 10, rec_cells_total = 0,
-  zero_threshold = 0, cD_reduce = 0, highlight_clusters = TRUE)
+  zero_threshold = 0, cD_reduce = 0, highlight_clusters = TRUE,
+  title_text = NULL)
 }
 \arguments{
 \item{P}{signaling probabilities cells x cells}
@@ -36,6 +37,8 @@ SigPlot(P, rgb_gap = 0.2, cluster_labels, lig_cells_per_cluster = 10,
 \item{cD_reduce}{ratio of the circlos plot grid element (cell or cluster) to the whole circle is less than this value, the item is omitted from the plot.  Default is zero, don't change unless you are inspecting an unhighlighted chord diagram, since it breaks highlighting if one or more pairs above the zero_threshold happen to have a low grid/circle ratio.}
 
 \item{highlight_clusters}{whether to label the plot with clusters.  Default is true.}
+
+\item{title_text}{the title of the plot}
 }
 \description{
 Produce a plot of a cell signaling network according to the cell-normalized expression score.

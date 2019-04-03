@@ -32,7 +32,7 @@ PlotLineage <- function(network, node_color = NULL, alpha_color = 1,
     E(network)$width <-
       E(network)$weight
   }
-
+  
   vertex_order <- as.numeric(names(edges(network)[[1]][1]))
   node_color <- node_color[vertex_order]
   plot.igraph(network, vertex.color = node_color)
@@ -94,12 +94,12 @@ FeatureScatterPlot <- function(flat_embedding,
                                featurename,
                                colorscale = NULL){
   n_features <- length(unique(feature))
-
+  
   p <- ggplot(flat_embedding,
-         aes_(x = as.name(colnames(flat_embedding)[1]),
-              y = as.name(colnames(flat_embedding)[2]),
-              color = ~`feature`))
-    
+              aes_(x = as.name(colnames(flat_embedding)[1]),
+                   y = as.name(colnames(flat_embedding)[2]),
+                   color = ~`feature`))
+  
   
   if(is.null(colorscale)){
     p +
@@ -108,10 +108,10 @@ FeatureScatterPlot <- function(flat_embedding,
       theme_minimal()
   }else{
     p +
-    geom_point() +
-    labs(title = title, subtitle = subtitle, color = featurename) +
-    theme_minimal() +
-    scale_color_manual(values = colorscale)
+      geom_point() +
+      labs(title = title, subtitle = subtitle, color = featurename) +
+      theme_minimal() +
+      scale_color_manual(values = colorscale)
   }
 }
 
@@ -137,25 +137,25 @@ FeatureScatterPlot <- function(flat_embedding,
 #' @export
 #'
 PlotTopN <- function(data,
-                 gene_names,
-                 cluster_labels, 
-                 markers,
-                 n_features){
+                     gene_names,
+                     cluster_labels, 
+                     markers,
+                     n_features){
   clusterId = geneScore = NULL # r cmd check pass
   n_cells <- ncol(data)
   n_clusters <- length(unique(cluster_labels))
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
-
+  
   markers_table <- as.data.frame(markers)
   sortedmarkers <- arrange(markers_table, clusterId, desc(geneScore))
   sorted_gene_table <- as_tibble(sortedmarkers) %>% group_by(clusterId) %>% top_n(n_features, geneScore)
   sorted_gene <- sorted_gene_table$geneID
-
+  
   plot_data <- data[sorted_gene, sorted_cell$ix]
-
-
+  
+  
   rlabs <- gene_names[sorted_gene]
-
+  
   clabs <- c(rep(NA, n_cells))
   counts <- as.matrix(table(cluster_labels))
   accumulator <- matrix(1, n_clusters, n_clusters)*lower.tri(matrix(1, n_clusters, n_clusters), diag = TRUE)
@@ -163,7 +163,7 @@ PlotTopN <- function(data,
   offset <- floor(counts/2)
   labeled_columns <- last_cells - offset
   clabs[labeled_columns] <- c(1:n_clusters)
-
+  
   p <- heatmap.2(as.matrix(plot_data),
                  col = rev(brewer.pal(11,"RdBu")),
                  trace = 'none',
@@ -199,7 +199,7 @@ PlotClusterExpression <- function(data,
                                   gene_names,
                                   cluster_labels, 
                                   markers){
-
+  
   n_clusters <- length(unique(cluster_labels))
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
   
@@ -234,6 +234,7 @@ PlotClusterExpression <- function(data,
 #' @param labels a vector of cluster assignments for the cells
 #' @param gene_name the name of the gene to plot
 #' @param colorscale optionally provided color scale
+#' @param jitsize the jitter size parameter
 #'
 #' @return a violin plot
 #'
@@ -283,29 +284,32 @@ ViolinPlotExpression <- function(data,
 #' @param zero_threshold real value for zero cutoff (0 to keep all edges)
 #' @param cD_reduce ratio of the circlos plot grid element (cell or cluster) to the whole circle is less than this value, the item is omitted from the plot.  Default is zero, don't change unless you are inspecting an unhighlighted chord diagram, since it breaks highlighting if one or more pairs above the zero_threshold happen to have a low grid/circle ratio.
 #' @param highlight_clusters whether to label the plot with clusters.  Default is true.
+#' @param title_text the title of the plot
 #' 
 #' 
 #' @import dplyr
 #' @import circlize
 #' @importFrom reshape2 melt
+#' @importFrom graphics legend title
 #'
 #' @export
 #'
 SigPlot <- function(P,
-                     rgb_gap = 0.2,
-                     cluster_labels,
-                     lig_cells_per_cluster = 10,
-                     lig_cells_total = 0,
-                     lig_edge_per_cell = 0,
-                     lig_edge_per_cluster = 0,
-                     lig_edge_total = 0,
-                     rec_cells_per_cluster = 10,
-                     rec_cells_total = 0,
-                     zero_threshold = 0,
-                     cD_reduce = 0,
-                     highlight_clusters = TRUE){
+                    rgb_gap = 0.2,
+                    cluster_labels,
+                    lig_cells_per_cluster = 10,
+                    lig_cells_total = 0,
+                    lig_edge_per_cell = 0,
+                    lig_edge_per_cluster = 0,
+                    lig_edge_total = 0,
+                    rec_cells_per_cluster = 10,
+                    rec_cells_total = 0,
+                    zero_threshold = 0,
+                    cD_reduce = 0,
+                    highlight_clusters = TRUE,
+                    title_text = NULL){
   label = lig_cluster_number = lig_cell = rec_cell = 
-    rec_cluster_number = NULL # r cmd check pass
+    rec_cluster_number = legend = title = NULL # r cmd check pass
   circos.clear()
   # compute
   # ordering: int vector of indices corresponding to the labels
@@ -321,11 +325,7 @@ SigPlot <- function(P,
   P <- P[ordering, ordering]
   nzrow <- which(rowSums(P) > zero_threshold)
   nzcol <- which(colSums(P) > zero_threshold)
-  
-  if(length(nzrow) < n_clusters | length(nzcol) < n_clusters){
-    print("number of nonzero cells is less than the number of clusters, reduce zero threshold")
-    return()
-  }
+
   
   # prune the ordering and labels for rows and cols
   nzordering_lig <- ordering[nzrow]
@@ -338,14 +338,20 @@ SigPlot <- function(P,
   rownames(P_ordered) <- nzordering_lig
   colnames(P_ordered) <- nzordering_rec
   
+  # for each cluster, get the location of the first and the last cell in the permutation of labels
+  lig_counts <- matrix(0, nrow = n_clusters, ncol = 1)
+  rec_counts <- matrix(0, nrow = n_clusters, ncol = 1)
+  rownames(lig_counts) <- rownames(rec_counts) <- as.character(c(1:n_clusters))
+  for(c in 1:n_clusters){
+    lig_counts[c,1] <- length(which(nzlabel_lig == c))
+    rec_counts[c,1] <- length(which(nzlabel_rec == c))
+  }
   
   # for each cluster, get the location of the first and the last cell in the permutation of labels
-  lig_counts <- as.matrix(table(nzlabel_lig))
   accumulator <- matrix(1, n_clusters, n_clusters)*lower.tri(matrix(1, n_clusters, n_clusters), diag = TRUE)
   lig_last_cells <- accumulator %*% lig_counts
   lig_first_cells <- lig_last_cells - lig_counts + 1
   
-  rec_counts <- as.matrix(table(nzlabel_rec))
   accumulator <- matrix(1, n_clusters, n_clusters)*lower.tri(matrix(1, n_clusters, n_clusters), diag = TRUE)
   rec_last_cells <- accumulator %*% rec_counts
   rec_first_cells <- rec_last_cells - rec_counts + 1
@@ -420,6 +426,7 @@ SigPlot <- function(P,
   
   # plot the chords
   circos.clear()
+
   chordDiagram(P_table[which(P_table$link_weight > zero_threshold),1:3],
                order = chord_plot_sector_order,
                directional = TRUE, 
@@ -450,7 +457,7 @@ SigPlot <- function(P,
       cluster_name <- paste0("C", i)
       highlight.sector(sector.index = lig_cells,
                        col = highlight_col, 
-                       text = cluster_name, 
+                       #text = cluster_name, # these may be cramped
                        text.vjust = -1, 
                        niceFacing = TRUE, 
                        track.index = 2)
@@ -461,11 +468,14 @@ SigPlot <- function(P,
       cluster_name <- paste0("C", i)
       highlight.sector(sector.index = rec_cells,
                        col = highlight_col, 
-                       text = cluster_name, 
+                       #text = cluster_name, # these may be cramped
                        text.vjust = -1, 
                        niceFacing = TRUE, 
                        track.index = 2)
-    }  
+    }
+    legend("topleft", legend = paste0("C", c(1:n_clusters)), pch=16, pt.cex=1.5, cex=1, bty='n',
+           col = cluster_colors$hex.1.n.)
+    title(title_text, cex.main = 1.5, line = -0.5)
   }
 }
 
@@ -502,7 +512,7 @@ ColorHue <- function(n, starthue = 15, endhue = 360,
 #'
 ChordColors <- function(edge_table, cluster_cols, gap) {
   chords <- c()
-  for(i in 1:length(unique(edge_table$lig_cluster_number))){
+  for(i in unique(edge_table$lig_cluster_number)){
     cell_labels <- edge_table[which(edge_table$lig_cluster_number == i),]$lig_cell
     starthue <- cluster_cols$hues.1.n.[i]
     cols <- ColorHue(n = length(cell_labels), 
@@ -516,4 +526,3 @@ ChordColors <- function(edge_table, cluster_cols, gap) {
   names(cols_rec) <- edge_table$rec_cell
   chords <- c(chords, cols_rec)
 }
-

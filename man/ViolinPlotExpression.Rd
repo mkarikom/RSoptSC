@@ -17,6 +17,8 @@ ViolinPlotExpression(data, gene_names, labels, gene_name,
 \item{gene_name}{the name of the gene to plot}
 
 \item{colorscale}{optionally provided color scale}
+
+\item{jitsize}{the jitter size parameter}
 }
 \value{
 a violin plot

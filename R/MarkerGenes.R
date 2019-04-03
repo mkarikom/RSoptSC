@@ -58,6 +58,9 @@ GetMarkerTable <- function(counts_data,
     output$all <- marker_table
     output$n_sorted <- sorted_table
   } else {
+    M <- counts_data
+    gene_names <- gene_names[counts_data$gene_use]
+    counts_data <- counts_data$M_variable
     n_clusters <- length(unique(cluster_labels))
     mean_exp <- matrix(0, nrow = nrow(counts_data), ncol = n_clusters)
     for (clust in 1:n_clusters){
@@ -82,21 +85,20 @@ GetMarkerTable <- function(counts_data,
     genecol <- c()
     idxcol <- c()
     for (clust in 1:n_clusters){
-      browser()
       idx <- which(cluster_assign == clust)
       scores <- DE_exp[idx, clust]
       ordering <- order(scores, decreasing = TRUE)
       idx <- idx[ordering]
       
-      idxcol <- c(idxcol, idx)
+      idxcol <- c(idxcol, M$gene_use[idx])
       scorecol <- c(scorecol, DE_exp[idx, clust])
       ccol <- c(ccol, rep(clust, length(idx)))
       genecol <- c(genecol, gene_names[idx])
     }
-    allmarkers <- cbind(geneID = genecol, clusterId = ccol, geneScore = scorecol)
+    allmarkers <- cbind(geneID = idxcol, clusterId = ccol, geneScore = scorecol)
     rownames(allmarkers) <- genecol
     
-    topsorted <- data.frame(geneID = genecol, clusterId = ccol, geneScore = scorecol, geneSymbol = genecol)
+    topsorted <- data.frame(geneID = idxcol, clusterId = ccol, geneScore = scorecol, geneSymbol = genecol)
     topsorted <- as_tibble(topsorted) %>% group_by(clusterId) %>% top_n(n_sorted, geneScore)
     output <- list()
     output$all <- allmarkers

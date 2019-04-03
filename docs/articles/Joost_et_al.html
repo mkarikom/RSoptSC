@@ -79,7 +79,7 @@
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2019-04-02</h4>
+            <h4 class="date">2019-04-03</h4>
       
       
       <div class="hidden name"><code>Joost_et_al.Rmd</code></div>
@@ -849,7 +849,8 @@ down
 <a class="sourceLine" id="cb24-2" data-line-number="2">        <span class="dt">cluster_labels =</span> labels,</a>
 <a class="sourceLine" id="cb24-3" data-line-number="3">        <span class="dt">lig_cells_per_cluster =</span> <span class="dv">5</span>,</a>
 <a class="sourceLine" id="cb24-4" data-line-number="4">        <span class="dt">rec_cells_per_cluster =</span> <span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb24-5" data-line-number="5">        <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb24-5" data-line-number="5">        <span class="dt">rgb_gap =</span> <span class="fl">0.06</span>,</a>
+<a class="sourceLine" id="cb24-6" data-line-number="6">        <span class="dt">title_text =</span> <span class="st">"Signaling Between Cells"</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-25-1.png" width="100%" height="100%"></p>
 </div>
 <div id="circos-plot-of-intercluster-network" class="section level3">
@@ -860,7 +861,8 @@ down
 <a class="sourceLine" id="cb25-2" data-line-number="2">                          <span class="dt">cluster_labels =</span> labels)</a>
 <a class="sourceLine" id="cb25-3" data-line-number="3">  <span class="kw"><a href="../reference/SigPlot.html">SigPlot</a></span>(<span class="dt">P =</span> cluster_P,</a>
 <a class="sourceLine" id="cb25-4" data-line-number="4">          <span class="dt">cluster_labels =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>n_clusters),</a>
-<a class="sourceLine" id="cb25-5" data-line-number="5">          <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb25-5" data-line-number="5">          <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>,</a>
+<a class="sourceLine" id="cb25-6" data-line-number="6">          <span class="dt">title_text =</span> <span class="st">"Signaling Between Clusters"</span>)</a></code></pre></div>
 <p><img src="Joost_et_al_files/figure-html/unnamed-chunk-26-1.png" width="100%" height="100%"></p>
 </div>
 <div id="heatmap-of-signaling-marker-expression" class="section level3">
