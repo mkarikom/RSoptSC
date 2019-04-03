@@ -122,8 +122,9 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>GetMarkerTable</span>(<span class='no'>counts_data</span>, <span class='no'>cluster_labels</span>, <span class='no'>H</span>, <span class='kw'>n_sorted</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='no'>gene_names</span>,
-  <span class='no'>gene_expression_threshold</span>, <span class='no'>n_features</span>)</pre>
+    <pre class="usage"><span class='fu'>GetMarkerTable</span>(<span class='no'>counts_data</span>, <span class='no'>cluster_labels</span>, <span class='kw'>H</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>n_sorted</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='no'>gene_names</span>, <span class='kw'>gene_expression_threshold</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>use_H</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -157,6 +158,10 @@ expressed in more than n-m cells or genes expressed in less than m cells</p></td
     <tr>
       <th>n_features</th>
       <td><p>number of marker genes per cluster to retrieve</p></td>
+    </tr>
+    <tr>
+      <th>use_H</th>
+      <td><p>whether to use H as loading, default is false, instead using cumulative absolute difference to sort max-mean assigned labels</p></td>
     </tr>
     </table>
     

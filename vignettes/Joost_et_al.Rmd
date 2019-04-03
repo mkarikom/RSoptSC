@@ -162,7 +162,8 @@ markers <- GetMarkerTable(counts_data = filtered_data,
                           n_sorted = 25,
                           gene_names = gene_names,
                           gene_expression_threshold = 3,
-                          n_features = 20000)
+                          n_features = 20000,
+                          use_H = TRUE)
 
 PlotTopN(data = log(data+1),
          gene_names = gene_names,
