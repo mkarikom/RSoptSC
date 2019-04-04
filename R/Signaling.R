@@ -7,6 +7,7 @@
 #' @param M a matrix of expression values for each cell (rows) and gene (columns)
 #' @param ids a vector of gene ids
 #' @param pathway a data frame with "ligands", "receptors", "direction", and "targets"
+#' @param normalize_aggregate whether or not to normalize the P_agg matrix by dividing each row by its sum default is true
 #'                                          
 #' @return a list containing:
 #'     \item{P}{a list of the cell-cell signaling probabilities for all ligand/receptor pairs}
@@ -19,8 +20,9 @@
 #' @export
 #'
 GetSignalingPartners <- function(M,
-                                  ids,
-                                  pathway){
+                                 ids,
+                                 pathway,
+                                 normalize_aggregate = TRUE){
   receptor = ligand = direction = NULL   # r cmd check pass
   n_cells <- ncol(as.matrix(M))
   n_genes <- nrow(as.matrix(M))
@@ -33,16 +35,9 @@ GetSignalingPartners <- function(M,
   LR_pairs <- unique(pathway[c("receptor", "ligand")])
   
   # version of model
-  target <- targupdown <- targdown <- targup <- FALSE
+  target <- FALSE
   if('target' %in% colnames(pathway)){
     target <- TRUE
-    if('up' %in% pathway$direction & 'down' %in% pathway$direction){
-      targupdown <- TRUE
-    } else if('up' %in% pathway$direction){
-      targup <- TRUE
-    } else {
-      targdown <- TRUE
-    }
   }
   
   P <- list()
@@ -63,10 +58,18 @@ GetSignalingPartners <- function(M,
       # note the following may require at least 2 targets of up/down, up, or down
       pathsubset <- pathway %>% filter(receptor == LR_pairs[pair, 1] &
                                          ligand == LR_pairs[pair, 2])
+      targupdown <- targdown <- targup <- FALSE
+      if('up' %in% pathsubset$direction & 'down' %in% pathsubset$direction){
+        targupdown <- TRUE
+      } else if('up' %in% pathsubset$direction){
+        targup <- TRUE
+      } else {
+        targdown <- TRUE
+      }
       targets <- pathsubset$target 
       if(targupdown){
         upsubset <- pathsubset %>% filter(direction == 'up')
-        updata <- M[match(upsubset$target,ids),]
+        updata <- M[drop=FALSE,match(upsubset$target,ids),]
         for(targind in 1:nrow(as.matrix(updata))){
           updata[targind,] <- NormalizeGene(updata[targind,])
         }
@@ -74,7 +77,7 @@ GetSignalingPartners <- function(M,
         beta <- exp(-1/updata)
         
         downsubset <- pathsubset %>% filter(direction == 'down')
-        downdata <- M[match(downsubset$target,ids),]
+        downdata <- M[drop=FALSE,match(downsubset$target,ids),]
         for(targind in 1:nrow(as.matrix(downdata))){
           downdata[targind,] <- NormalizeGene(downdata[targind,])
         }
@@ -108,7 +111,7 @@ GetSignalingPartners <- function(M,
         }
       } else if(targup){
         upsubset <- pathsubset %>% filter(direction == 'up')
-        updata <- M[match(upsubset$target,ids),]
+        updata <- M[drop=FALSE,match(upsubset$target,ids),]
         for(targind in 1:nrow(as.matrix(updata))){
           updata[targind,] <- NormalizeGene(updata[targind,])
         }
@@ -137,7 +140,7 @@ GetSignalingPartners <- function(M,
         }
       } else {
         downsubset <- pathsubset %>% filter(direction == 'down')
-        downdata <- M[match(downsubset$target,ids),]
+        downdata <- M[drop=FALSE,match(downsubset$target,ids),]
         for(targind in 1:nrow(as.matrix(downdata))){
           downdata[targind,] <- NormalizeGene(downdata[targind,])
         }
@@ -182,7 +185,19 @@ GetSignalingPartners <- function(M,
     P[[pair]][P[[pair]] <= 1e-6] <- 0
   }
   
-  P_agg <- Reduce('+', P)/length(P)
+  if(normalize_aggregate){
+    P_agg <- Reduce('+', P)
+    nnorm <- apply(P_agg, 1, function(x){
+                    if(max(x) > 0){
+                      x/sum(x)
+                    }else{
+                      x
+                    }
+                  })
+    P_agg <- t(nnorm)
+  }else{
+    P_agg <- Reduce('+', P)/length(P)
+  }
   return(list(P = P, P_agg = P_agg))
 }
 
@@ -190,7 +205,7 @@ GetSignalingPartners <- function(M,
 #' 
 #' Normalize signal across cells
 #'
-#' @param M a vector of expression values for each cell (columns) and gene (rows)
+#' @param M a matrix of expression values for each cell (columns) and gene (rows)
 #' 
 #' @return a normalized vector of expression values
 #'
@@ -251,7 +266,7 @@ ClusterSig <- function(P,
   
   sums <- t(sums)
   
-
+  
   for(c in 1:n_clusters){
     nzcounts[c,1] <- length(which(nzlabel == c))
   }
@@ -265,7 +280,7 @@ ClusterSig <- function(P,
       }
     }
   }
-
+  
   arclabs <- paste0("C", c(1:n_clusters))
   rownames(sums) <- arclabs
   colnames(sums) <- arclabs
@@ -287,10 +302,10 @@ ClusterSig <- function(P,
 #' @export
 #'
 ClusterAvg <- function(M,
-                    gene_names,
-                    cell_order,
-                    cell_labels,
-                    gene_list){
+                       gene_names,
+                       cell_order,
+                       cell_labels,
+                       gene_list){
   n_clusters <- length(unique(cell_labels))
   n_cells <- length(cell_labels)
   
@@ -317,7 +332,7 @@ ClusterAvg <- function(M,
   avg_matrix <- apply(sums, 1, function(x){
     x/counts
   })
-
+  
   return(avg_matrix[,match(gene_list, gene_names)])
   ## insert code for plot
 }
@@ -347,11 +362,11 @@ ClusterAvg <- function(M,
 #' @export
 #'
 ImportPathway <- function(lig_table = NULL,
-                           rec_table = NULL,
-                           lig_table_path,
-                           rec_table_path = NULL,
-                           data,
-                           gene_names = NULL){
+                          rec_table = NULL,
+                          lig_table_path,
+                          rec_table_path = NULL,
+                          data,
+                          gene_names = NULL){
   if(is.null(rownames(data))){
     genes <- gene_names
   } else {

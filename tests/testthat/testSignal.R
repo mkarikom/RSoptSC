@@ -14,7 +14,8 @@ test_that("signaling is accurate when only up targs are used", {
                            gene_names = gene_names)
   Pmats <- GetSignalingPartners(data,
                                 gene_names,
-                                pathway$pathway_removed)
+                                pathway$pathway_removed,
+                                normalize_aggregate = FALSE)
   expect_true(sum(abs(Pmats$P_agg - as.matrix(joostTest$signal_all_up))) <= 1e-15)
 })
 
@@ -26,8 +27,9 @@ test_that("signaling is accurate when up and down targs are used", {
                             data = data,
                             gene_names = gene_names)
   Pmats <- GetSignalingPartners(data,
-                                 gene_names,
-                                 pathway$pathway_removed)
+                                gene_names,
+                                pathway$pathway_removed,
+                                normalize_aggregate = FALSE)
   print(dim(joostTest$signal_all_both))
   expect_true(sum(abs(Pmats$P_agg - as.matrix(joostTest$signal_all_both))) <= 1e-15)
 })
@@ -39,7 +41,8 @@ test_that("signaling is accurate when no targets are used", {
                            gene_names = gene_names)
   Pmats <- GetSignalingPartners(data,
                                 gene_names,
-                                pathway$pathway_removed)
+                                pathway$pathway_removed,
+                                normalize_aggregate = FALSE)
   expect_true(sum(abs(Pmats$P_agg - as.matrix(joostTest$signal_all_notarg))) <= 1e-15)
 })
 

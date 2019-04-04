@@ -80,10 +80,13 @@ PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfi
 #' @param subtitle the subtitle of the plot
 #' @param featurename the name of the feature to title the legend
 #' @param colorscale color scale for discrete data
+#' @param pointsize the size of geom point
+#' @param hide_legend hide the legend and return a list, containing the legendless plot and the legend
 #'
 #' @return a ggplot2 object
 #' 
 #' @import ggplot2
+#' @importFrom cowplot get_legend
 #'
 #' @export
 #'
@@ -92,7 +95,9 @@ FeatureScatterPlot <- function(flat_embedding,
                                title,
                                subtitle,
                                featurename,
-                               colorscale = NULL){
+                               colorscale = NULL,
+                               pointsize = 1,
+                               hide_legend = FALSE){
   n_features <- length(unique(feature))
   
   p <- ggplot(flat_embedding,
@@ -102,16 +107,23 @@ FeatureScatterPlot <- function(flat_embedding,
   
   
   if(is.null(colorscale)){
-    p +
-      geom_point() +
+    p <- p +
+      geom_point(size = pointsize) +
       labs(title = title, subtitle = subtitle, color = featurename) +
       theme_minimal()
   }else{
-    p +
-      geom_point() +
+    p <- p +
+      geom_point(size = pointsize) +
       labs(title = title, subtitle = subtitle, color = featurename) +
       theme_minimal() +
       scale_color_manual(values = colorscale)
+  }
+  if(hide_legend){
+    leg <- get_legend(p)
+    p <- p + theme_update(legend.position = "none")
+    list(legend = leg, plot = p)
+  }else{
+    p
   }
 }
 

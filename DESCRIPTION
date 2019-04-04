@@ -31,7 +31,8 @@ Imports:
     umap (>= 0.2.0.0),
     expm (>= 0.999-3),
     cluster (>= 2.0.7-1),
-    magrittr (>= 1.5)
+    magrittr (>= 1.5),
+    cowplot (>= 0.9.3)
 Suggests: testthat,
     rmarkdown, knitr, kableExtra
 RoxygenNote: 6.1.1

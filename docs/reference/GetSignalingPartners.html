@@ -126,7 +126,7 @@ Note that activated genes are required under this model.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>GetSignalingPartners</span>(<span class='no'>M</span>, <span class='no'>ids</span>, <span class='no'>pathway</span>)</pre>
+    <pre class="usage"><span class='fu'>GetSignalingPartners</span>(<span class='no'>M</span>, <span class='no'>ids</span>, <span class='no'>pathway</span>, <span class='kw'>normalize_aggregate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -142,6 +142,10 @@ Note that activated genes are required under this model.</p>
     <tr>
       <th>pathway</th>
       <td><p>a data frame with "ligands", "receptors", "direction", and "targets"</p></td>
+    </tr>
+    <tr>
+      <th>normalize_aggregate</th>
+      <td><p>whether or not to normalize the P_agg matrix by dividing each row by its sum default is true</p></td>
     </tr>
     </table>
     

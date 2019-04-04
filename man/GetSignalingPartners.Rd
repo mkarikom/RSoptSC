@@ -4,7 +4,7 @@
 \alias{GetSignalingPartners}
 \title{Compute Cell-cell interaction probability}
 \usage{
-GetSignalingPartners(M, ids, pathway)
+GetSignalingPartners(M, ids, pathway, normalize_aggregate = TRUE)
 }
 \arguments{
 \item{M}{a matrix of expression values for each cell (rows) and gene (columns)}
@@ -12,6 +12,8 @@ GetSignalingPartners(M, ids, pathway)
 \item{ids}{a vector of gene ids}
 
 \item{pathway}{a data frame with "ligands", "receptors", "direction", and "targets"}
+
+\item{normalize_aggregate}{whether or not to normalize the P_agg matrix by dividing each row by its sum default is true}
 }
 \value{
 a list containing:

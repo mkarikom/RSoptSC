@@ -7,7 +7,7 @@
 NormalizeGene(M)
 }
 \arguments{
-\item{M}{a vector of expression values for each cell (columns) and gene (rows)}
+\item{M}{a matrix of expression values for each cell (columns) and gene (rows)}
 }
 \value{
 a normalized vector of expression values
