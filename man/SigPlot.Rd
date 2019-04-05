@@ -5,11 +5,8 @@
 \title{Circos plot of signaling score}
 \usage{
 SigPlot(P, rgb_gap = 0.2, cluster_labels, lig_cells_per_cluster = 10,
-  lig_cells_total = 0, lig_edge_per_cell = 0,
-  lig_edge_per_cluster = 0, lig_edge_total = 0,
-  rec_cells_per_cluster = 10, rec_cells_total = 0,
-  zero_threshold = 0, cD_reduce = 0, highlight_clusters = TRUE,
-  title_text = NULL)
+  rec_cells_per_cluster = 10, zero_threshold = 0, cD_reduce = 0,
+  highlight_clusters = TRUE, title_text = NULL, n_clusters = NULL)
 }
 \arguments{
 \item{P}{signaling probabilities cells x cells}
@@ -20,17 +17,7 @@ SigPlot(P, rgb_gap = 0.2, cluster_labels, lig_cells_per_cluster = 10,
 
 \item{lig_cells_per_cluster}{int 0 to keep all}
 
-\item{lig_cells_total}{int 0 to keep remaining cells per cluster}
-
-\item{lig_edge_per_cell}{int 0 to keep all}
-
-\item{lig_edge_per_cluster}{int 0 to keep remaining edge per cell}
-
-\item{lig_edge_total}{int 0 to keep keep remaining edge per cluster}
-
 \item{rec_cells_per_cluster}{int 0 to keep all}
-
-\item{rec_cells_total}{int 0 to keep remaining cells per cluster}
 
 \item{zero_threshold}{real value for zero cutoff (0 to keep all edges)}
 
@@ -39,6 +26,8 @@ SigPlot(P, rgb_gap = 0.2, cluster_labels, lig_cells_per_cluster = 10,
 \item{highlight_clusters}{whether to label the plot with clusters.  Default is true.}
 
 \item{title_text}{the title of the plot}
+
+\item{n_clusters}{if n is higher than the number of unique labels (colorscale can be used for meta plotting)}
 }
 \description{
 Produce a plot of a cell signaling network according to the cell-normalized expression score.

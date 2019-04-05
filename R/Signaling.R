@@ -188,12 +188,12 @@ GetSignalingPartners <- function(M,
   if(normalize_aggregate){
     P_agg <- Reduce('+', P)
     nnorm <- apply(P_agg, 1, function(x){
-                    if(max(x) > 0){
-                      x/sum(x)
-                    }else{
-                      x
-                    }
-                  })
+      if(max(x) > 0){
+        x/sum(x)
+      }else{
+        x
+      }
+    })
     P_agg <- t(nnorm)
   }else{
     P_agg <- Reduce('+', P)/length(P)
@@ -261,14 +261,16 @@ ClusterSig <- function(P,
   nzrow <- which(rowSums(sums) > 0)
   nzlabel <- cell_labels[nzrow]
   nzcounts <- matrix(0, nrow = n_clusters, ncol = 1)
-  rownames(nzcounts) <- as.character(c(1:n_clusters))  
+  rownames(nzcounts) <- rownames(counts)  
   sums <- t(sums) %*% summing_matrix
   
   sums <- t(sums)
   
-  
+  cnums <- sort(as.integer(rownames(counts)))
+  #cnums <- sort(unique(labels))
   for(c in 1:n_clusters){
-    nzcounts[c,1] <- length(which(nzlabel == c))
+    clust <- cnums[c]
+    nzcounts[c,1] <- length(which(nzlabel == clust))
   }
   
   for(col in 1:ncol(sums)){
@@ -282,8 +284,8 @@ ClusterSig <- function(P,
   }
   
   arclabs <- paste0("C", c(1:n_clusters))
-  rownames(sums) <- arclabs
-  colnames(sums) <- arclabs
+  rownames(sums) <- rownames(counts)
+  colnames(sums) <- rownames(counts)
   return(sums)
 }
 

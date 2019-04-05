@@ -287,16 +287,12 @@ ViolinPlotExpression <- function(data,
 #' @param rgb_gap real percent of the inter-cluster spectrum gap to encompass cluster highlighting
 #' @param cluster_labels labels of cells ordered from 1 to n
 #' @param lig_cells_per_cluster int 0 to keep all
-#' @param lig_cells_total int 0 to keep remaining cells per cluster
-#' @param lig_edge_per_cell int 0 to keep all
-#' @param lig_edge_per_cluster int 0 to keep remaining edge per cell
-#' @param lig_edge_total int 0 to keep keep remaining edge per cluster
 #' @param rec_cells_per_cluster int 0 to keep all
-#' @param rec_cells_total int 0 to keep remaining cells per cluster
 #' @param zero_threshold real value for zero cutoff (0 to keep all edges)
 #' @param cD_reduce ratio of the circlos plot grid element (cell or cluster) to the whole circle is less than this value, the item is omitted from the plot.  Default is zero, don't change unless you are inspecting an unhighlighted chord diagram, since it breaks highlighting if one or more pairs above the zero_threshold happen to have a low grid/circle ratio.
 #' @param highlight_clusters whether to label the plot with clusters.  Default is true.
 #' @param title_text the title of the plot
+#' @param n_clusters if n is higher than the number of unique labels (colorscale can be used for meta plotting)
 #' 
 #' 
 #' @import dplyr
@@ -310,16 +306,16 @@ SigPlot <- function(P,
                     rgb_gap = 0.2,
                     cluster_labels,
                     lig_cells_per_cluster = 10,
-                    lig_cells_total = 0,
-                    lig_edge_per_cell = 0,
-                    lig_edge_per_cluster = 0,
-                    lig_edge_total = 0,
                     rec_cells_per_cluster = 10,
-                    rec_cells_total = 0,
                     zero_threshold = 0,
                     cD_reduce = 0,
                     highlight_clusters = TRUE,
-                    title_text = NULL){
+                    title_text = NULL,
+                    n_clusters = NULL){
+  if(max(P) <= zero_threshold){
+    print('no signaling in P')
+    return()
+  }
   label = lig_cluster_number = lig_cell = rec_cell = 
     rec_cluster_number = legend = title = NULL # r cmd check pass
   circos.clear()
@@ -330,14 +326,16 @@ SigPlot <- function(P,
   ordering <- sorted_cell$ix
   labels <- sorted_cell$x
   
-  n_clusters <- length(unique(labels))
+  if(is.null(n_clusters)){
+    n_clusters <- length(unique(labels))
+  }
   n_cells <- length(labels)
   
   # find nonzero rows and columns of ordered P
-  P <- P[ordering, ordering]
+  P <- P[drop=FALSE,ordering, ordering]
   nzrow <- which(rowSums(P) > zero_threshold)
   nzcol <- which(colSums(P) > zero_threshold)
-
+  
   
   # prune the ordering and labels for rows and cols
   nzordering_lig <- ordering[nzrow]
@@ -346,7 +344,7 @@ SigPlot <- function(P,
   nzlabel_rec <- labels[nzcol]
   
   # prune P
-  P_ordered <- P[nzrow, nzcol]
+  P_ordered <- P[drop=FALSE,nzrow, nzcol]
   rownames(P_ordered) <- nzordering_lig
   colnames(P_ordered) <- nzordering_rec
   
@@ -369,7 +367,6 @@ SigPlot <- function(P,
   rec_first_cells <- rec_last_cells - rec_counts + 1
   
   ### apply cell and edge thresholds ###
-  
   # apply top cell per cluster lig
   if(lig_cells_per_cluster > 0){
     sums <- rowSums(P_ordered)
@@ -380,7 +377,7 @@ SigPlot <- function(P,
       group_by(label) %>%
       top_n(n = lig_cells_per_cluster,
             wt = sum)
-    P_ordered <- P_ordered[as.character(filtered$cell),]  
+    P_ordered <- P_ordered[drop=FALSE,as.character(filtered$cell),]  
   }
   
   # apply top cell per cluster rec
@@ -393,7 +390,7 @@ SigPlot <- function(P,
       group_by(label) %>%
       top_n(n = rec_cells_per_cluster,
             wt = sum)
-    P_ordered <- P_ordered[,as.character(filtered$cell)]  
+    P_ordered <- P_ordered[drop=FALSE,,as.character(filtered$cell)]  
   }
   
   
@@ -426,19 +423,20 @@ SigPlot <- function(P,
   
   # get rgb codes and 0-360 hue map for the clusters
   cluster_colors <- ColorHue(n_clusters)
+  rownames(cluster_colors) <- unique(labels)
   alt_cluster_colors <- ColorHue(n_clusters,
                                  luminance = 100,
                                  chroma = 90)
+  rownames(alt_cluster_colors) <- unique(labels)
   
   # get the rgb codes for the sectors (cells), based on 20% of the spectrum starting from the cluster hue
   gap <- rgb_gap*(cluster_colors[2,1] - cluster_colors[1,1])
   
   # get the chordcolors for the ligands
   cols <- ChordColors(P_table, cluster_colors, gap)
-  
   # plot the chords
   circos.clear()
-
+  
   chordDiagram(P_table[which(P_table$link_weight > zero_threshold),1:3],
                order = chord_plot_sector_order,
                directional = TRUE, 
@@ -478,7 +476,7 @@ SigPlot <- function(P,
       rec_cells <- unique(P_table$rec_cell[which(P_table$rec_cluster_number == i)])
       highlight_col <- cluster_colors$hex.1.n.[i]
       cluster_name <- paste0("C", i)
-      highlight.sector(sector.index = rec_cells,
+      highlight.sector(sector.index = rec_cells[which(rec_cells %in% get.all.sector.index())],
                        col = highlight_col, 
                        #text = cluster_name, # these may be cramped
                        text.vjust = -1, 
@@ -526,7 +524,7 @@ ChordColors <- function(edge_table, cluster_cols, gap) {
   chords <- c()
   for(i in unique(edge_table$lig_cluster_number)){
     cell_labels <- edge_table[which(edge_table$lig_cluster_number == i),]$lig_cell
-    starthue <- cluster_cols$hues.1.n.[i]
+    starthue <- cluster_cols[as.character(i),1]
     cols <- ColorHue(n = length(cell_labels), 
                      starthue = starthue,
                      endhue = starthue + gap)
