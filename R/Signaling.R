@@ -276,8 +276,8 @@ ClusterSig <- function(P,
   browser()
   for(col in 1:ncol(sums)){
     for(row in 1:nrow(sums)){
-      if(nzcounts[row,1] > 0){
-        sums[row,col] <- sums[row,col]/nzcounts[row,1]
+      if(nzcounts[row,1] > 0 & nzcounts[col,1] > 0){
+        sums[row,col] <- sums[row,col]/nzcounts[row,1]/nzcounts[col,1]
       }else{
         sums[row,col] <- 0
       }
