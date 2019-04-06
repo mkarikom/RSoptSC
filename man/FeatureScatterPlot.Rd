@@ -5,7 +5,8 @@
 \title{Produce a scatter plot of the cells}
 \usage{
 FeatureScatterPlot(flat_embedding, feature, title, subtitle, featurename,
-  colorscale = NULL, pointsize = 1, hide_legend = FALSE)
+  colorscale = NULL, pointsize = 1, hide_legend = FALSE,
+  legsize = 5, legt = 5, legtxt = 5)
 }
 \arguments{
 \item{flat_embedding}{a low dim embedding of cells}
@@ -23,6 +24,12 @@ FeatureScatterPlot(flat_embedding, feature, title, subtitle, featurename,
 \item{pointsize}{the size of geom point}
 
 \item{hide_legend}{hide the legend and return a list, containing the legendless plot and the legend}
+
+\item{legsize}{the size of the legend}
+
+\item{legt}{size of legend title}
+
+\item{legtxt}{size of legend text}
 }
 \value{
 a ggplot2 object

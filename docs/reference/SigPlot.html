@@ -74,6 +74,9 @@
   </a>
 </li>
 <li>
+  <a href="../articles/RSoptSC.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -123,11 +126,8 @@
     </div>
 
     <pre class="usage"><span class='fu'>SigPlot</span>(<span class='no'>P</span>, <span class='kw'>rgb_gap</span> <span class='kw'>=</span> <span class='fl'>0.2</span>, <span class='no'>cluster_labels</span>, <span class='kw'>lig_cells_per_cluster</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>lig_cells_total</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>lig_edge_per_cell</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>lig_edge_per_cluster</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>lig_edge_total</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>rec_cells_per_cluster</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>rec_cells_total</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>zero_threshold</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>cD_reduce</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>highlight_clusters</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>title_text</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+  <span class='kw'>rec_cells_per_cluster</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>zero_threshold</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>cD_reduce</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>highlight_clusters</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>title_text</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>n_clusters</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,28 +149,8 @@
       <td><p>int 0 to keep all</p></td>
     </tr>
     <tr>
-      <th>lig_cells_total</th>
-      <td><p>int 0 to keep remaining cells per cluster</p></td>
-    </tr>
-    <tr>
-      <th>lig_edge_per_cell</th>
-      <td><p>int 0 to keep all</p></td>
-    </tr>
-    <tr>
-      <th>lig_edge_per_cluster</th>
-      <td><p>int 0 to keep remaining edge per cell</p></td>
-    </tr>
-    <tr>
-      <th>lig_edge_total</th>
-      <td><p>int 0 to keep keep remaining edge per cluster</p></td>
-    </tr>
-    <tr>
       <th>rec_cells_per_cluster</th>
       <td><p>int 0 to keep all</p></td>
-    </tr>
-    <tr>
-      <th>rec_cells_total</th>
-      <td><p>int 0 to keep remaining cells per cluster</p></td>
     </tr>
     <tr>
       <th>zero_threshold</th>
@@ -187,6 +167,10 @@
     <tr>
       <th>title_text</th>
       <td><p>the title of the plot</p></td>
+    </tr>
+    <tr>
+      <th>n_clusters</th>
+      <td><p>if n is higher than the number of unique labels (colorscale can be used for meta plotting)</p></td>
     </tr>
     </table>
     

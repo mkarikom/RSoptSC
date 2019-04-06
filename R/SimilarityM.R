@@ -26,7 +26,8 @@
 #' @export
 #'
 SimilarityM <- function(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL, use_umap_indices = FALSE, pre_embed_method = 'umap', ...){
-  # make min = 0, max = 1, then divide by column vector norm
+  set.seed(1)
+  
   m = nrow(data)
   n = ncol(data)
   
@@ -76,7 +77,6 @@ SimilarityM <- function(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL
   }
   
   if(pre_embed_method == 'tsne'){
-    set.seed(1)
     X2 <- Rtsne(X = t(as.matrix(X)), ...)
     D <- matrix(1, n, n)
     

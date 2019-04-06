@@ -33,6 +33,7 @@ RepresentationMap <- function(flat_embedding = NULL,
                                normalize_S = TRUE,
                                flat_embedding_method = 'umap',
                                ...){
+  set.seed(1)
   if(normalize_S){
     similarity_matrix <- similarity_matrix / sum(similarity_matrix)
   }
@@ -40,7 +41,6 @@ RepresentationMap <- function(flat_embedding = NULL,
   if(is.null(flat_embedding)){
     if(flat_embedding_method == 'tsne'){
       # set the seed for tsne
-      set.seed(1)
       # initialize with low dim embedding
       flat_embedding <- Rtsne(X = as.matrix(similarity_matrix), ...)$Y
       flat_embedding <- as.data.frame(flat_embedding)

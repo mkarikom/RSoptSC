@@ -273,6 +273,7 @@ ClusterSig <- function(P,
     nzcounts[c,1] <- length(which(nzlabel == clust))
   }
   
+  browser()
   for(col in 1:ncol(sums)){
     for(row in 1:nrow(sums)){
       if(nzcounts[row,1] > 0){

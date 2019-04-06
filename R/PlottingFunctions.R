@@ -82,6 +82,9 @@ PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfi
 #' @param colorscale color scale for discrete data
 #' @param pointsize the size of geom point
 #' @param hide_legend hide the legend and return a list, containing the legendless plot and the legend
+#' @param legsize the size of the legend
+#' @param legt size of legend title
+#' @param legtxt size of legend text
 #'
 #' @return a ggplot2 object
 #' 
@@ -97,7 +100,10 @@ FeatureScatterPlot <- function(flat_embedding,
                                featurename,
                                colorscale = NULL,
                                pointsize = 1,
-                               hide_legend = FALSE){
+                               hide_legend = FALSE,
+                               legsize = 5,
+                               legt = 5,
+                               legtxt = 5){
   n_features <- length(unique(feature))
   
   p <- ggplot(flat_embedding,
@@ -110,17 +116,21 @@ FeatureScatterPlot <- function(flat_embedding,
     p <- p +
       geom_point(size = pointsize) +
       labs(title = title, subtitle = subtitle, color = featurename) +
-      theme_minimal()
+      theme_minimal() + 
+      theme(legend.title = element_text(size=legt), legend.text = element_text(size = legtxt)) 
   }else{
     p <- p +
       geom_point(size = pointsize) +
       labs(title = title, subtitle = subtitle, color = featurename) +
       theme_minimal() +
-      scale_color_manual(values = colorscale)
+      scale_color_manual(values = colorscale) +
+      guides(colour = guide_legend(override.aes = list(size=legsize))) +
+      theme(legend.title = element_text(size=legt), legend.text = element_text(size = legtxt))
   }
   if(hide_legend){
     leg <- get_legend(p)
-    p <- p + theme_update(legend.position = "none")
+    p <- p + theme_minimal()
+    p <- p + theme(legend.position = "none")
     list(legend = leg, plot = p)
   }else{
     p
@@ -423,11 +433,12 @@ SigPlot <- function(P,
   
   # get rgb codes and 0-360 hue map for the clusters
   cluster_colors <- ColorHue(n_clusters)
-  rownames(cluster_colors) <- unique(labels)
   alt_cluster_colors <- ColorHue(n_clusters,
                                  luminance = 100,
                                  chroma = 90)
-  rownames(alt_cluster_colors) <- unique(labels)
+
+  cluster_colors <- cluster_colors[sort(unique(cluster_labels)),]
+  alt_cluster_colors <- alt_cluster_colors[sort(unique(cluster_labels)),]
   
   # get the rgb codes for the sectors (cells), based on 20% of the spectrum starting from the cluster hue
   gap <- rgb_gap*(cluster_colors[2,1] - cluster_colors[1,1])
@@ -450,7 +461,7 @@ SigPlot <- function(P,
   
   # Circlize only plots the P_table connections that are non-zero
   # In case zero_threshold is <= 0, find which clusters are being plotted
-  
+
   # find highlightable pairs
   if(length(which(P_table$link_weight <= zero_threshold)) > 0){
     nz_lig_clust <- unique(P_table$lig_cluster_number[-(which(P_table$link_weight <= zero_threshold))])
@@ -462,8 +473,9 @@ SigPlot <- function(P,
   
   if(highlight_clusters){
     for(i in nz_lig_clust){
+      ii <- which(rownames(cluster_colors) == i)
       lig_cells <- unique(P_table$lig_cell[which(P_table$lig_cluster_number == i)])
-      highlight_col <- cluster_colors$hex.1.n.[i]
+      highlight_col <- cluster_colors$hex.1.n.[ii]
       cluster_name <- paste0("C", i)
       highlight.sector(sector.index = lig_cells,
                        col = highlight_col, 
@@ -473,8 +485,9 @@ SigPlot <- function(P,
                        track.index = 2)
     }
     for(i in nz_rec_clust){
+      ii <- which(rownames(cluster_colors) == i)
       rec_cells <- unique(P_table$rec_cell[which(P_table$rec_cluster_number == i)])
-      highlight_col <- cluster_colors$hex.1.n.[i]
+      highlight_col <- cluster_colors$hex.1.n.[ii]
       cluster_name <- paste0("C", i)
       highlight.sector(sector.index = rec_cells[which(rec_cells %in% get.all.sector.index())],
                        col = highlight_col, 
@@ -483,7 +496,7 @@ SigPlot <- function(P,
                        niceFacing = TRUE, 
                        track.index = 2)
     }
-    legend("topleft", legend = paste0("C", c(1:n_clusters)), pch=16, pt.cex=1.5, cex=1, bty='n',
+    legend("topleft", legend = paste0("C", sort(unique(cluster_labels))), pch=16, pt.cex=1.5, cex=1, bty='n',
            col = cluster_colors$hex.1.n.)
     title(title_text, cex.main = 1.5, line = -0.5)
   }

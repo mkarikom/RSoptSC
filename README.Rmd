@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 * Demo SoptSC at [`vignette("Joost_et_al")`](https://mkarikom.github.io/RSoptSC/articles/Joost_et_al.html)
 
-* Read the SoptSC preprint on [bioRxiv](https://www.biorxiv.org/content/10.1101/168922v3)
+* Read the SoptSC article in [NAR](https://doi.org/10.1093/nar/gkz204)
 
 * SoptSC is also available as a MATLAB package [here](https://github.com/wangshuxiong/soptsc)
 
