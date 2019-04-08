@@ -6,7 +6,8 @@
 \usage{
 FeatureScatterPlot(flat_embedding, feature, title, subtitle, featurename,
   colorscale = NULL, pointsize = 1, hide_legend = FALSE,
-  legsize = 5, legt = 5, legtxt = 5)
+  legsize = 5, legt = 5, legtxt = 5, grad_lim = NULL,
+  autoscale_dropout = FALSE, dropout_NA = TRUE)
 }
 \arguments{
 \item{flat_embedding}{a low dim embedding of cells}
@@ -30,6 +31,12 @@ FeatureScatterPlot(flat_embedding, feature, title, subtitle, featurename,
 \item{legt}{size of legend title}
 
 \item{legtxt}{size of legend text}
+
+\item{grad_lim}{the limits of the color gradient for continuous features, this should usually be in log-expression space, overrides autoscale_dropout}
+
+\item{autoscale_dropout}{whether to set plots where the feature space is 0 to #102033, default min for scale_color_gradient auto scaling, overrides dropout_NA}
+
+\item{dropout_NA}{whether to set plots where the feature space is 0 to NA, note: the legend element in a hide_legend output will be NULL}
 }
 \value{
 a ggplot2 object

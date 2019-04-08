@@ -127,7 +127,8 @@
 
     <pre class="usage"><span class='fu'>FeatureScatterPlot</span>(<span class='no'>flat_embedding</span>, <span class='no'>feature</span>, <span class='no'>title</span>, <span class='no'>subtitle</span>, <span class='no'>featurename</span>,
   <span class='kw'>colorscale</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>pointsize</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>hide_legend</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>legsize</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>legt</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>legtxt</span> <span class='kw'>=</span> <span class='fl'>5</span>)</pre>
+  <span class='kw'>legsize</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>legt</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>legtxt</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>grad_lim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>autoscale_dropout</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>dropout_NA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -175,6 +176,18 @@
     <tr>
       <th>legtxt</th>
       <td><p>size of legend text</p></td>
+    </tr>
+    <tr>
+      <th>grad_lim</th>
+      <td><p>the limits of the color gradient for continuous features, this should usually be in log-expression space, overrides autoscale_dropout</p></td>
+    </tr>
+    <tr>
+      <th>autoscale_dropout</th>
+      <td><p>whether to set plots where the feature space is 0 to #102033, default min for scale_color_gradient auto scaling, overrides dropout_NA</p></td>
+    </tr>
+    <tr>
+      <th>dropout_NA</th>
+      <td><p>whether to set plots where the feature space is 0 to NA, note: the legend element in a hide_legend output will be NULL</p></td>
     </tr>
     </table>
     

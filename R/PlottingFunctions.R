@@ -85,6 +85,9 @@ PlotMatlabDtree <- function(edge_table, predecessors, outputdir = NULL, outputfi
 #' @param legsize the size of the legend
 #' @param legt size of legend title
 #' @param legtxt size of legend text
+#' @param grad_lim the limits of the color gradient for continuous features, this should usually be in log-expression space, overrides autoscale_dropout
+#' @param autoscale_dropout whether to set plots where the feature space is 0 to #102033, default min for scale_color_gradient auto scaling, overrides dropout_NA
+#' @param dropout_NA whether to set plots where the feature space is 0 to NA, note: the legend element in a hide_legend output will be NULL
 #'
 #' @return a ggplot2 object
 #' 
@@ -103,7 +106,10 @@ FeatureScatterPlot <- function(flat_embedding,
                                hide_legend = FALSE,
                                legsize = 5,
                                legt = 5,
-                               legtxt = 5){
+                               legtxt = 5,
+                               grad_lim = NULL,
+                               autoscale_dropout = FALSE,
+                               dropout_NA = TRUE){
   n_features <- length(unique(feature))
   
   p <- ggplot(flat_embedding,
@@ -118,6 +124,18 @@ FeatureScatterPlot <- function(flat_embedding,
       labs(title = title, subtitle = subtitle, color = featurename) +
       theme_minimal() + 
       theme(legend.title = element_text(size=legt), legend.text = element_text(size = legtxt)) 
+    if(!is.null(grad_lim)){
+      p <- p + scale_colour_gradient(limits = grad_lim)
+    } else if (autoscale_dropout) {
+      if(length(unique(feature)) == 1){
+        p <- p + scale_colour_gradient(low = "#102033", high = "#102033")
+      }
+    } else if (dropout_NA){
+      if(length(unique(feature)) == 1){
+        feature[which(feature == 0)] <- NA
+        p <- p + scale_color_gradient(na.value = "grey50")
+      }
+    }
   }else{
     p <- p +
       geom_point(size = pointsize) +
@@ -128,15 +146,21 @@ FeatureScatterPlot <- function(flat_embedding,
       theme(legend.title = element_text(size=legt), legend.text = element_text(size = legtxt))
   }
   if(hide_legend){
-    leg <- get_legend(p)
-    p <- p + theme_minimal()
-    p <- p + theme(legend.position = "none")
-    list(legend = leg, plot = p)
+    if(length(unique(feature)) == 1){
+      # NAs have replaced the dropout 0's
+      p <- p + theme_minimal()
+      p <- p + theme(legend.position = "none")
+      list(legend = NULL, plot = p)
+    } else {
+      leg <- get_legend(p)
+      p <- p + theme_minimal()
+      p <- p + theme(legend.position = "none")
+      list(legend = leg, plot = p)
+    }
   }else{
     p
   }
 }
-
 
 #' Heatmap of the top n markers
 #' 
