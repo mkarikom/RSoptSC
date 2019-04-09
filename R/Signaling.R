@@ -202,11 +202,11 @@ GetSignalingPartners <- function(M,
 }
 
 #' Normalize signal across cells
-#' 
+#'
 #' Normalize signal across cells
 #'
 #' @param M a matrix of expression values for each cell (columns) and gene (rows)
-#' 
+#'
 #' @return a normalized vector of expression values
 #'
 NormalizeGene <- function(M){
@@ -224,13 +224,15 @@ NormalizeGene <- function(M){
 #'
 #' @param P signaling probabilities cells x cells
 #' @param cluster_labels labels of cells 1:n
+#' @param normalize_rows normalize the rows of the output matrix so that the rows sum to 1, default true
 #'
 #' @return a matrix of cluster to cluster signaling
-#' 
+#'
 #' @export
 #'
 ClusterSig <- function(P,
-                       cluster_labels){
+                       cluster_labels,
+                       normalize_rows = TRUE){
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
   cell_order <- sorted_cell$ix
   cell_labels <- sorted_cell$x
@@ -257,30 +259,50 @@ ClusterSig <- function(P,
   }
   # collapse the colums by summing, note that because each row is normalized,
   # the following procedure will give normalized rows
-  sums <- P[cell_order, cell_order] %*% summing_matrix
-  nzrow <- which(rowSums(sums) > 0)
-  nzlabel <- cell_labels[nzrow]
-  nzcounts <- matrix(0, nrow = n_clusters, ncol = 1)
-  rownames(nzcounts) <- rownames(counts)  
-  sums <- t(sums) %*% summing_matrix
   
-  sums <- t(sums)
-  
-  cnums <- sort(as.integer(rownames(counts)))
-  #cnums <- sort(unique(labels))
+  nzrow <- which(rowSums(P[cell_order, cell_order]) > 0)
+  nzlabel_row <- cell_labels[nzrow]
+  nzcounts_row <- matrix(0, nrow = n_clusters, ncol = 1)
+  rownames(nzcounts_row) <- rownames(counts)  
+  cnums_row <- sort(as.integer(rownames(counts)))
   for(c in 1:n_clusters){
-    clust <- cnums[c]
-    nzcounts[c,1] <- length(which(nzlabel == clust))
+    clust <- cnums_row[c]
+    nzcounts_row[c,1] <- length(which(nzlabel_row == clust))
   }
+  
+  nzcol <- which(colSums(P[cell_order,cell_order]) > 0)
+  nzlabel_col <- cell_labels[nzcol]
+  nzcounts_col <- matrix(0, nrow = n_clusters, ncol = 1)
+  rownames(nzcounts_col) <- rownames(counts)  
+  cnums_col <- sort(as.integer(rownames(counts)))
+  for(c in 1:n_clusters){
+    clust <- cnums_col[c]
+    nzcounts_col[c,1] <- length(which(nzlabel_col == clust))
+  }
+  
+  sums <- P[cell_order, cell_order] %*% summing_matrix
+  sums <- t(sums) %*% summing_matrix
+  sums <- t(sums)
   
   for(col in 1:ncol(sums)){
     for(row in 1:nrow(sums)){
-      if(nzcounts[row,1] > 0 & nzcounts[col,1] > 0){
-        sums[row,col] <- sums[row,col]/nzcounts[row,1]/nzcounts[col,1]
+      if(nzcounts_row[row,1] > 0 & nzcounts_col[col,1] > 0){
+        sums[row,col] <- sums[row,col]/nzcounts_row[row,1]/nzcounts_col[col,1]
       }else{
         sums[row,col] <- 0
       }
     }
+  }
+  
+  if(normalize_rows){
+    normsums <- apply(sums, 1, function(x){
+      if(max(x) > 0){
+        x / sum(x)
+      }else{
+        x
+      }
+    })
+    sums <- t(normsums)
   }
   
   arclabs <- paste0("C", c(1:n_clusters))

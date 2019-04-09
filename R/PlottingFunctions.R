@@ -327,6 +327,8 @@ ViolinPlotExpression <- function(data,
 #' @param highlight_clusters whether to label the plot with clusters.  Default is true.
 #' @param title_text the title of the plot
 #' @param n_clusters if n is higher than the number of unique labels (colorscale can be used for meta plotting)
+#' @param n_cluster_cols for plots with different subpopulations, use this to reserve dropout clusters in individual plots.  WARNING: this is strongly recommended if there are dropouts, ie unique(labels) != 1:length(labels)
+#' @param receptor_chord_color color the chords according to the receptor-bearing cell they point to.  default is false
 #' 
 #' 
 #' @import dplyr
@@ -345,13 +347,15 @@ SigPlot <- function(P,
                     cD_reduce = 0,
                     highlight_clusters = TRUE,
                     title_text = NULL,
-                    n_clusters = NULL){
+                    n_clusters = NULL,
+                    n_cluster_cols = NULL,
+                    receptor_chord_color = FALSE){
   if(max(P) <= zero_threshold){
     print('no signaling in P')
     return()
   }
   label = lig_cluster_number = lig_cell = rec_cell = 
-    rec_cluster_number = legend = title = NULL # r cmd check pass
+    rec_cluster_number = legend = title = link_weight = arbitrary_order = NULL # r cmd check pass
   circos.clear()
   # compute
   # ordering: int vector of indices corresponding to the labels
@@ -363,6 +367,10 @@ SigPlot <- function(P,
   if(is.null(n_clusters)){
     n_clusters <- length(unique(labels))
   }
+  if(is.null(n_cluster_cols)){
+    n_cluster_cols <- max(labels)
+  }
+  
   n_cells <- length(labels)
   
   # find nonzero rows and columns of ordered P
@@ -387,8 +395,9 @@ SigPlot <- function(P,
   rec_counts <- matrix(0, nrow = n_clusters, ncol = 1)
   rownames(lig_counts) <- rownames(rec_counts) <- as.character(c(1:n_clusters))
   for(c in 1:n_clusters){
-    lig_counts[c,1] <- length(which(nzlabel_lig == c))
-    rec_counts[c,1] <- length(which(nzlabel_rec == c))
+    cc <- unique(labels)[c]
+    lig_counts[c,1] <- length(which(nzlabel_lig == cc))
+    rec_counts[c,1] <- length(which(nzlabel_rec == cc))
   }
   
   # for each cluster, get the location of the first and the last cell in the permutation of labels
@@ -406,11 +415,10 @@ SigPlot <- function(P,
     sums <- rowSums(P_ordered)
     tab <- data.frame(cell = nzordering_lig,
                       label = nzlabel_lig,
-                      sum = sums)
-    filtered <- tab %>%
-      group_by(label) %>%
-      top_n(n = lig_cells_per_cluster,
-            wt = sum)
+                      sum = sums,
+                      arbitrary_order = 1:length(sums))
+    grouped <- tab %>% group_by(label)
+    filtered <- top_n(grouped, n = lig_cells_per_cluster,wt = arbitrary_order)
     P_ordered <- P_ordered[drop=FALSE,as.character(filtered$cell),]  
   }
   
@@ -419,11 +427,11 @@ SigPlot <- function(P,
     sums <- colSums(P_ordered)
     tab <- data.frame(cell = nzordering_rec,
                       label = nzlabel_rec,
-                      sum = sums)
-    filtered <- tab %>%
-      group_by(label) %>%
-      top_n(n = rec_cells_per_cluster,
-            wt = sum)
+                      sum = sums,
+                      arbitrary_order = 1:length(sums))
+    grouped <- tab %>%
+      group_by(label)
+    filtered <- top_n(grouped, n = rec_cells_per_cluster, wt = arbitrary_order)
     P_ordered <- P_ordered[drop=FALSE,,as.character(filtered$cell)]  
   }
   
@@ -456,74 +464,143 @@ SigPlot <- function(P,
   P_table$rec_cell <- paste(P_table$rec_cell, "R", sep = "_")
   
   # get rgb codes and 0-360 hue map for the clusters
-  cluster_colors <- ColorHue(n_clusters)
-  alt_cluster_colors <- ColorHue(n_clusters,
+  cluster_colors <- ColorHue(n_cluster_cols)
+  alt_cluster_colors <- ColorHue(n_cluster_cols,
                                  luminance = 100,
                                  chroma = 90)
-
-  cluster_colors <- cluster_colors[sort(unique(cluster_labels)),]
-  alt_cluster_colors <- alt_cluster_colors[sort(unique(cluster_labels)),]
+  # rownames(cluster_colors) <- sort(unique(labels))
+  # rownames(alt_cluster_colors) <- sort(unique(labels))
+  
+  # cluster_colors <- cluster_colors[sort(unique(cluster_labels)),]
+  # alt_cluster_colors <- alt_cluster_colors[sort(unique(cluster_labels)),]
   
   # get the rgb codes for the sectors (cells), based on 20% of the spectrum starting from the cluster hue
   gap <- rgb_gap*(cluster_colors[2,1] - cluster_colors[1,1])
   
-  # get the chordcolors for the ligands
-  cols <- ChordColors(P_table, cluster_colors, gap)
-  # plot the chords
-  circos.clear()
-  
-  chordDiagram(P_table[which(P_table$link_weight > zero_threshold),1:3],
-               order = chord_plot_sector_order,
-               directional = TRUE, 
-               direction.type = c("diffHeight", "arrows"), 
-               link.arr.type = "big.arrow", 
-               annotationTrack = "grid", 
-               grid.col = cols, 
-               preAllocateTracks = list(list(track.height = 0.05), list(track.height = 0.05)),
-               reduce = cD_reduce)
-  # apply highlighting to the ligand signaling cells
-  
-  # Circlize only plots the P_table connections that are non-zero
-  # In case zero_threshold is <= 0, find which clusters are being plotted
-
-  # find highlightable pairs
-  if(length(which(P_table$link_weight <= zero_threshold)) > 0){
-    nz_lig_clust <- unique(P_table$lig_cluster_number[-(which(P_table$link_weight <= zero_threshold))])
-    nz_rec_clust <- unique(P_table$rec_cluster_number[-(which(P_table$link_weight <= zero_threshold))])
+  if(!receptor_chord_color){
+    # get the chordcolors for the ligands
+    cols <- ChordColors(P_table, cluster_colors, gap)
+    # plot the chords
+    circos.clear()
+    chordDiagram(P_table[which(P_table$link_weight > zero_threshold),1:3],
+                 order = chord_plot_sector_order,
+                 directional = TRUE, 
+                 direction.type = c("diffHeight", "arrows"), 
+                 link.arr.type = "big.arrow", 
+                 annotationTrack = "grid", 
+                 grid.col = cols, 
+                 preAllocateTracks = list(list(track.height = 0.05), list(track.height = 0.05)),
+                 reduce = cD_reduce)
+    # apply highlighting to the ligand signaling cells
+    
+    # Circlize only plots the P_table connections that are non-zero
+    # In case zero_threshold is <= 0, find which clusters are being plotted
+    
+    # find highlightable pairs
+    if(length(which(P_table$link_weight <= zero_threshold)) > 0){
+      nz_lig_clust <- unique(P_table$lig_cluster_number[-(which(P_table$link_weight <= zero_threshold))])
+      nz_rec_clust <- unique(P_table$rec_cluster_number[-(which(P_table$link_weight <= zero_threshold))])
+    } else {
+      nz_lig_clust <- unique(P_table$lig_cluster_number)
+      nz_rec_clust <- unique(P_table$rec_cluster_number)
+    }
+    
+    if(highlight_clusters){
+      for(i in nz_lig_clust){
+        ii <- which(rownames(cluster_colors) == i)
+        lig_cells <- unique(P_table$lig_cell[which(P_table$lig_cluster_number == i)])
+        highlight_col <- cluster_colors$hex.1.n.[ii]
+        cluster_name <- paste0("C", i)
+        highlight.sector(sector.index = lig_cells,
+                         col = highlight_col, 
+                         #text = cluster_name, # these may be cramped
+                         text.vjust = -1, 
+                         niceFacing = TRUE, 
+                         track.index = 2)
+      }
+      for(i in nz_rec_clust){
+        ii <- which(rownames(cluster_colors) == i)
+        rec_cells <- unique(P_table$rec_cell[which(P_table$rec_cluster_number == i)])
+        highlight_col <- cluster_colors$hex.1.n.[ii]
+        cluster_name <- paste0("C", i)
+        highlight.sector(sector.index = rec_cells[which(rec_cells %in% get.all.sector.index())],
+                         col = highlight_col, 
+                         #text = cluster_name, # these may be cramped
+                         text.vjust = -1, 
+                         niceFacing = TRUE, 
+                         track.index = 2)
+      }
+      subset_cols <- cluster_colors$hex.1.n.[sort(unique(labels))]
+      legend("topleft", legend = paste0("C", sort(unique(cluster_labels))), pch=16, pt.cex=1.5, cex=1, bty='n',
+             col = subset_cols)
+      title(title_text, cex.main = 1.5, line = -0.5)
+    }
   } else {
-    nz_lig_clust <- unique(P_table$lig_cluster_number)
-    nz_rec_clust <- unique(P_table$rec_cluster_number)
+    P_table <- arrange(P_table, lig_cluster_number, rec_cluster_number, desc(link_weight), rec_cell)
+    P_table <- P_table[which(P_table$link_weight > zero_threshold),]
+    #colnames(P_table) <- c("lig_link", "rec_cell", "link_weight", "lig_cluster_number", "rec_cluster_number")
+    P_table$lig_cell <- 1:nrow(P_table) # this is not actually cells anymore, more like cell-extracted links
+    chord_plot_sector_order <- c(P_table$lig_cell, rec_cell_unique)
+    # get the chordcolors for the ligands
+    cols <- ChordColors(P_table, cluster_colors, gap, receptor_chord_color = TRUE)
+    # plot the chords
+    circos.clear()
+    
+    chordDiagram(P_table[which(P_table$link_weight > zero_threshold),1:3],
+                 order = chord_plot_sector_order,
+                 directional = TRUE, 
+                 direction.type = c("diffHeight", "arrows"), 
+                 link.arr.type = "big.arrow", 
+                 annotationTrack = "grid", 
+                 grid.col = cols, 
+                 preAllocateTracks = list(list(track.height = 0.05), list(track.height = 0.05)),
+                 reduce = cD_reduce)
+    # apply highlighting to the ligand signaling cells
+    
+    # Circlize only plots the P_table connections that are non-zero
+    # In case zero_threshold is <= 0, find which clusters are being plotted
+    
+    # find highlightable pairs
+    if(length(which(P_table$link_weight <= zero_threshold)) > 0){
+      nz_lig_clust <- unique(P_table$lig_cluster_number[-(which(P_table$link_weight <= zero_threshold))])
+      nz_rec_clust <- unique(P_table$rec_cluster_number[-(which(P_table$link_weight <= zero_threshold))])
+    } else {
+      nz_lig_clust <- unique(P_table$lig_cluster_number)
+      nz_rec_clust <- unique(P_table$rec_cluster_number)
+    }
+    
+    if(highlight_clusters){
+      for(i in nz_lig_clust){
+        ii <- which(rownames(cluster_colors) == i)
+        lig_cells <- unique(P_table$lig_cell[which(P_table$lig_cluster_number == i)])
+        highlight_col <- cluster_colors$hex.1.n.[ii]
+        cluster_name <- paste0("C", i)
+        highlight.sector(sector.index = lig_cells,
+                         col = highlight_col, 
+                         #text = cluster_name, # these may be cramped
+                         text.vjust = -1, 
+                         niceFacing = TRUE, 
+                         track.index = 2)
+      }
+      for(i in nz_rec_clust){
+        ii <- which(rownames(cluster_colors) == i)
+        rec_cells <- unique(P_table$rec_cell[which(P_table$rec_cluster_number == i)])
+        highlight_col <- cluster_colors$hex.1.n.[ii]
+        cluster_name <- paste0("C", i)
+        highlight.sector(sector.index = rec_cells[which(rec_cells %in% get.all.sector.index())],
+                         col = highlight_col, 
+                         #text = cluster_name, # these may be cramped
+                         text.vjust = -1, 
+                         niceFacing = TRUE, 
+                         track.index = 2)
+      }
+      subset_cols <- cluster_colors$hex.1.n.[sort(unique(labels))]
+      legend("topleft", legend = paste0("C", sort(unique(cluster_labels))), pch=16, pt.cex=1.5, cex=1, bty='n',
+             col = subset_cols)
+      title(title_text, cex.main = 1.5, line = -0.5)
+    }
   }
   
-  if(highlight_clusters){
-    for(i in nz_lig_clust){
-      ii <- which(rownames(cluster_colors) == i)
-      lig_cells <- unique(P_table$lig_cell[which(P_table$lig_cluster_number == i)])
-      highlight_col <- cluster_colors$hex.1.n.[ii]
-      cluster_name <- paste0("C", i)
-      highlight.sector(sector.index = lig_cells,
-                       col = highlight_col, 
-                       #text = cluster_name, # these may be cramped
-                       text.vjust = -1, 
-                       niceFacing = TRUE, 
-                       track.index = 2)
-    }
-    for(i in nz_rec_clust){
-      ii <- which(rownames(cluster_colors) == i)
-      rec_cells <- unique(P_table$rec_cell[which(P_table$rec_cluster_number == i)])
-      highlight_col <- cluster_colors$hex.1.n.[ii]
-      cluster_name <- paste0("C", i)
-      highlight.sector(sector.index = rec_cells[which(rec_cells %in% get.all.sector.index())],
-                       col = highlight_col, 
-                       #text = cluster_name, # these may be cramped
-                       text.vjust = -1, 
-                       niceFacing = TRUE, 
-                       track.index = 2)
-    }
-    legend("topleft", legend = paste0("C", sort(unique(cluster_labels))), pch=16, pt.cex=1.5, cex=1, bty='n',
-           col = cluster_colors$hex.1.n.)
-    title(title_text, cex.main = 1.5, line = -0.5)
-  }
 }
 
 #' Get a vector of n equally spaced rgb colors
@@ -556,20 +633,42 @@ ColorHue <- function(n, starthue = 15, endhue = 360,
 #' @param edge_table a table with lig, rec, score, lig_cluster, rec_cluster
 #' @param cluster_cols colors for the clusters
 #' @param gap the hue gap
+#' @param receptor_chord_color color the chords according to the receptor-bearing cell they point to.  default is false
 #'
-ChordColors <- function(edge_table, cluster_cols, gap) {
+ChordColors <- function(edge_table, cluster_cols, gap,
+                        receptor_chord_color = FALSE) {
   chords <- c()
-  for(i in unique(edge_table$lig_cluster_number)){
-    cell_labels <- edge_table[which(edge_table$lig_cluster_number == i),]$lig_cell
-    starthue <- cluster_cols[as.character(i),1]
-    cols <- ColorHue(n = length(cell_labels), 
-                     starthue = starthue,
-                     endhue = starthue + gap)
-    cols <- cols$hex.1.n.
-    names(cols) <- cell_labels
-    chords <- c(chords, cols)
+  if(!receptor_chord_color){
+    for(i in unique(edge_table$lig_cluster_number)){
+      cell_labels <- edge_table[which(edge_table$lig_cluster_number == i),]$lig_cell
+      starthue <- cluster_cols[as.character(i),1]
+      cols <- ColorHue(n = length(cell_labels), 
+                       starthue = starthue,
+                       endhue = starthue + gap)
+      cols <- cols$hex.1.n.
+      names(cols) <- cell_labels
+      chords <- c(chords, cols)
+    }
+    cols_rec <- rep("grey", length(edge_table$rec_cell))
+    names(cols_rec) <- edge_table$rec_cell
+    chords <- c(chords, cols_rec)
+    
+  } else {
+    for(i in unique(edge_table$lig_cluster_number)){
+      sub_table <- edge_table[which(edge_table$lig_cluster_number == i),]
+      for(ii in unique(sub_table$rec_cluster_number)){
+        sub_sub_table <- sub_table[which(sub_table$rec_cluster_number == ii),]
+        starthue <- cluster_cols[as.character(ii),1]
+        cols <- ColorHue(n = nrow(sub_sub_table), 
+                         starthue = starthue,
+                         endhue = starthue + gap)
+        cols <- cols$hex.1.n.
+        names(cols) <- sub_sub_table$lig_cell
+        chords <- c(chords, cols)
+      }
+    }
+    cols_rec <- rep("grey", length(edge_table$rec_cell))
+    names(cols_rec) <- edge_table$rec_cell
+    chords <- c(chords, cols_rec)
   }
-  cols_rec <- rep("grey", length(edge_table$rec_cell))
-  names(cols_rec) <- edge_table$rec_cell
-  chords <- c(chords, cols_rec)
 }

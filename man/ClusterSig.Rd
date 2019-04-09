@@ -4,12 +4,14 @@
 \alias{ClusterSig}
 \title{Average cluster to cluster signaling}
 \usage{
-ClusterSig(P, cluster_labels)
+ClusterSig(P, cluster_labels, normalize_rows = TRUE)
 }
 \arguments{
 \item{P}{signaling probabilities cells x cells}
 
 \item{cluster_labels}{labels of cells 1:n}
+
+\item{normalize_rows}{normalize the rows of the output matrix so that the rows sum to 1, default true}
 }
 \value{
 a matrix of cluster to cluster signaling

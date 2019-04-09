@@ -4,7 +4,7 @@
 \alias{ChordColors}
 \title{Get chord colors for cells}
 \usage{
-ChordColors(edge_table, cluster_cols, gap)
+ChordColors(edge_table, cluster_cols, gap, receptor_chord_color = FALSE)
 }
 \arguments{
 \item{edge_table}{a table with lig, rec, score, lig_cluster, rec_cluster}
@@ -12,6 +12,8 @@ ChordColors(edge_table, cluster_cols, gap)
 \item{cluster_cols}{colors for the clusters}
 
 \item{gap}{the hue gap}
+
+\item{receptor_chord_color}{color the chords according to the receptor-bearing cell they point to.  default is false}
 }
 \description{
 Get chord colors for cells.

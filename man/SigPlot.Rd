@@ -6,7 +6,8 @@
 \usage{
 SigPlot(P, rgb_gap = 0.2, cluster_labels, lig_cells_per_cluster = 10,
   rec_cells_per_cluster = 10, zero_threshold = 0, cD_reduce = 0,
-  highlight_clusters = TRUE, title_text = NULL, n_clusters = NULL)
+  highlight_clusters = TRUE, title_text = NULL, n_clusters = NULL,
+  n_cluster_cols = NULL, receptor_chord_color = FALSE)
 }
 \arguments{
 \item{P}{signaling probabilities cells x cells}
@@ -28,6 +29,10 @@ SigPlot(P, rgb_gap = 0.2, cluster_labels, lig_cells_per_cluster = 10,
 \item{title_text}{the title of the plot}
 
 \item{n_clusters}{if n is higher than the number of unique labels (colorscale can be used for meta plotting)}
+
+\item{n_cluster_cols}{for plots with different subpopulations, use this to reserve dropout clusters in individual plots.  WARNING: this is strongly recommended if there are dropouts, ie unique(labels) != 1:length(labels)}
+
+\item{receptor_chord_color}{color the chords according to the receptor-bearing cell they point to.  default is false}
 }
 \description{
 Produce a plot of a cell signaling network according to the cell-normalized expression score.
