@@ -32,6 +32,6 @@ test_that("lineage graph is correct", {
   
   
   cluster_dtree <- GetDominatorTree(cluster_predecessors, cluster_ptime$graph_cluster)
-  
+  browser()
   expect_true(identical_graphs(cluster_dtree, joostTest$lineage_graph))
 })

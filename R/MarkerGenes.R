@@ -12,6 +12,7 @@
 #'     expressed in more than n-m cells or genes expressed in less than m cells
 #' @param n_features number of marker genes per cluster to retrieve
 #' @param use_H whether to use H as loading, default is false, instead using cumulative absolute difference to sort max-mean assigned labels
+#' @param lognorm perform log transform, normalization, and scaling on the data before the computing the markers
 #'
 #' @return a list containing 
 #'     \item{all}{all the markers listed by gene index, cluster, and score}
@@ -19,23 +20,29 @@
 #'
 #' @importFrom dplyr arrange top_n 
 #' @importFrom magrittr %>%
+#' @importFrom Matrix rowMeans
 #'
 #' @export
 #'
 GetMarkerTable <- function(counts_data,
-                            cluster_labels,
-                            H = NULL,
-                            n_sorted = 50,
-                            gene_names,
-                            gene_expression_threshold = NULL,
-                            n_features = NULL,
-                            use_H = FALSE){
+                           cluster_labels,
+                           H = NULL,
+                           n_sorted = 50,
+                           gene_names,
+                           gene_expression_threshold = NULL,
+                           n_features = NULL,
+                           use_H = FALSE,
+                           lognorm = FALSE){
   # filter the data according to desired samples (cells) and features (genes)
   clusterId = geneScore = NULL # get r cmd check to pass
   
   if(use_H){
     M <- counts_data
-    Mnorm <- LogNormalize(M$M_variable)
+    if(lognorm){
+      Mnorm <- LogNormalize(M$M_variable)
+    }else{
+      Mnorm <- M$M_variable
+    }
     
     # for each gene (rows), for each cluster (columns)
     # get cell-weighted expression score
@@ -46,8 +53,14 @@ GetMarkerTable <- function(counts_data,
       c(which(x == max(x)), max(x))
     })
     
+    # prevent cbind issues because of the wrong matrix format
+    if(class(gene_assignments) == 'list'){
+      gene_assignments <- Reduce(rbind, gene_assignments)
+      marker_table <- cbind(M$gene_use, gene_assignments)
+    }else{
+      marker_table <- cbind(M$gene_use, t(gene_assignments))
+    }
     
-    marker_table <- cbind(M$gene_use, t(gene_assignments))
     colnames(marker_table) <- c('geneID', 'clusterId', 'geneScore')
     
     sorted_table <- arrange(as.data.frame(marker_table), clusterId, desc(geneScore))

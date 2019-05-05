@@ -6,7 +6,7 @@
 \usage{
 GetMarkerTable(counts_data, cluster_labels, H = NULL, n_sorted = 50,
   gene_names, gene_expression_threshold = NULL, n_features = NULL,
-  use_H = FALSE)
+  use_H = FALSE, lognorm = FALSE)
 }
 \arguments{
 \item{counts_data}{a matrix of expression values for each cell (rows) and gene (columns) which will be normalized and}
@@ -26,6 +26,8 @@ expressed in more than n-m cells or genes expressed in less than m cells}
 \item{n_features}{number of marker genes per cluster to retrieve}
 
 \item{use_H}{whether to use H as loading, default is false, instead using cumulative absolute difference to sort max-mean assigned labels}
+
+\item{lognorm}{perform log transform, normalization, and scaling on the data before the computing the markers}
 }
 \value{
 a list containing 
