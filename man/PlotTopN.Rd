@@ -4,7 +4,7 @@
 \alias{PlotTopN}
 \title{Heatmap of the top n markers}
 \usage{
-PlotTopN(data, gene_names, cluster_labels, markers, n_features)
+PlotTopN(data, gene_names, cluster_labels, markers, n_features, ...)
 }
 \arguments{
 \item{data}{expression data with genes x cells}
@@ -16,6 +16,8 @@ PlotTopN(data, gene_names, cluster_labels, markers, n_features)
 \item{markers}{a table of markers}
 
 \item{n_features}{the top n features to plot}
+
+\item{...}{extra args to heatmap.2}
 }
 \value{
 nothing

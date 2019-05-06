@@ -171,6 +171,7 @@ FeatureScatterPlot <- function(flat_embedding,
 #' @param cluster_labels a vector of cluster labels corresponding to the columns in the data matrix
 #' @param markers a table of markers
 #' @param n_features the top n features to plot
+#' @param ... extra args to heatmap.2
 #' 
 #' @return nothing
 #'
@@ -186,7 +187,8 @@ PlotTopN <- function(data,
                      gene_names,
                      cluster_labels, 
                      markers,
-                     n_features){
+                     n_features,
+                     ...){
   clusterId = geneScore = NULL # r cmd check pass
   n_cells <- ncol(data)
   n_clusters <- length(unique(cluster_labels))
@@ -222,7 +224,8 @@ PlotTopN <- function(data,
                  #cexRow = .7,
                  #lhei = c(1,3.5),
                  key.title = NA,
-                 scale = "row")
+                 scale = "row",
+                 ...)
 }
 
 #' Heatmap of specific genes
