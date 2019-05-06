@@ -1,6 +1,7 @@
 context("pseudotime inference and lineage trajectories")
 library(RSoptSC)
 library(igraph)
+skip('need precomputed tree for joostTest')
 
 test_that("lineage graph is correct", {
   low_dim_mapping <- RepresentationMap(similarity_matrix = joostTest$S,
@@ -32,6 +33,5 @@ test_that("lineage graph is correct", {
   
   
   cluster_dtree <- GetDominatorTree(cluster_predecessors, cluster_ptime$graph_cluster)
-  
   expect_true(identical_graphs(cluster_dtree, joostTest$lineage_graph))
 })
