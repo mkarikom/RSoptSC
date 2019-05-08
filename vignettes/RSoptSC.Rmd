@@ -45,7 +45,7 @@ data <- GSE67602_Joost$data[-spikein,]
 Apply number of features and exclusion threshold
 
 ```{r, results='asis'}
-logdata <- log10(data + 1)
+logdata <- log10(GSE67602_Joost$data + 1)
 gene_expression_threshold <- 0.03
 n_features <- 3000
 filtered_data <- SelectData(logdata, gene_expression_threshold, n_features)
