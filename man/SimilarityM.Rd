@@ -4,7 +4,7 @@
 \alias{SimilarityM}
 \title{Compute the similarity matrix}
 \usage{
-SimilarityM(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL,
+SimilarityM(lambda = 0.5, data, comps_knn = NULL,
   use_umap_indices = FALSE, pre_embed_method = "umap", ...)
 }
 \arguments{
@@ -13,8 +13,6 @@ SimilarityM(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL,
 \item{data}{the expression data, where each column is treated as a normalized vector}
 
 \item{comps_knn}{number of components to use for knn, overrides eigengap-based inference}
-
-\item{k_neighbors}{the number of neighbors for knn, overrides zero eigenvalue-based inference}
 
 \item{use_umap_indices}{use the knn indices computed during umap embedding to impose sparsity on L2R2, instead of recomputing based on the layout.}
 

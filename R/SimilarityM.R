@@ -8,7 +8,6 @@
 #' @param lambda the balance term between the rank of Z and the error, default is 0.5
 #' @param pre_embed_method how the initial non-linear embedding is performed, default is 'umap'
 #' @param comps_knn number of components to use for knn, overrides eigengap-based inference
-#' @param k_neighbors the number of neighbors for knn, overrides zero eigenvalue-based inference
 #' @param use_umap_indices use the knn indices computed during umap embedding to impose sparsity on L2R2, instead of recomputing based on the layout.
 #' @param ... extra arguments passed to umap or Rtsne
 #' 
@@ -25,7 +24,8 @@
 #'
 #' @export
 #'
-SimilarityM <- function(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL, use_umap_indices = FALSE, pre_embed_method = 'umap', ...){
+SimilarityM <- function(lambda = 0.5, data, comps_knn = NULL, 
+                        use_umap_indices = FALSE, pre_embed_method = 'umap', ...){
   set.seed(1)
   
   m = nrow(data)
@@ -54,9 +54,8 @@ SimilarityM <- function(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL
     No_Comps1 = 1
   }
   No_Comps1 = No_Comps1 + 2
-  
   if(!is.null(comps_knn)){
-    No_Comps1 = comps_knn
+     comps_knn = No_Comps1
   }
   
   cc = cumsum(pca_eigvalue1[-(1)])
@@ -71,19 +70,13 @@ SimilarityM <- function(lambda = 0.5, data, comps_knn = NULL, k_neighbors = NULL
   } else {
     K = K1+1
   }
-  
-  if(!is.null(k_neighbors)){
-    K = k_neighbors
-  }
-  
   if(pre_embed_method == 'tsne'){
     X2 <- Rtsne(X = t(as.matrix(X)), ...)
     D <- matrix(1, n, n)
-    
     knn_object = get.knnx(X2$Y[,1:(No_Comps1)], X2$Y[,1:(No_Comps1)], k = K)
     IDX = knn_object$nn.index
   } else if (pre_embed_method == 'umap'){
-    data.umap <- umap(d = t(as.matrix(data)), n_neighbors = K, n_components = comps_knn, ...)
+    data.umap <- umap(d = t(as.matrix(data)), n_components = comps_knn, ...)
     X2 <- data.umap$layout
     
     D <- matrix(1, n, n)

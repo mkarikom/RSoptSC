@@ -20,7 +20,7 @@ Imports:
     ggplot2 (>= 3.0.0),
     Matrix (>= 1.2-12),
     Rtsne (>= 0.13),
-    NMF (>= 0.21.0),
+    NMF (>= 0.23),
     reshape2 (>= 1.4.3),
     dplyr (>= 0.7.6),
     gplots (>= 3.0.1),
@@ -32,7 +32,13 @@ Imports:
     expm (>= 0.999-3),
     cluster (>= 2.0.7-1),
     magrittr (>= 1.5),
-    cowplot (>= 0.9.3)
+    cowplot (>= 0.9.3),
+    SingleCellExperiment (>= 1.6.0),
+    scater (>= 1.12.1),
+    scran (>= 1.12.0),
+    org.Mm.eg.db (>= 3.8.2),
+    GEOquery (>= 2.52.0),
+    BiocSingular (>= 1.0.0)
 Suggests: testthat,
     rmarkdown, knitr, kableExtra
 RoxygenNote: 6.1.1

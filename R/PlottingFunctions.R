@@ -171,61 +171,87 @@ FeatureScatterPlot <- function(flat_embedding,
 #' @param cluster_labels a vector of cluster labels corresponding to the columns in the data matrix
 #' @param markers a table of markers
 #' @param n_features the top n features to plot
-#' @param ... extra args to heatmap.2
+#' @param y_lsize y axis label size
+#' @param y_tsize y axis title size
+#' @param x_lsize x axis label size
+#' @param x_tsize x axis title size
+#' @param use_z use z-score per gene instead of raw expression
 #' 
-#' @return nothing
+#' @return a ggplot2 plot object
 #'
 #' @import dplyr
-#' @import RColorBrewer
-#' @import gplots
-#' @importFrom tibble as_tibble
+#' @importFrom reshape2 melt
 #' @importFrom Matrix as.matrix
 #'
 #' @export
 #'
 PlotTopN <- function(data,
-                     gene_names,
                      cluster_labels, 
                      markers,
                      n_features,
-                     ...){
-  clusterId = geneScore = NULL # r cmd check pass
-  n_cells <- ncol(data)
-  n_clusters <- length(unique(cluster_labels))
-  sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
+                     y_lsize = ((length(unique(cluster_labels))*n_features)/120)*5,
+                     y_tsize = ((length(unique(cluster_labels))*n_features)/120)*15,
+                     x_lsize = ((length(unique(cluster_labels))*n_features)/120)*14,
+                     x_tsize = ((length(unique(cluster_labels))*n_features)/120)*15,
+                     use_z = TRUE){
+  names(cluster_labels) <- colnames(data)
+  ind <- order(cluster_labels)
+  barcode_order <- colnames(data)[ind]
+  # # markers <- data.frame(symbol = gene_names[markers[,'geneID']], 
+  # #                       cluster = markers[,'clusterId'], 
+  # #                       score = markers[,'geneScore'])
+  # markers <- markers %>% group_by(clusterId) 
+  # markers$symbol <- factor(markers$geneSymbol, levels=markers$symbol)
+  filtered_markers <- markers %>% group_by(clusterId) %>% top_n(n_features, geneScore) 
+  if(use_z){
+    data <- apply(data, 1, function(x){
+      m <- mean(x)
+      sd <- sd(x)
+      z <- (x-m)/sd
+    })
+    data <- t(data)
+    expr_label <- "Z-score"
+  }else{
+    expr_label <- "Log Expression"
+  }
   
-  markers_table <- as.data.frame(markers)
-  sortedmarkers <- arrange(markers_table, clusterId, desc(geneScore))
-  sorted_gene_table <- as_tibble(sortedmarkers) %>% group_by(clusterId) %>% top_n(n_features, geneScore)
-  sorted_gene <- sorted_gene_table$geneID
+  melted <- melt(as.matrix(data))
+  colnames(melted) <- c("geneSymbol", "barcode", "expression")
   
-  plot_data <- data[sorted_gene, sorted_cell$ix]
+  melted$geneSymbol <- factor(melted$geneSymbol, levels=markers$geneSymbol)
   
+  full_melted <- inner_join(melted, filtered_markers)
+  full_melted <- arrange(full_melted, clusterId, desc(geneScore))
+  full_melted$fac_barcode <- factor(full_melted$barcode, levels=barcode_order)
+  full_melted$fac_symbol <- factor(full_melted$geneSymbol, levels=markers$geneSymbol)
   
-  rlabs <- gene_names[sorted_gene]
+  # get x axis cluster ticks
+  counts <- unname(table(cluster_labels))
+  names <- c()
+  pos <- c()
+  current <- 0
+  for(i in 1:length(counts)){
+    names[i] <- paste0(i)
+    current <- current + counts[i]
+    pos[i] <- floor(current - counts[i]/2)
+  }
+  p <- ggplot(full_melted, aes(x = fac_barcode, y = fac_symbol, fill = expression)) +
+    geom_tile() +
+    scale_fill_gradient2(low = 'purple',
+                         mid = 'black',
+                         high = 'yellow',
+                         midpoint = 0,
+                         name = eval(expr_label)) +
+    xlab("Cluster") +
+    ylab("Gene Symbol") +
+    scale_x_discrete(breaks = barcode_order[pos], labels = names) +
+    theme(axis.title.x = element_text(size = x_tsize, angle = 0, vjust = 0.5),
+          axis.title.y = element_text(size = y_tsize),
+          axis.text.x = element_text(size = x_lsize),
+          axis.text.y = element_text(size = y_lsize))
+  plot(p)
+  return(p)
   
-  clabs <- c(rep(NA, n_cells))
-  counts <- as.matrix(table(cluster_labels))
-  accumulator <- matrix(1, n_clusters, n_clusters)*lower.tri(matrix(1, n_clusters, n_clusters), diag = TRUE)
-  last_cells <- accumulator %*% counts
-  offset <- floor(counts/2)
-  labeled_columns <- last_cells - offset
-  clabs[labeled_columns] <- c(1:n_clusters)
-  
-  p <- heatmap.2(as.matrix(plot_data),
-                 col = rev(brewer.pal(11,"RdBu")),
-                 trace = 'none',
-                 dendrogram='none',
-                 Rowv=FALSE, Colv=FALSE,
-                 labCol = clabs,
-                 labRow = rlabs,
-                 srtCol = 0,
-                 #cexCol =1,
-                 #cexRow = .7,
-                 #lhei = c(1,3.5),
-                 key.title = NA,
-                 scale = "row",
-                 ...)
 }
 
 #' Heatmap of specific genes
@@ -236,41 +262,60 @@ PlotTopN <- function(data,
 #' @param gene_names a vector of symbolic gene names corresponding to the rows in the data matrix
 #' @param cluster_labels a vector of cluster labels corresponding to the columns in the data matrix
 #' @param markers a vector of markers
+#' @param use_z use z-score per gene instead of raw expression
 #' 
 #' @return nothing
 #'
-#' @import RColorBrewer
-#' @import gplots
+#' @importFrom reshape2 melt
+#' @import ggplot2
 #'
 #' @export
 #'
 PlotClusterExpression <- function(data,
-                                  gene_names,
-                                  cluster_labels, 
-                                  markers){
-  
+                                  cluster_labels,
+                                  y_lsize = (length(unique(cluster_labels))/8)*5,
+                                  y_tsize = (length(unique(cluster_labels))/8)*15,
+                                  x_lsize = (length(unique(cluster_labels))/8)*14,
+                                  x_tsize = (length(unique(cluster_labels))/8)*15,
+                                  markers,
+                                  use_z = TRUE){
   n_clusters <- length(unique(cluster_labels))
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
-  
+  gene_names <- rownames(data)
   filtered <- ClusterAvg(M = data,
                          gene_names = gene_names,
                          cell_order = sorted_cell$ix,
                          cell_labels = cluster_labels,
                          gene_list = markers)
   
-  p <- heatmap.2(log10(t(filtered) + 1),
-                 col = rev(brewer.pal(11,"RdBu")),
-                 trace = 'none',
-                 dendrogram='none',
-                 Rowv=FALSE, Colv=FALSE,
-                 labCol = c(1:n_clusters),
-                 labRow = markers,
-                 srtCol = 0,
-                 cexCol =1,
-                 cexRow = .7,
-                 lhei = c(1,2),
-                 key.title = NA,
-                 scale = "row")
+  if(use_z){
+    filtered <- apply(filtered, 1, function(x){
+      m <- mean(x)
+      sd <- sd(x)
+      z <- (x-m)/sd
+    })
+    filtered <- t(filtered)
+    expr_label <- "Z-score"
+  }else{
+    expr_label <- "Log Expression"
+  }
+  melted <- melt(filtered)
+  colnames(melted) <- c("cluster", "symbol", "expression")
+  p <- ggplot(melted, aes(x = as.factor(cluster), y = symbol, fill = expression)) +
+    geom_tile() +
+    scale_fill_gradient2(low = 'purple',
+                         mid = 'black',
+                         high = 'yellow',
+                         midpoint = 0,
+                         name = eval(expr_label)) +
+    xlab("Cluster") +
+    ylab("Gene Symbol") +
+    theme(axis.title.x = element_text(size = x_tsize, angle = 0, vjust = 0.5),
+          axis.title.y = element_text(size = y_tsize),
+          axis.text.x = element_text(size = x_lsize),
+          axis.text.y = element_text(size = y_lsize))
+  plot(p)
+  return(p)
 }
 
 

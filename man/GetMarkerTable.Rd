@@ -5,11 +5,10 @@
 \title{Get the marker genes for each cluster}
 \usage{
 GetMarkerTable(counts_data, cluster_labels, H = NULL, n_sorted = 50,
-  gene_names, gene_expression_threshold = NULL, n_features = NULL,
-  use_H = FALSE, lognorm = FALSE)
+  gene_expression_threshold = NULL, use_H = FALSE, lognorm = FALSE)
 }
 \arguments{
-\item{counts_data}{a matrix of expression values for each cell (rows) and gene (columns) which will be normalized and}
+\item{counts_data}{a matrix of expression values for each cell (rows) and gene (columns)}
 
 \item{cluster_labels}{a vector of cluster labels}
 
@@ -18,12 +17,8 @@ by which cell i belongs to the jth cluster}
 
 \item{n_sorted}{the number of markers to report in the n_sorted table}
 
-\item{gene_names}{gene symbols corresponding to rows in counts_data (this should match rows of M, if provided)}
-
 \item{gene_expression_threshold}{for n cells, for \code{gene_expression_threshold} = m, dont consider genes
 expressed in more than n-m cells or genes expressed in less than m cells}
-
-\item{n_features}{number of marker genes per cluster to retrieve}
 
 \item{use_H}{whether to use H as loading, default is false, instead using cumulative absolute difference to sort max-mean assigned labels}
 

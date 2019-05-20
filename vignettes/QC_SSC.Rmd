@@ -25,30 +25,24 @@ This is an example of clustering, marker identification and pseudotime inference
 A matrix of counts with rows as genes and columns as cells must be provided.  Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files.  Here we load example data from NCBI GEO (GSE67602) originally published in Joost et al 2016.
 
 ```{r, results='asis'}
+library(org.Mm.eg.db)
 library(RSoptSC)
-df <- system.file("extdata", "GSE67602_JoostData.csv.bz2", package = "RSoptSC")
-gf <- system.file("extdata", "GSE67602_JoostGenes.csv.bz2", package = "RSoptSC")
-cf <- system.file("extdata", "GSE67602_JoostCells.csv.bz2", package = "RSoptSC")
-af <- system.file("extdata", "GSE67602_JoostAnnotation.csv.bz2", package = "RSoptSC")
+upper <- 10000 # number of variable genes
+cache <- ReadAnnotateCountsSCE(series_accession = 'GSE67602', GEOfilecache = '/tmp/', 
+                               pheno_filter = c('IFE-B','IFE-DI','IFE-DII','IFE-KI','IFE-KII'),
+                               annotation_db = 'org.Mm.eg.db',
+                               feature_annotation_key = "SYMBOL")
+# which cells are epidermis
 
-GSE67602_Joost <- LoadData(df, gf, cf, af)
-```
+#similarity_data <- logcounts(cache$pheno[cache$vargenes[1:upper],])
+all_data <- logcounts(cache$qc)
+similarity_data <- logcounts(cache$qc)
+gene_names <- rownames(similarity_data)
 
-### Remove Spike-in RNA
-```{r, include=FALSE}
-gene_names <- GSE67602_Joost$gene_names
-spikein <- grep('ERCC', gene_names)
-gene_names <- gene_names[-spikein]
-data <- GSE67602_Joost$data[-spikein,]
-```
 
-Apply number of features and exclusion threshold
+# similarity_data <- counts(cache$filtered[1:1000,1:100])
+# all_data <- counts(cache$qc[1:1000,1:100])
 
-```{r, results='asis'}
-logdata <- log10(data + 1)
-gene_expression_threshold <- 0.03
-n_features <- 3000
-filtered_data <- SelectData(logdata, gene_expression_threshold, n_features)
 ```
 
 ## Compute the Similarity Matrix
@@ -57,7 +51,7 @@ Run L2R2 on the processed data, outputting the number of iterations and value of
 
 ```{r, results='asis', results='hide'}
 S <- SimilarityM(lambda = 0.05, 
-                 data = filtered_data$M_variable,
+                 data = similarity_data,
                  dims = 3,
                  pre_embed_method = 'tsne',
                  perplexity = 20, 
@@ -69,56 +63,28 @@ Compute distances on the similarity matrix.  If the truncated graph has multiple
 
 ```{r, results='asis'}
 low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
-                            flat_embedding_method = 'tsne',
-                            join_components = FALSE,
-                            perplexity = 35,
-                            theta = 0.5,
-                            normalize = FALSE,
-                            pca = TRUE,
-                            pca_center = TRUE,
-                            pca_scale = TRUE,
-                            dims = 2,
-                            initial_dims = 2)
+                                      flat_embedding_method = 'tsne',
+                                      join_components = FALSE,
+                                      perplexity = 35,
+                                      theta = 0.5,
+                                      normalize = FALSE,
+                                      pca = TRUE,
+                                      pca_center = TRUE,
+                                      pca_scale = TRUE,
+                                      dims = 2,
+                                      initial_dims = 2)
 ```
 
 ## Cluster the Cells
 
-Infer cluster number using spectra of the ensemble Laplacian.
+Cluster the cells by factoring the similarity matrix.  Infer cluster number using spectra of the ensemble Laplacian. In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap.  We take this value as the cluster number here.
 
-```{r, results='asis'}
-clusters <- CountClusters(data = S$W, n_comp = 15)
-n_clusters <- clusters$upper_bound
+```{r, results='asis', message=FALSE, warning=FALSE}
+clusters <- ClusterCells(similarityMatrix = S$W, n_comp = 10, .options='p')
+H <- clusters$H
+labels <- clusters$labels
+n_clusters <- length(unique(clusters$labels))
 ```
-
-In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap.  We take this value as the cluster number here.
-
-```{r, results='asis'}
-plot(c(1:20), 
-     clusters$eigs$val[1:20],
-     xlab = NA,
-     ylab = 'eigenvalues',
-     main = 'Eigenvalues of the Graph Laplacian')
-```
-
-
-Factor the similarity matrix such that W = HxH', using the computed cluster number for the rank of H.
-
-```{r, results='asis', warning=FALSE}
-output_NMF <- NMF::nmf(x = Matrix::as.matrix(S$W),
-              rank = n_clusters,
-              method = 'lee',
-              seed = 'nndsvd',
-              .options = 'nP');
-H <- NMF::basis(output_NMF)
-```
-
-Assign cluster labels to the cells.
-
-```{r, results='asis'}
-labels <- apply(H, 1, function(x){
-  which(x == max(x))})
-```
-
 
 ### Visualize the Clusters
 
@@ -131,23 +97,23 @@ colorscale <- colorscale$hex.1.n.
 
 # plot clusters
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
-                         feature = as.factor(labels),
-                         title = "NMF Cluster Labeling",
-                         subtitle = "t-SNE Embedding",
-                         featurename = "Cluster ID",
-                         colorscale = colorscale)
+                   feature = as.factor(labels),
+                   title = "NMF Cluster Labeling",
+                   subtitle = "t-SNE Embedding",
+                   featurename = "Cluster ID",
+                   colorscale = colorscale)
 ```
 
 As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-DII, IFE-KI, IFE-KII were identified by standard techniques.
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-true_labels <- GSE67602_Joost$annotation
+true_labels <- cache$orig$Phenotype
 # plot clusters
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
-                         feature = as.factor(true_labels),
-                         title = "True Labeling",
-                         subtitle = "t-SNE Embedding",
-                         featurename = "Annotated Cell Types")
+                   feature = cache$qc$Phenotype,
+                   title = "True Labeling",
+                   subtitle = "t-SNE Embedding",
+                   featurename = "Annotated Cell Types")
 ```
 
 ## Find cluster marker genes.
@@ -156,24 +122,15 @@ Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the marker
 
 ```{r, fig.width=7, fig.height=7}
 
-markers <- GetMarkerTable(counts_data = list(M_variable = data, gene_use = 1:nrow(data)),
-                          cluster_labels = labels,
-                          H = H,
-                          n_sorted = 25,
-                          gene_names = gene_names,
-                          gene_expression_threshold = 3,
-                          use_H = FALSE, 
-                          lognorm = TRUE)
+  markers <- GetMarkerTable(counts_data = similarity_data,
+                            cluster_labels = labels,
+                            H = H,
+                            n_sorted = 25)
 
-p <- PlotTopN(data = log(data+1),
-         gene_names = gene_names,
-         cluster_labels = labels,
-         markers = markers$all,
-         n_features = 5,
-         y_lsize = 10,
-         y_tsize = 10,
-         x_lsize = 10,
-         x_tsize = 10)
+p <- PlotTopN(data = similarity_data,
+              cluster_labels = labels,
+              markers = markers$all,
+              n_features = 15)
 ```
 
 ## Pseudotime Inference
@@ -231,7 +188,7 @@ Plot Expression of Krt14, Krt10, and Lor in t-SNE Space:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 gene_index <- which(gene_names == 'Krt14')
-data_gene <- logdata[gene_index,]
+data_gene <- similarity_data[gene_index,]
 
 # plot features
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
@@ -243,7 +200,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 gene_index <- which(gene_names == 'Krt10')
-data_gene <- logdata[gene_index,]
+data_gene <- similarity_data[gene_index,]
 
 # plot features
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
@@ -255,7 +212,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
 gene_index <- which(gene_names == 'Lor')
-data_gene <- logdata[gene_index,]
+data_gene <- similarity_data[gene_index,]
 
 # plot features
 FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
@@ -270,7 +227,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 Violin Plot of Krt14 expression.  Note strong expression of the basal compartment:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-  plot(ViolinPlotExpression(data = logdata,
+  plot(ViolinPlotExpression(data = similarity_data,
                        gene_names = gene_names,
                        labels = labels,
                        gene_name = "Krt14"))
@@ -278,7 +235,7 @@ Violin Plot of Krt14 expression.  Note strong expression of the basal compartmen
 Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/DII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-  plot(ViolinPlotExpression(data = logdata,
+  plot(ViolinPlotExpression(data = similarity_data,
                        gene_names = gene_names,
                        labels = labels,
                        gene_name = "Krt10"))
@@ -286,7 +243,7 @@ Violin Plot of Krt10 expression.  Note uniformly high expression in the IFE-DI/D
 Violin Plot of Lor expression.  Note strong expression in the terminally differentiated IFE-KI/KII compartments:
 
 ```{r, results='asis', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
-  plot(ViolinPlotExpression(data = logdata,
+  plot(ViolinPlotExpression(data = similarity_data,
                        gene_names = gene_names,
                        labels = labels,
                        gene_name = "Lor"))
@@ -304,7 +261,7 @@ lig_rec_path <- system.file("extdata", "tgfb_lig_rec.tsv", package = "RSoptSC")
 rec_target_path <- system.file("extdata", "tgfb_rec_target_both.tsv", package = "RSoptSC")
 pathway <- ImportPathway(lig_table_path = lig_rec_path,
                          rec_table_path = rec_target_path,
-                         data = logdata,
+                         data = similarity_data,
                          gene_names = gene_names)
 
 
@@ -315,7 +272,7 @@ pathway$pathway %>% kable() %>% kable_styling()
 
 ```{r, results='hide', out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7, message=FALSE}
   
-  Pmats <- GetSignalingPartners(logdata,
+  Pmats <- GetSignalingPartners(similarity_data,
                                 gene_names,
                                 pathway$pathway_removed)
 ```
@@ -353,8 +310,7 @@ Visualize the expression of ligand/receptor and up/down target expression across
                 'Tgfbr1', 'Tgfbr2',
                 'Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')
 
-  PlotClusterExpression(data = logdata,
-                        gene_names = gene_names,
+  PlotClusterExpression(data = similarity_data,
                         cluster_labels = labels, 
                         markers = gene_list)
 ```

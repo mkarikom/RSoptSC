@@ -26,6 +26,8 @@ LoadData <- function(d_f,
   genes <- read.csv(gene_f)
   cells <- read.csv(cell_f)
   annotations <- read.csv(annotation_f)
+  rownames(datas) <- genes$x
+  colnames(datas) <- cells$x
     
   list(cell_names = as.vector(cells[,2]),
        gene_names = as.vector(genes[,2]),
