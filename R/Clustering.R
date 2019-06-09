@@ -12,6 +12,7 @@
 #'     \item{labels}{the cluster labels}
 #'
 #' @importFrom NMF basis nmf seed
+#' @importFrom Matrix as.matrix
 #'
 #' @export
 #'
@@ -19,13 +20,12 @@ ClusterCells <- function(similarityMatrix = NULL,
                          n_clusters = NULL,
                          n_comp = 3,
                          ...){
-  
   if(is.null(n_clusters)){
     clusters <- CountClusters(data = similarityMatrix, n_comp = n_comp)
     n_clusters <- clusters$upper_bound
   }
   
-  output_NMF <- nmf(x = S$W,
+  output_NMF <- nmf(x = as.matrix(similarityMatrix),
                    rank = n_clusters,
                    method = 'lee',
                    seed = 'nndsvd',

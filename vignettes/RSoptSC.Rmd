@@ -65,58 +65,31 @@ S <- SimilarityM(lambda = 0.05,
                  pca_scale = TRUE)
 ```
 
-Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
+Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to allow inter-cluster distance estimation.
 
 ```{r, results='asis'}
 low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
-                            flat_embedding_method = 'tsne',
-                            join_components = FALSE,
-                            perplexity = 35,
-                            theta = 0.5,
-                            normalize = FALSE,
-                            pca = TRUE,
-                            pca_center = TRUE,
-                            pca_scale = TRUE,
-                            dims = 2,
-                            initial_dims = 2)
+                                      flat_embedding_method = 'tsne',
+                                      join_components = TRUE,
+                                      perplexity = 35,
+                                      theta = 0.5,
+                                      normalize = FALSE,
+                                      pca = TRUE,
+                                      pca_center = TRUE,
+                                      pca_scale = TRUE,
+                                      dims = 2,
+                                      initial_dims = 2)
 ```
 
 ## Cluster the Cells
 
-Infer cluster number using spectra of the ensemble Laplacian.
+Cluster the cells by factoring the similarity matrix.  Infer cluster number using spectra of the ensemble Laplacian. In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap.  We take this value as the cluster number.
 
-```{r, results='asis'}
-clusters <- CountClusters(data = S$W, n_comp = 15)
-n_clusters <- clusters$upper_bound
-```
-
-In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap.  We take this value as the cluster number here.
-
-```{r, results='asis'}
-plot(c(1:20), 
-     clusters$eigs$val[1:20],
-     xlab = NA,
-     ylab = 'eigenvalues',
-     main = 'Eigenvalues of the Graph Laplacian')
-```
-
-
-Factor the similarity matrix such that W = HxH', using the computed cluster number for the rank of H.
-
-```{r, results='asis', warning=FALSE}
-output_NMF <- NMF::nmf(x = Matrix::as.matrix(S$W),
-              rank = n_clusters,
-              method = 'lee',
-              seed = 'nndsvd',
-              .options = 'nP');
-H <- NMF::basis(output_NMF)
-```
-
-Assign cluster labels to the cells.
-
-```{r, results='asis'}
-labels <- apply(H, 1, function(x){
-  which(x == max(x))})
+```{r, results='asis', message=FALSE, warning=FALSE}
+clusters <- ClusterCells(similarityMatrix = S$W, n_comp = 15, .options='p')
+H <- clusters$H
+labels <- clusters$labels
+n_clusters <- length(unique(clusters$labels))
 ```
 
 
@@ -155,25 +128,15 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters.  We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters.  The top six markers selected as described in Wang et. al.  As expected, markers Krt14, Krt10, and Lor are inferred for clusters overlapping with IHC-based Basal, Differentiated (IFE-DI, IFE-DII), and Keratinized (IFE-KI, IFE-KII) cell annotations.   
 
 ```{r, fig.width=7, fig.height=7}
+markers <- GetMarkerTable(counts_data = logdata,
+                            cluster_labels = labels,
+                            H = H,
+                            n_sorted = 25)
 
-markers <- GetMarkerTable(counts_data = list(M_variable = data, gene_use = 1:nrow(data)),
-                          cluster_labels = labels,
-                          H = H,
-                          n_sorted = 25,
-                          gene_names = gene_names,
-                          gene_expression_threshold = 3,
-                          use_H = FALSE, 
-                          lognorm = TRUE)
-
-p <- PlotTopN(data = log(data+1),
-         gene_names = gene_names,
-         cluster_labels = labels,
-         markers = markers$all,
-         n_features = 5,
-         y_lsize = 10,
-         y_tsize = 10,
-         x_lsize = 10,
-         x_tsize = 10)
+p <- PlotTopN_Grid(data = logdata,
+              cluster_labels = labels,
+              markers = markers$all,
+              n_features = 15)
 ```
 
 ## Pseudotime Inference
@@ -348,13 +311,12 @@ Directional plot of cluster-to-cluster signaling.  The root of the directional c
 
 Visualize the expression of ligand/receptor and up/down target expression across clusters
 
-```{r, results='asis', warning=FALSE, message= FALSE, out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', warning=FALSE, message= FALSE, out.width = '100%', out.height = '100%', fig.width = 4, fig.heigt = 4}
   gene_list = c('Tgfb1', 'Tgfb2', 
                 'Tgfbr1', 'Tgfbr2',
                 'Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')
 
-  PlotClusterExpression(data = logdata,
-                        gene_names = gene_names,
+  p <- PlotClusterExpression(data = logdata,
                         cluster_labels = labels, 
                         markers = gene_list)
 ```

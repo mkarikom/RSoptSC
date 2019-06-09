@@ -91,7 +91,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/Joost_et_al.html">Clustering Pseudotime Inference on Skin Cell scRNA-seq</a>
+      <a href="../articles/QC_SSC.html">Direct Download from GEO with Annotation for Skin Cell scRNA-seq</a>
     </li>
   </ul>
 </li>
@@ -129,12 +129,12 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>PlotTopN</span>(<span class='no'>data</span>, <span class='no'>gene_names</span>, <span class='no'>cluster_labels</span>, <span class='no'>markers</span>, <span class='no'>n_features</span>,
-  <span class='kw'>y_lsize</span> <span class='kw'>=</span> (<span class='fl'>120</span>/(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>)) * <span class='no'>n_features</span>)) * <span class='fl'>5</span>,
-  <span class='kw'>y_tsize</span> <span class='kw'>=</span> (<span class='fl'>120</span>/(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>)) * <span class='no'>n_features</span>)) * <span class='fl'>15</span>,
-  <span class='kw'>x_lsize</span> <span class='kw'>=</span> (<span class='fl'>120</span>/(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>)) * <span class='no'>n_features</span>)) * <span class='fl'>14</span>,
-  <span class='kw'>x_tsize</span> <span class='kw'>=</span> (<span class='fl'>120</span>/(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>)) * <span class='no'>n_features</span>)) * <span class='fl'>15</span>,
-  <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>PlotTopN</span>(<span class='no'>data</span>, <span class='no'>cluster_labels</span>, <span class='no'>markers</span>, <span class='no'>n_features</span>,
+  <span class='kw'>y_lsize</span> <span class='kw'>=</span> ((<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>)) * <span class='no'>n_features</span>)/<span class='fl'>120</span>) * <span class='fl'>5</span>,
+  <span class='kw'>y_tsize</span> <span class='kw'>=</span> ((<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>)) * <span class='no'>n_features</span>)/<span class='fl'>120</span>) * <span class='fl'>15</span>,
+  <span class='kw'>x_lsize</span> <span class='kw'>=</span> ((<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>)) * <span class='no'>n_features</span>)/<span class='fl'>120</span>) * <span class='fl'>14</span>,
+  <span class='kw'>x_tsize</span> <span class='kw'>=</span> ((<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>)) * <span class='no'>n_features</span>)/<span class='fl'>120</span>) * <span class='fl'>15</span>,
+  <span class='kw'>use_z</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -142,10 +142,6 @@
     <tr>
       <th>data</th>
       <td><p>expression data with genes x cells</p></td>
-    </tr>
-    <tr>
-      <th>gene_names</th>
-      <td><p>a vector of symbolic gene names corresponding to the rows in the data matrix</p></td>
     </tr>
     <tr>
       <th>cluster_labels</th>
@@ -176,8 +172,8 @@
       <td><p>x axis title size</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>extra args to heatmap.2</p></td>
+      <th>use_z</th>
+      <td><p>use z-score per gene instead of raw expression</p></td>
     </tr>
     </table>
     

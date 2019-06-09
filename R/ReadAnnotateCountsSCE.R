@@ -17,14 +17,18 @@
 #' @param GEOfilecache location for caching series supplemental files, default is current directory
 #' @param annotation_db annotation package for the data, eg "org.Mm.eg.db"
 #' @param feature_annotation_key the key for annotation.db lookups, eg "SYMBOL"
-#' @param pheno_title the name of the phenotype to add to sce, gotten from metad_title
 #' @param pheno_filter a vector of strings to partially match cell metadata 
 #' @param plot_title path of the saved mean/variance plot, default NULL, if NULL the plot will be printed instead
+#' @param remove_spike_ERCC remove ERCC spike ins after they are used for normalization
+#' @param pre_clust whether or not to precluster the cells before getting size factors
+#' @param rescale whether to compute size factors and rescale counts
+#' @param var_gene_method how to select variable genes, eg 'mean_var', 'pca'.  mean_var selects the genes whose variance is highest after removing the fitted spike-in-based technical variance. pca finds the genes with the max rotation coefficients 
 #' @param ... arguments to called functions
 #' @return a list containing:
 #'     \item{c(seur, sce)}{a seurat or sce object}
 #'
-#' @importFrom SingleCellExperiment isSpike colData rowData
+#' @importFrom SingleCellExperiment isSpike isSpike<- colData rowData SingleCellExperiment logcounts
+#' @importFrom SummarizedExperiment rowData<- colData<- assay assay<-
 #' @importFrom BiocSingular IrlbaParam
 #' @importFrom AnnotationDbi mapIds
 #' @importFrom GEOquery getGEO getGEOSuppFiles
@@ -41,16 +45,18 @@ ReadAnnotateCountsSCE <- function(filepath = NULL,
                         series_accession,
                         metad_title = 'characteristics_ch1',
                         cell_id = 'title',
-                        pheno_title = 'Phenotype',
                         pheno_filter = NULL,
                         plot_title = NULL,
                         GEOfilecache = getwd(),
                         annotation_db,
                         feature_annotation_key,
+                        remove_spike_ERCC = FALSE,
+                        pre_clust = FALSE,
+                        rescale = TRUE,
+                        var_gene_method = 'mean_var',
                         ...) {
-  
-  #GSE67602 <- getGEO('GSE67602', destdir="~/Desktop/")
-  #metadata <- pData(GSE67602$GSE67602_series_matrix.txt.gz)
+
+  x = NULL
   # get metadata
   series <- getGEO(series_accession, GSEMatrix = TRUE) # 'GSE67602'
   pheno <- cbind(pData(series[[1]])[eval(cell_id)],
@@ -65,7 +71,7 @@ ReadAnnotateCountsSCE <- function(filepath = NULL,
   }))
   
   sce <- SingleCellExperiment(list(counts=as.matrix(counts)))
-  colData(sce)[,eval(pheno_title)] <- pheno[,eval(metad_title)]
+  sce$Phenotype <- pheno[,eval(metad_title)]
   if(!is.null(pheno_filter)){
     matches <- unique(grep(paste(pheno_filter,collapse="|"),
                            sce$Phenotype,value=FALSE))
@@ -86,6 +92,8 @@ ReadAnnotateCountsSCE <- function(filepath = NULL,
     SYMBOL <- mapIds(get(annotation_db), keys=rownames(sce),
                       column="SYMBOL", keytype=feature_annotation_key)
     rowData(sce)$SYMBOL <- SYMBOL
+    rownames(sce) <- SYMBOL
+    isSpike(sce, "ERCC") <- grepl("^ERCC", rownames(sce))
   }
 
   
@@ -115,7 +123,6 @@ ReadAnnotateCountsSCE <- function(filepath = NULL,
   sce.orig <- sce
   sce <- sce[,keep]
   
-  browser()
   # filter out lowly expressed genes
   # this removes unexpressed genes from sce, and creates a second filtered where avg expressio for all genes is > 1
   
@@ -132,31 +139,61 @@ ReadAnnotateCountsSCE <- function(filepath = NULL,
 
   
   # spike in based normalization
-  clusters <- quickCluster(sce, use.ranks=FALSE, BSPARAM=IrlbaParam())
-  sce <- computeSumFactors(sce, cluster=clusters, min.mean=0.1)
-  sce <- computeSumFactors(sce)
-  sce <- computeSpikeFactors(sce, type="ERCC", general.use=FALSE)
-  sce <- normalize(sce)
+  if(pre_clust){
+    clusters <- quickCluster(sce, use.ranks=FALSE, BSPARAM=IrlbaParam())
+  }else{
+    clusters <- NULL
+  }
+
+  if(rescale){
+    sce <- computeSumFactors(sce, cluster=clusters, min.mean=0.1)
+    sce <- computeSpikeFactors(sce, type="ERCC", general.use=FALSE)
+    sce <- normalize(sce)
+  }else{
+    assay(sce, 'logcounts') <- log2(counts(sce) + 1)
+  }
+
   var.fit <- trendVar(sce, parametric=TRUE,loess.args=list(span=0.3))
   var.out <- decomposeVar(sce, var.fit)
+  dec.bio <- order(var.out$bio, decreasing=TRUE)
+  dec.bio.genes <- rownames(sce)[dec.bio]
+
+  # remove spike ins prior to downstream analysis
+  if(remove_spike_ERCC){
+    ind <- which(rowData(sce)$is_feature_control_ERCC)
+    sce <- sce[-ind,]
+  }
   
   # variable gene selection
-  chosen.genes <- order(var.out$bio, decreasing=TRUE)
-  
-  if(!is.null(plot_title)){
-    cairo_ps(plot_title, width = 5, height = 4)
+  if(var_gene_method == 'mean_var'){
+    chosen.genes.names <- dec.bio.genes
+    chosen.genes.ind <- match(dec.bio.genes, rownames(sce))
+    chosen.genes.ind <- chosen.genes.ind[!is.na(chosen.genes.ind)]
+    chosen.genes <- list(names = chosen.genes.names, ind = chosen.genes.ind)
+    
+    if(!is.null(plot_title)){
+      cairo_ps(plot_title, width = 5, height = 4)
       plot(var.out$mean, var.out$total, pch=16, cex=0.6, xlab="Mean log-expression", 
            ylab="Variance of log-expression")
       curve(var.fit$trend(x), col="dodgerblue", lwd=2, add=TRUE)
       cur.spike <- isSpike(sce)
       points(var.out$mean[cur.spike], var.out$total[cur.spike], col="red", pch=16)
-    dev.off()
-  } else {
-    plot(var.out$mean, var.out$total, pch=16, cex=0.6, xlab="Mean log-expression", 
-         ylab="Variance of log-expression")
-    curve(var.fit$trend(x), col="dodgerblue", lwd=2, add=TRUE)
-    cur.spike <- isSpike(sce)
-    points(var.out$mean[cur.spike], var.out$total[cur.spike], col="red", pch=16)
+      dev.off()
+    } else {
+      plot(var.out$mean, var.out$total, pch=16, cex=0.6, xlab="Mean log-expression", 
+           ylab="Variance of log-expression")
+      curve(var.fit$trend(x), col="dodgerblue", lwd=2, add=TRUE)
+      cur.spike <- isSpike(sce)
+      points(var.out$mean[cur.spike], var.out$total[cur.spike], col="red", pch=16)
+    }
+  }else if(var_gene_method == 'varimax'){
+    pr <- prcomp(t(logcounts(sce)))
+    coef <- pr$rotation[,1:5]
+    max_coef <- apply(coef, 1, max)
+    ord <- order(max_coef, decreasing = TRUE)
+    chosen.genes.ind <- ord
+    chosen.genes.names <- rownames(sce)[ord]
+    chosen.genes <- list(names = chosen.genes.names, ind = chosen.genes.ind)
   }
   
   return(list(orig = sce.orig, qc = sce, 

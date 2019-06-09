@@ -9,7 +9,7 @@ PlotTopN(data, cluster_labels, markers, n_features,
   y_tsize = ((length(unique(cluster_labels)) * n_features)/120) * 15,
   x_lsize = ((length(unique(cluster_labels)) * n_features)/120) * 14,
   x_tsize = ((length(unique(cluster_labels)) * n_features)/120) * 15,
-  ...)
+  use_z = TRUE)
 }
 \arguments{
 \item{data}{expression data with genes x cells}
@@ -28,9 +28,7 @@ PlotTopN(data, cluster_labels, markers, n_features,
 
 \item{x_tsize}{x axis title size}
 
-\item{...}{extra args to heatmap.2}
-
-\item{gene_names}{a vector of symbolic gene names corresponding to the rows in the data matrix}
+\item{use_z}{use z-score per gene instead of raw expression}
 }
 \value{
 a ggplot2 plot object

@@ -91,7 +91,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/Joost_et_al.html">Clustering Pseudotime Inference on Skin Cell scRNA-seq</a>
+      <a href="../articles/QC_SSC.html">Direct Download from GEO with Annotation for Skin Cell scRNA-seq</a>
     </li>
   </ul>
 </li>
@@ -129,7 +129,14 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>PlotClusterExpression</span>(<span class='no'>data</span>, <span class='no'>gene_names</span>, <span class='no'>cluster_labels</span>, <span class='no'>markers</span>)</pre>
+    <pre class="usage"><span class='fu'>PlotClusterExpression</span>(<span class='no'>data</span>, <span class='no'>cluster_labels</span>,
+  <span class='kw'>y_lsize</span> <span class='kw'>=</span> (<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>))/<span class='fl'>8</span>) * <span class='fl'>7</span>,
+  <span class='kw'>y_tsize</span> <span class='kw'>=</span> (<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>))/<span class='fl'>8</span>) * <span class='fl'>7</span>,
+  <span class='kw'>x_lsize</span> <span class='kw'>=</span> (<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>))/<span class='fl'>8</span>) * <span class='fl'>7</span>,
+  <span class='kw'>x_tsize</span> <span class='kw'>=</span> (<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>))/<span class='fl'>8</span>) * <span class='fl'>7</span>,
+  <span class='kw'>lti_size</span> <span class='kw'>=</span> (<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>))/<span class='fl'>8</span>) * <span class='fl'>7</span>,
+  <span class='kw'>lt_size</span> <span class='kw'>=</span> (<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>cluster_labels</span>))/<span class='fl'>8</span>) * <span class='fl'>7</span>, <span class='no'>markers</span>,
+  <span class='kw'>use_z</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,16 +146,40 @@
       <td><p>expression data with genes x cells</p></td>
     </tr>
     <tr>
-      <th>gene_names</th>
-      <td><p>a vector of symbolic gene names corresponding to the rows in the data matrix</p></td>
-    </tr>
-    <tr>
       <th>cluster_labels</th>
       <td><p>a vector of cluster labels corresponding to the columns in the data matrix</p></td>
     </tr>
     <tr>
+      <th>y_lsize</th>
+      <td><p>y axis label size</p></td>
+    </tr>
+    <tr>
+      <th>y_tsize</th>
+      <td><p>y axis title size</p></td>
+    </tr>
+    <tr>
+      <th>x_lsize</th>
+      <td><p>x axis label size</p></td>
+    </tr>
+    <tr>
+      <th>x_tsize</th>
+      <td><p>x axis title size</p></td>
+    </tr>
+    <tr>
+      <th>lti_size</th>
+      <td><p>size of legend title</p></td>
+    </tr>
+    <tr>
+      <th>lt_size</th>
+      <td><p>size of legend text</p></td>
+    </tr>
+    <tr>
       <th>markers</th>
       <td><p>a vector of markers</p></td>
+    </tr>
+    <tr>
+      <th>use_z</th>
+      <td><p>use z-score per gene instead of raw expression</p></td>
     </tr>
     </table>
     

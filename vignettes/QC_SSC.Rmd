@@ -1,10 +1,10 @@
 ---
-title: "Clustering Pseudotime Inference on Skin Cell scRNA-seq"
+title: "Direct Download from GEO with Annotation for Skin Cell scRNA-seq"
 author: "Matt Karikomi"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Clustering Pseudotime Inference on Skin Cell scRNA-seq}
+  %\VignetteIndexEntry{Direct Download from GEO with Annotation for Skin Cell scRNA-seq}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -24,24 +24,23 @@ This is an example of clustering, marker identification and pseudotime inference
 
 A matrix of counts with rows as genes and columns as cells must be provided.  Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files.  Here we load example data from NCBI GEO (GSE67602) originally published in Joost et al 2016.
 
-```{r, results='asis'}
+```{r, results='asis',message=FALSE, warning=FALSE}
+library(SingleCellExperiment)
 library(org.Mm.eg.db)
 library(RSoptSC)
+
+# filter epidermis based on GEO metadata
+pheno = c('IFE-B','IFE-DI','IFE-DII','IFE-KI','IFE-KII')
 upper <- 10000 # number of variable genes
 cache <- ReadAnnotateCountsSCE(series_accession = 'GSE67602', GEOfilecache = '/tmp/', 
-                               pheno_filter = c('IFE-B','IFE-DI','IFE-DII','IFE-KI','IFE-KII'),
+                               pheno_filter = pheno,
                                annotation_db = 'org.Mm.eg.db',
-                               feature_annotation_key = "SYMBOL")
-# which cells are epidermis
-
-#similarity_data <- logcounts(cache$pheno[cache$vargenes[1:upper],])
+                               feature_annotation_key = "SYMBOL",
+                               pre_clust = TRUE,
+                               rescale = TRUE)
 all_data <- logcounts(cache$qc)
-similarity_data <- logcounts(cache$qc)
+similarity_data <- logcounts(cache$qc[cache$vargenes$ind[1:upper],])
 gene_names <- rownames(similarity_data)
-
-
-# similarity_data <- counts(cache$filtered[1:1000,1:100])
-# all_data <- counts(cache$qc[1:1000,1:100])
 
 ```
 
@@ -49,7 +48,7 @@ gene_names <- rownames(similarity_data)
 
 Run L2R2 on the processed data, outputting the number of iterations and value of the objective.
 
-```{r, results='asis', results='hide'}
+```{r, results='asis'}
 S <- SimilarityM(lambda = 0.05, 
                  data = similarity_data,
                  dims = 3,
@@ -59,12 +58,12 @@ S <- SimilarityM(lambda = 0.05,
                  pca_scale = TRUE)
 ```
 
-Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to improve inter-cluster distance estimation.
+Compute distances on the similarity matrix.  If the truncated graph has multiple components, join them to allow inter-cluster distance estimation.
 
 ```{r, results='asis'}
 low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
                                       flat_embedding_method = 'tsne',
-                                      join_components = FALSE,
+                                      join_components = TRUE,
                                       perplexity = 35,
                                       theta = 0.5,
                                       normalize = FALSE,
@@ -77,10 +76,10 @@ low_dim_mapping <- RepresentationMap(similarity_matrix = S$W,
 
 ## Cluster the Cells
 
-Cluster the cells by factoring the similarity matrix.  Infer cluster number using spectra of the ensemble Laplacian. In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap.  We take this value as the cluster number here.
+Cluster the cells by factoring the similarity matrix.  Infer cluster number using spectra of the ensemble Laplacian. In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap.  We take this value as the cluster number.
 
 ```{r, results='asis', message=FALSE, warning=FALSE}
-clusters <- ClusterCells(similarityMatrix = S$W, n_comp = 10, .options='p')
+clusters <- ClusterCells(similarityMatrix = S$W, n_comp = 15, .options='p')
 H <- clusters$H
 labels <- clusters$labels
 n_clusters <- length(unique(clusters$labels))
@@ -127,7 +126,7 @@ Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the marker
                             H = H,
                             n_sorted = 25)
 
-p <- PlotTopN(data = similarity_data,
+p <- PlotTopN_Grid(data = similarity_data,
               cluster_labels = labels,
               markers = markers$all,
               n_features = 15)
@@ -305,12 +304,12 @@ Directional plot of cluster-to-cluster signaling.  The root of the directional c
 
 Visualize the expression of ligand/receptor and up/down target expression across clusters
 
-```{r, results='asis', warning=FALSE, message= FALSE, out.width = '100%', out.height = '100%', fig.width = 7, fig.heigt = 7}
+```{r, results='asis', warning=FALSE, message= FALSE, out.width = '100%', out.height = '100%', fig.width = 4, fig.heigt = 4}
   gene_list = c('Tgfb1', 'Tgfb2', 
                 'Tgfbr1', 'Tgfbr2',
                 'Zeb2','Smad2','Wnt4','Wnt11','Bmp7','Sox9','Notch1')
 
-  PlotClusterExpression(data = similarity_data,
+  p <- PlotClusterExpression(data = all_data,
                         cluster_labels = labels, 
                         markers = gene_list)
 ```

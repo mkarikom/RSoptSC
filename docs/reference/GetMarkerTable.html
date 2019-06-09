@@ -91,7 +91,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/Joost_et_al.html">Clustering Pseudotime Inference on Skin Cell scRNA-seq</a>
+      <a href="../articles/QC_SSC.html">Direct Download from GEO with Annotation for Skin Cell scRNA-seq</a>
     </li>
   </ul>
 </li>
@@ -130,15 +130,14 @@
     </div>
 
     <pre class="usage"><span class='fu'>GetMarkerTable</span>(<span class='no'>counts_data</span>, <span class='no'>cluster_labels</span>, <span class='kw'>H</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>n_sorted</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='no'>gene_names</span>, <span class='kw'>gene_expression_threshold</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>use_H</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>lognorm</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>gene_expression_threshold</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>use_H</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>lognorm</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>counts_data</th>
-      <td><p>a matrix of expression values for each cell (rows) and gene (columns) which will be normalized and</p></td>
+      <td><p>a matrix of expression values for each cell (rows) and gene (columns)</p></td>
     </tr>
     <tr>
       <th>cluster_labels</th>
@@ -154,17 +153,9 @@ by which cell i belongs to the jth cluster</p></td>
       <td><p>the number of markers to report in the n_sorted table</p></td>
     </tr>
     <tr>
-      <th>gene_names</th>
-      <td><p>gene symbols corresponding to rows in counts_data (this should match rows of M, if provided)</p></td>
-    </tr>
-    <tr>
       <th>gene_expression_threshold</th>
       <td><p>for n cells, for <code>gene_expression_threshold</code> = m, dont consider genes
 expressed in more than n-m cells or genes expressed in less than m cells</p></td>
-    </tr>
-    <tr>
-      <th>n_features</th>
-      <td><p>number of marker genes per cluster to retrieve</p></td>
     </tr>
     <tr>
       <th>use_H</th>

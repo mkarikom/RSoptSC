@@ -7,8 +7,10 @@
 ReadAnnotateCountsSCE(filepath = NULL, inf_exp_rate = 0,
   inf_gene_count = 0, inf_cell_count = 0, series_accession,
   metad_title = "characteristics_ch1", cell_id = "title",
-  pheno_title = "Phenotype", pheno_filter = NULL, plot_title = NULL,
-  GEOfilecache = getwd(), ...)
+  pheno_filter = NULL, plot_title = NULL, GEOfilecache = getwd(),
+  annotation_db, feature_annotation_key, remove_spike_ERCC = FALSE,
+  pre_clust = FALSE, rescale = TRUE, var_gene_method = "mean_var",
+  ...)
 }
 \arguments{
 \item{filepath}{the full or relative (to the workspace) path of the data file}
@@ -25,13 +27,23 @@ ReadAnnotateCountsSCE(filepath = NULL, inf_exp_rate = 0,
 
 \item{cell_id}{the series accession code, eg "GSE67602"}
 
-\item{pheno_title}{the name of the phenotype to add to sce, gotten from metad_title}
-
 \item{pheno_filter}{a vector of strings to partially match cell metadata}
 
 \item{plot_title}{path of the saved mean/variance plot, default NULL, if NULL the plot will be printed instead}
 
 \item{GEOfilecache}{location for caching series supplemental files, default is current directory}
+
+\item{annotation_db}{annotation package for the data, eg "org.Mm.eg.db"}
+
+\item{feature_annotation_key}{the key for annotation.db lookups, eg "SYMBOL"}
+
+\item{remove_spike_ERCC}{remove ERCC spike ins after they are used for normalization}
+
+\item{pre_clust}{whether or not to precluster the cells before getting size factors}
+
+\item{rescale}{whether to compute size factors and rescale counts}
+
+\item{var_gene_method}{how to select variable genes, eg 'mean_var', 'pca'.  mean_var selects the genes whose variance is highest after removing the fitted spike-in-based technical variance. pca finds the genes with the max rotation coefficients}
 
 \item{...}{arguments to called functions}
 }
