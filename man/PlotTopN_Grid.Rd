@@ -33,7 +33,7 @@ PlotTopN_Grid(data, cluster_labels, markers, n_features,
 \item{spacing}{the number of lines between grids}
 }
 \value{
-a ggplot2 plot object
+as heatmap
 }
 \description{
 Plot the heatmap of the top n inferred markers for each cluster.

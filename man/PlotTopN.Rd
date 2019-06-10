@@ -31,7 +31,7 @@ PlotTopN(data, cluster_labels, markers, n_features,
 \item{use_z}{use z-score per gene instead of raw expression}
 }
 \value{
-a ggplot2 plot object
+a heatmap
 }
 \description{
 Plot the heatmap of the top n inferred markers for each cluster.

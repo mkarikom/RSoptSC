@@ -10,6 +10,7 @@
 #' @return a list containing 
 #'     \item{H}{the cluster weight matrix, the factorization of the similarity matrix}
 #'     \item{labels}{the cluster labels}
+#'     \item{ensemble}{results of model selection}
 #'
 #' @importFrom NMF basis nmf seed
 #' @importFrom Matrix as.matrix
@@ -36,12 +37,13 @@ ClusterCells <- function(similarityMatrix = NULL,
     which(x == max(x))})
   
   return(list(H = H, 
-              labels = labels))
+              labels = labels,
+              ensemble = clusters))
 }
 
 #' Use clustering consensus to infer cluster number
 #' 
-#' Use clustering consensus to infer cluster number.  Plot the the eigenvalue spacing.
+#' Use clustering consensus to infer cluster number.
 #'
 #' @param data a symmetric nonnegative similarity matrix
 #' @param tol  cutoff for lambda zero
@@ -74,12 +76,6 @@ CountClusters <- function(data, tol = 0.01, range = 2:20, eigengap = TRUE, n_com
   
   # compute the number of zero eigenvalues
   lower_bound <- length(eigs$val[which(eigs$val <= tol)])
-  
-  plot(c(1:20), 
-       eigs$val[1:20],
-       xlab = NA,
-       ylab = 'eigenvalues',
-       main = 'Eigenvalues of the Graph Laplacian')
   
   return(list(upper_bound = upper_bound, 
               lower_bound = lower_bound,

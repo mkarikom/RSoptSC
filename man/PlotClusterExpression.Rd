@@ -35,7 +35,7 @@ PlotClusterExpression(data, cluster_labels,
 \item{use_z}{use z-score per gene instead of raw expression}
 }
 \value{
-nothing
+a grid plot
 }
 \description{
 Given a set of markers, plot their expression across clusters on a heatmap.

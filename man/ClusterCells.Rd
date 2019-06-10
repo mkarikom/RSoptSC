@@ -20,6 +20,7 @@ ClusterCells(similarityMatrix = NULL, n_clusters = NULL, n_comp = 3,
 a list containing 
     \item{H}{the cluster weight matrix, the factorization of the similarity matrix}
     \item{labels}{the cluster labels}
+    \item{ensemble}{results of model selection}
 }
 \description{
 Use NMF to cluster the cells.  Currently, the Lee and Seung algorithm is implemented via a call to renozao/NMF.  If cluster-number is inferred then output relevent diagnostics (eg the eigenvalue spaceing of the ensemble method).

@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">RSoptSC</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
       </span>
     </div>
 
@@ -61,13 +61,6 @@
     </li>
   </ul>
 </li>
-<li>
-  <a href="https://github.com/mkarikom/RSoptSC">
-    <span class="fa fa-github fa-lg"></span>
-     
-    GitHub
-  </a>
-</li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
 </div>
@@ -94,10 +87,10 @@
     
     
 <p>This is an example of clustering, marker identification and pseudotime inference on a set of skin cells.</p>
-<div id="load-and-preprocess-data" class="section level2">
+<div id="load-and-preprocess-data-download-from-ncbi-via-geo-api" class="section level2">
 <h2 class="hasAnchor">
-<a href="#load-and-preprocess-data" class="anchor"></a>Load and Preprocess Data</h2>
-<p>A matrix of counts with rows as genes and columns as cells must be provided. Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files. Here we load example data from NCBI GEO (GSE67602) originally published in Joost et al 2016.</p>
+<a href="#load-and-preprocess-data-download-from-ncbi-via-geo-api" class="anchor"></a>Load and Preprocess Data (Download from NCBI via GEO API)</h2>
+<p>A matrix of counts with rows as genes and columns as cells must be provided. Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files. Here we load example data (GSE67602) originally published in Joost et al 2016. This is an experimental feature built on top of the excellent GEOquery package by Sean Davis.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(SingleCellExperiment)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(org.Mm.eg.db)</a>
 <a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(RSoptSC)</a>
@@ -145,179 +138,191 @@
 <h2 class="hasAnchor">
 <a href="#cluster-the-cells" class="anchor"></a>Cluster the Cells</h2>
 <p>Cluster the cells by factoring the similarity matrix. Infer cluster number using spectra of the ensemble Laplacian. In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap. We take this value as the cluster number.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">clusters &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ClusterCells.html">ClusterCells</a></span>(<span class="dt">similarityMatrix =</span> S<span class="op">$</span>W, <span class="dt">n_comp =</span> <span class="dv">15</span>, <span class="dt">.options=</span><span class="st">'p'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">clusters &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ClusterCells.html">ClusterCells</a></span>(<span class="dt">similarityMatrix =</span> S<span class="op">$</span>W, <span class="dt">n_comp =</span> <span class="dv">15</span>, <span class="dt">.options=</span><span class="st">'p'</span>)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">H &lt;-<span class="st"> </span>clusters<span class="op">$</span>H</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">labels &lt;-<span class="st"> </span>clusters<span class="op">$</span>labels</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">n_clusters &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(clusters<span class="op">$</span>labels))</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>), </a>
+<a class="sourceLine" id="cb5-7" data-line-number="7">     clusters<span class="op">$</span>ensemble<span class="op">$</span>eigs<span class="op">$</span>val[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>],</a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">     <span class="dt">xlab =</span> <span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb5-9" data-line-number="9">     <span class="dt">ylab =</span> <span class="st">'eigenvalues'</span>,</a>
+<a class="sourceLine" id="cb5-10" data-line-number="10">     <span class="dt">main =</span> <span class="st">'Eigenvalues of the Graph Laplacian'</span>)</a></code></pre></div>
 <p><img src="QC_SSC_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">H &lt;-<span class="st"> </span>clusters<span class="op">$</span>H</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">labels &lt;-<span class="st"> </span>clusters<span class="op">$</span>labels</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">n_clusters &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(clusters<span class="op">$</span>labels))</a></code></pre></div>
 <div id="visualize-the-clusters" class="section level3">
 <h3 class="hasAnchor">
 <a href="#visualize-the-clusters" class="anchor"></a>Visualize the Clusters</h3>
 <p>Cells are labeled by cluster membership and plotted on low-dimensional embedding (t-SNE) of the similarity matrix.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># define a scheme for the coloring.  This is a required parameter for plotting discrete (factor) data</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">colorscale &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ColorHue.html">ColorHue</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(labels)))</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">colorscale &lt;-<span class="st"> </span>colorscale<span class="op">$</span>hex.<span class="fl">1.</span>n.</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co"># plot clusters</span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb7-7" data-line-number="7">                   <span class="dt">feature =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">as.factor</a></span>(labels),</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8">                   <span class="dt">title =</span> <span class="st">"NMF Cluster Labeling"</span>,</a>
-<a class="sourceLine" id="cb7-9" data-line-number="9">                   <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
-<a class="sourceLine" id="cb7-10" data-line-number="10">                   <span class="dt">featurename =</span> <span class="st">"Cluster ID"</span>,</a>
-<a class="sourceLine" id="cb7-11" data-line-number="11">                   <span class="dt">colorscale =</span> colorscale)</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-5-1.png" width="100%" height="100%"></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># define a scheme for the coloring.  This is a required parameter for plotting discrete (factor) data</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">colorscale &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ColorHue.html">ColorHue</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(labels)))</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">colorscale &lt;-<span class="st"> </span>colorscale<span class="op">$</span>hex.<span class="fl">1.</span>n.</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co"># plot clusters</span></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
+<a class="sourceLine" id="cb6-7" data-line-number="7">                   <span class="dt">feature =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">as.factor</a></span>(labels),</a>
+<a class="sourceLine" id="cb6-8" data-line-number="8">                   <span class="dt">title =</span> <span class="st">"NMF Cluster Labeling"</span>,</a>
+<a class="sourceLine" id="cb6-9" data-line-number="9">                   <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
+<a class="sourceLine" id="cb6-10" data-line-number="10">                   <span class="dt">featurename =</span> <span class="st">"Cluster ID"</span>,</a>
+<a class="sourceLine" id="cb6-11" data-line-number="11">                   <span class="dt">colorscale =</span> colorscale)</a></code></pre></div>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
 <p>As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-DII, IFE-KI, IFE-KII were identified by standard techniques.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">true_labels &lt;-<span class="st"> </span>cache<span class="op">$</span>orig<span class="op">$</span>Phenotype</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co"># plot clusters</span></a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb8-4" data-line-number="4">                   <span class="dt">feature =</span> cache<span class="op">$</span>qc<span class="op">$</span>Phenotype,</a>
-<a class="sourceLine" id="cb8-5" data-line-number="5">                   <span class="dt">title =</span> <span class="st">"True Labeling"</span>,</a>
-<a class="sourceLine" id="cb8-6" data-line-number="6">                   <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
-<a class="sourceLine" id="cb8-7" data-line-number="7">                   <span class="dt">featurename =</span> <span class="st">"Annotated Cell Types"</span>)</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-6-1.png" width="100%" height="100%"></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">true_labels &lt;-<span class="st"> </span>cache<span class="op">$</span>orig<span class="op">$</span>Phenotype</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co"># plot clusters</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">                   <span class="dt">feature =</span> cache<span class="op">$</span>qc<span class="op">$</span>Phenotype,</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">                   <span class="dt">title =</span> <span class="st">"True Labeling"</span>,</a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">                   <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">                   <span class="dt">featurename =</span> <span class="st">"Annotated Cell Types"</span>)</a></code></pre></div>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 </div>
 </div>
 <div id="find-cluster-marker-genes-" class="section level2">
 <h2 class="hasAnchor">
 <a href="#find-cluster-marker-genes-" class="anchor"></a>Find cluster marker genes.</h2>
 <p>Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters. We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters. The top six markers selected as described in Wang et. al. As expected, markers Krt14, Krt10, and Lor are inferred for clusters overlapping with IHC-based Basal, Differentiated (IFE-DI, IFE-DII), and Keratinized (IFE-KI, IFE-KII) cell annotations.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"></a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">  markers &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetMarkerTable.html">GetMarkerTable</a></span>(<span class="dt">counts_data =</span> similarity_data,</a>
-<a class="sourceLine" id="cb9-3" data-line-number="3">                            <span class="dt">cluster_labels =</span> labels,</a>
-<a class="sourceLine" id="cb9-4" data-line-number="4">                            <span class="dt">H =</span> H,</a>
-<a class="sourceLine" id="cb9-5" data-line-number="5">                            <span class="dt">n_sorted =</span> <span class="dv">25</span>)</a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb9-7" data-line-number="7">p &lt;-<span class="st"> </span><span class="kw"><a href="../reference/PlotTopN_Grid.html">PlotTopN_Grid</a></span>(<span class="dt">data =</span> similarity_data,</a>
-<a class="sourceLine" id="cb9-8" data-line-number="8">              <span class="dt">cluster_labels =</span> labels,</a>
-<a class="sourceLine" id="cb9-9" data-line-number="9">              <span class="dt">markers =</span> markers<span class="op">$</span>all,</a>
-<a class="sourceLine" id="cb9-10" data-line-number="10">              <span class="dt">n_features =</span> <span class="dv">15</span>)</a>
-<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; Joining, by = "geneSymbol"</span></a>
-<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt; Warning: Column `geneSymbol` joining factors with different levels,</span></a>
-<a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; coercing to character vector</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">markers &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetMarkerTable.html">GetMarkerTable</a></span>(<span class="dt">counts_data =</span> similarity_data,</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">                            <span class="dt">cluster_labels =</span> labels,</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">                            <span class="dt">H =</span> H,</a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">                            <span class="dt">n_sorted =</span> <span class="dv">25</span>)</a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="kw"><a href="../reference/PlotTopN_Grid.html">PlotTopN_Grid</a></span>(<span class="dt">data =</span> similarity_data,</a>
+<a class="sourceLine" id="cb8-8" data-line-number="8">              <span class="dt">cluster_labels =</span> labels,</a>
+<a class="sourceLine" id="cb8-9" data-line-number="9">              <span class="dt">markers =</span> markers<span class="op">$</span>all,</a>
+<a class="sourceLine" id="cb8-10" data-line-number="10">              <span class="dt">n_features =</span> <span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb8-11" data-line-number="11"><span class="co">#&gt; Joining, by = "geneSymbol"</span></a>
+<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt; Warning: Column `geneSymbol` joining factors with different levels,</span></a>
+<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt; coercing to character vector</span></a></code></pre></div>
 <p><img src="QC_SSC_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
 </div>
 <div id="pseudotime-inference" class="section level2">
 <h2 class="hasAnchor">
 <a href="#pseudotime-inference" class="anchor"></a>Pseudotime Inference</h2>
 <p>Compute cluster-cluster graph and find the root cluster.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">cluster_ptime &lt;-<span class="st"> </span><span class="kw"><a href="../reference/FindRootCluster.html">FindRootCluster</a></span>(<span class="dt">cluster_labels =</span> labels,</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">                                 <span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">                                 <span class="dt">dist_graph =</span> low_dim_mapping<span class="op">$</span>dist_graph,</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4">                                 <span class="dt">dist_flat =</span> low_dim_mapping<span class="op">$</span>dist_flat,</a>
-<a class="sourceLine" id="cb10-5" data-line-number="5">                                 <span class="dt">reverse =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">cluster_ptime &lt;-<span class="st"> </span><span class="kw"><a href="../reference/FindRootCluster.html">FindRootCluster</a></span>(<span class="dt">cluster_labels =</span> labels,</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">                                 <span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
+<a class="sourceLine" id="cb9-3" data-line-number="3">                                 <span class="dt">dist_graph =</span> low_dim_mapping<span class="op">$</span>dist_graph,</a>
+<a class="sourceLine" id="cb9-4" data-line-number="4">                                 <span class="dt">dist_flat =</span> low_dim_mapping<span class="op">$</span>dist_flat,</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5">                                 <span class="dt">reverse =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>Compute the cell-cell graph and find the root cell.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">root_cell &lt;-<span class="st"> </span><span class="kw"><a href="../reference/FindRootCell.html">FindRootCell</a></span>(<span class="dt">use_flat_dist =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">                          <span class="dt">cluster_order_by =</span> <span class="st">"distance"</span>,</a>
-<a class="sourceLine" id="cb11-3" data-line-number="3">                          <span class="dt">cell_order_by =</span> <span class="st">"distance"</span>,</a>
-<a class="sourceLine" id="cb11-4" data-line-number="4">                          <span class="dt">graph_cluster_mst =</span> cluster_ptime<span class="op">$</span>cluster_mst,</a>
-<a class="sourceLine" id="cb11-5" data-line-number="5">                          <span class="dt">dist_graph  =</span> low_dim_mapping<span class="op">$</span>dist_graph,</a>
-<a class="sourceLine" id="cb11-6" data-line-number="6">                          <span class="dt">dist_flat =</span> low_dim_mapping<span class="op">$</span>dist_flat,</a>
-<a class="sourceLine" id="cb11-7" data-line-number="7">                          <span class="dt">cluster_labels =</span> labels,</a>
-<a class="sourceLine" id="cb11-8" data-line-number="8">                          <span class="dt">root_cluster =</span> cluster_ptime<span class="op">$</span>root_cluster)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">root_cell &lt;-<span class="st"> </span><span class="kw"><a href="../reference/FindRootCell.html">FindRootCell</a></span>(<span class="dt">use_flat_dist =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">                          <span class="dt">cluster_order_by =</span> <span class="st">"distance"</span>,</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3">                          <span class="dt">cell_order_by =</span> <span class="st">"distance"</span>,</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">                          <span class="dt">graph_cluster_mst =</span> cluster_ptime<span class="op">$</span>cluster_mst,</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">                          <span class="dt">dist_graph  =</span> low_dim_mapping<span class="op">$</span>dist_graph,</a>
+<a class="sourceLine" id="cb10-6" data-line-number="6">                          <span class="dt">dist_flat =</span> low_dim_mapping<span class="op">$</span>dist_flat,</a>
+<a class="sourceLine" id="cb10-7" data-line-number="7">                          <span class="dt">cluster_labels =</span> labels,</a>
+<a class="sourceLine" id="cb10-8" data-line-number="8">                          <span class="dt">root_cluster =</span> cluster_ptime<span class="op">$</span>root_cluster)</a></code></pre></div>
 </div>
 <div id="pseudotime-visualization" class="section level2">
 <h2 class="hasAnchor">
 <a href="#pseudotime-visualization" class="anchor"></a>Pseudotime Visualization</h2>
 <p>Compute the directional minimum spanning tree on the cluster-cluster graph for visualization.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">cluster_predecessors &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetPredecessors.html">GetPredecessors</a></span>(cluster_ptime<span class="op">$</span>cluster_mst, cluster_ptime<span class="op">$</span>root_cluster)</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">cluster_dtree &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetDominatorTree.html">GetDominatorTree</a></span>(cluster_predecessors, cluster_ptime<span class="op">$</span>graph_cluster)</a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="kw"><a href="../reference/PlotLineage.html">PlotLineage</a></span>(cluster_dtree)</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-10-1.png" width="100%" height="100%"></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">cluster_predecessors &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetPredecessors.html">GetPredecessors</a></span>(cluster_ptime<span class="op">$</span>cluster_mst, cluster_ptime<span class="op">$</span>root_cluster)</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">cluster_dtree &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetDominatorTree.html">GetDominatorTree</a></span>(cluster_predecessors, cluster_ptime<span class="op">$</span>graph_cluster)</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw"><a href="../reference/PlotLineage.html">PlotLineage</a></span>(cluster_dtree)</a></code></pre></div>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <p>Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">pseudotime &lt;-<span class="st"> </span>low_dim_mapping<span class="op">$</span>dist_graph[root_cell,]</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="co"># plot pseudotime</span></a>
-<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb13-5" data-line-number="5">                         <span class="dt">feature =</span> pseudotime,</a>
-<a class="sourceLine" id="cb13-6" data-line-number="6">                         <span class="dt">title =</span> <span class="st">"Pseudotime Labeling"</span>,</a>
-<a class="sourceLine" id="cb13-7" data-line-number="7">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
-<a class="sourceLine" id="cb13-8" data-line-number="8">                         <span class="dt">featurename =</span> <span class="st">"Pseudotime Distance"</span>)</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-11-1.png" width="100%" height="100%"></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">pseudotime &lt;-<span class="st"> </span>low_dim_mapping<span class="op">$</span>dist_graph[root_cell,]</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co"># plot pseudotime</span></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
+<a class="sourceLine" id="cb12-5" data-line-number="5">                         <span class="dt">feature =</span> pseudotime,</a>
+<a class="sourceLine" id="cb12-6" data-line-number="6">                         <span class="dt">title =</span> <span class="st">"Pseudotime Labeling"</span>,</a>
+<a class="sourceLine" id="cb12-7" data-line-number="7">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
+<a class="sourceLine" id="cb12-8" data-line-number="8">                         <span class="dt">featurename =</span> <span class="st">"Pseudotime Distance"</span>)</a></code></pre></div>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 </div>
 <div id="plot-gene-expression-on-the-flat-embedding" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-gene-expression-on-the-flat-embedding" class="anchor"></a>Plot Gene Expression on the Flat Embedding</h2>
 <p>Plot Expression of Krt14, Krt10, and Lor in t-SNE Space:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Krt14'</span>)</a>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Krt14'</span>)</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>similarity_data[gene_index,]</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co"># plot features</span></a>
+<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
+<a class="sourceLine" id="cb13-6" data-line-number="6">                    <span class="dt">feature =</span> data_gene,</a>
+<a class="sourceLine" id="cb13-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Krt14 Expression"</span>,</a>
+<a class="sourceLine" id="cb13-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
+<a class="sourceLine" id="cb13-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Krt10'</span>)</a>
 <a class="sourceLine" id="cb14-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>similarity_data[gene_index,]</a>
 <a class="sourceLine" id="cb14-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb14-4" data-line-number="4"><span class="co"># plot features</span></a>
 <a class="sourceLine" id="cb14-5" data-line-number="5"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
 <a class="sourceLine" id="cb14-6" data-line-number="6">                    <span class="dt">feature =</span> data_gene,</a>
-<a class="sourceLine" id="cb14-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Krt14 Expression"</span>,</a>
+<a class="sourceLine" id="cb14-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Krt10 Expression"</span>,</a>
 <a class="sourceLine" id="cb14-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb14-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-12-1.png" width="100%" height="100%"></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Krt10'</span>)</a>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Lor'</span>)</a>
 <a class="sourceLine" id="cb15-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>similarity_data[gene_index,]</a>
 <a class="sourceLine" id="cb15-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb15-4" data-line-number="4"><span class="co"># plot features</span></a>
 <a class="sourceLine" id="cb15-5" data-line-number="5"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
 <a class="sourceLine" id="cb15-6" data-line-number="6">                    <span class="dt">feature =</span> data_gene,</a>
-<a class="sourceLine" id="cb15-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Krt10 Expression"</span>,</a>
+<a class="sourceLine" id="cb15-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Lor Expression"</span>,</a>
 <a class="sourceLine" id="cb15-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb15-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-13-1.png" width="100%" height="100%"></p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Lor'</span>)</a>
-<a class="sourceLine" id="cb16-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>similarity_data[gene_index,]</a>
-<a class="sourceLine" id="cb16-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="co"># plot features</span></a>
-<a class="sourceLine" id="cb16-5" data-line-number="5"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb16-6" data-line-number="6">                    <span class="dt">feature =</span> data_gene,</a>
-<a class="sourceLine" id="cb16-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Lor Expression"</span>,</a>
-<a class="sourceLine" id="cb16-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
-<a class="sourceLine" id="cb16-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-14-1.png" width="100%" height="100%"></p>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 </div>
 <div id="plot-gene-expression-levels-in-cells-grouped-by-cluster" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-gene-expression-levels-in-cells-grouped-by-cluster" class="anchor"></a>Plot Gene Expression Levels in Cells Grouped by Cluster</h2>
 <p>Violin Plot of Krt14 expression. Note strong expression of the basal compartment:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> similarity_data,</a>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> similarity_data,</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2">                       <span class="dt">gene_names =</span> gene_names,</a>
+<a class="sourceLine" id="cb16-3" data-line-number="3">                       <span class="dt">labels =</span> labels,</a>
+<a class="sourceLine" id="cb16-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Krt14"</span>)</a></code></pre></div>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-15-1.png" width="700"> Violin Plot of Krt10 expression. Note uniformly high expression in the IFE-DI/DII compartments:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> similarity_data,</a>
 <a class="sourceLine" id="cb17-2" data-line-number="2">                       <span class="dt">gene_names =</span> gene_names,</a>
 <a class="sourceLine" id="cb17-3" data-line-number="3">                       <span class="dt">labels =</span> labels,</a>
-<a class="sourceLine" id="cb17-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Krt14"</span>))</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-15-1.png" width="100%" height="100%"> Violin Plot of Krt10 expression. Note uniformly high expression in the IFE-DI/DII compartments:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> similarity_data,</a>
+<a class="sourceLine" id="cb17-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Krt10"</span>)</a></code></pre></div>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-16-1.png" width="700"> Violin Plot of Lor expression. Note strong expression in the terminally differentiated IFE-KI/KII compartments:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> similarity_data,</a>
 <a class="sourceLine" id="cb18-2" data-line-number="2">                       <span class="dt">gene_names =</span> gene_names,</a>
 <a class="sourceLine" id="cb18-3" data-line-number="3">                       <span class="dt">labels =</span> labels,</a>
-<a class="sourceLine" id="cb18-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Krt10"</span>))</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-16-1.png" width="100%" height="100%"> Violin Plot of Lor expression. Note strong expression in the terminally differentiated IFE-KI/KII compartments:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">  <span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> similarity_data,</a>
-<a class="sourceLine" id="cb19-2" data-line-number="2">                       <span class="dt">gene_names =</span> gene_names,</a>
-<a class="sourceLine" id="cb19-3" data-line-number="3">                       <span class="dt">labels =</span> labels,</a>
-<a class="sourceLine" id="cb19-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Lor"</span>))</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-17-1.png" width="100%" height="100%"></p>
+<a class="sourceLine" id="cb18-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Lor"</span>)</a></code></pre></div>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
 </div>
 <div id="analyze-signaling-mediated-by-a-ligand-receptor-family" class="section level2">
 <h2 class="hasAnchor">
 <a href="#analyze-signaling-mediated-by-a-ligand-receptor-family" class="anchor"></a>Analyze Signaling Mediated by a Ligand-Receptor Family</h2>
 <p>In order to analyze signaling, we can load in tables which describe a pathay in detail. There are two tables needed, one that specifies all unique ligand receptor combinations and another that specifies receptor/target/up|down combinations. Example tables for the TgfB pathway are provided in extdata/ and loaded here for the current skin data set. Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples. We then compute the probability of intercellular interaction based on this pathway.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(knitr)</a>
-<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(kableExtra)</a>
-<a class="sourceLine" id="cb20-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb20-4" data-line-number="4">lig_rec_path &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"tgfb_lig_rec.tsv"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb20-5" data-line-number="5">rec_target_path &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"tgfb_rec_target_both.tsv"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb20-6" data-line-number="6">pathway &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ImportPathway.html">ImportPathway</a></span>(<span class="dt">lig_table_path =</span> lig_rec_path,</a>
-<a class="sourceLine" id="cb20-7" data-line-number="7">                         <span class="dt">rec_table_path =</span> rec_target_path,</a>
-<a class="sourceLine" id="cb20-8" data-line-number="8">                         <span class="dt">data =</span> similarity_data,</a>
-<a class="sourceLine" id="cb20-9" data-line-number="9">                         <span class="dt">gene_names =</span> gene_names)</a>
-<a class="sourceLine" id="cb20-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb20-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb20-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb20-13" data-line-number="13">pathway<span class="op">$</span>pathway <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/knitr/topics/kable">kable</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/kableExtra/topics/kable_styling">kable_styling</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(knitr)</a>
+<a class="sourceLine" id="cb19-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(kableExtra)</a>
+<a class="sourceLine" id="cb19-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb19-4" data-line-number="4">lig_rec_path &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"tgfb_lig_rec.tsv"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb19-5" data-line-number="5">rec_target_path &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"tgfb_rec_target_both.tsv"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb19-6" data-line-number="6">pathway &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ImportPathway.html">ImportPathway</a></span>(<span class="dt">lig_table_path =</span> lig_rec_path,</a>
+<a class="sourceLine" id="cb19-7" data-line-number="7">                         <span class="dt">rec_table_path =</span> rec_target_path,</a>
+<a class="sourceLine" id="cb19-8" data-line-number="8">                         <span class="dt">data =</span> similarity_data,</a>
+<a class="sourceLine" id="cb19-9" data-line-number="9">                         <span class="dt">gene_names =</span> gene_names)</a>
+<a class="sourceLine" id="cb19-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb19-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb19-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb19-13" data-line-number="13">k =<span class="st"> </span>pathway<span class="op">$</span>pathway <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/knitr/topics/kable">kable</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">  </a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">  Pmats &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetSignalingPartners.html">GetSignalingPartners</a></span>(similarity_data,</a>
+<a class="sourceLine" id="cb20-3" data-line-number="3">                                gene_names,</a>
+<a class="sourceLine" id="cb20-4" data-line-number="4">                                pathway<span class="op">$</span>pathway_removed)</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/kableExtra/topics/kable_styling">kable_styling</a></span>(<span class="dt">kable_input =</span> k) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/kableExtra/topics/scroll_box">scroll_box</a></span>(<span class="dt">height =</span> <span class="st">"500px"</span>, <span class="dt">width =</span> <span class="st">"300px"</span>)</a></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:300px; ">
 <table class="table table">
 <thead><tr>
-<th style="text-align:left;">
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 receptor
 </th>
-<th style="text-align:left;">
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 ligand
 </th>
-<th style="text-align:left;">
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 target
 </th>
-<th style="text-align:left;">
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 direction
 </th>
 </tr></thead>
@@ -828,10 +833,7 @@ down
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">  </a>
-<a class="sourceLine" id="cb21-2" data-line-number="2">  Pmats &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetSignalingPartners.html">GetSignalingPartners</a></span>(similarity_data,</a>
-<a class="sourceLine" id="cb21-3" data-line-number="3">                                gene_names,</a>
-<a class="sourceLine" id="cb21-4" data-line-number="4">                                pathway<span class="op">$</span>pathway_removed)</a></code></pre></div>
+</div>
 <div id="circos-plot-of-intercellular-network" class="section level3">
 <h3 class="hasAnchor">
 <a href="#circos-plot-of-intercellular-network" class="anchor"></a>Circos Plot of Intercellular Network</h3>
@@ -842,7 +844,7 @@ down
 <a class="sourceLine" id="cb22-4" data-line-number="4">        <span class="dt">rec_cells_per_cluster =</span> <span class="dv">5</span>,</a>
 <a class="sourceLine" id="cb22-5" data-line-number="5">        <span class="dt">rgb_gap =</span> <span class="fl">0.06</span>,</a>
 <a class="sourceLine" id="cb22-6" data-line-number="6">        <span class="dt">title_text =</span> <span class="st">"Signaling Between Cells"</span>)</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-20-1.png" width="100%" height="100%"></p>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-21-1.png" width="700"></p>
 </div>
 <div id="circos-plot-of-intercluster-network" class="section level3">
 <h3 class="hasAnchor">
@@ -854,7 +856,7 @@ down
 <a class="sourceLine" id="cb23-4" data-line-number="4">          <span class="dt">cluster_labels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span><span class="op">:</span>n_clusters),</a>
 <a class="sourceLine" id="cb23-5" data-line-number="5">          <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>,</a>
 <a class="sourceLine" id="cb23-6" data-line-number="6">          <span class="dt">title_text =</span> <span class="st">"Signaling Between Clusters"</span>)</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-21-1.png" width="100%" height="100%"></p>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-22-1.png" width="700"></p>
 </div>
 <div id="heatmap-of-signaling-marker-expression" class="section level3">
 <h3 class="hasAnchor">
@@ -864,10 +866,10 @@ down
 <a class="sourceLine" id="cb24-2" data-line-number="2">                <span class="st">'Tgfbr1'</span>, <span class="st">'Tgfbr2'</span>,</a>
 <a class="sourceLine" id="cb24-3" data-line-number="3">                <span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>)</a>
 <a class="sourceLine" id="cb24-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb24-5" data-line-number="5">  p &lt;-<span class="st"> </span><span class="kw"><a href="../reference/PlotClusterExpression.html">PlotClusterExpression</a></span>(<span class="dt">data =</span> all_data,</a>
+<a class="sourceLine" id="cb24-5" data-line-number="5">  <span class="kw"><a href="../reference/PlotClusterExpression.html">PlotClusterExpression</a></span>(<span class="dt">data =</span> all_data,</a>
 <a class="sourceLine" id="cb24-6" data-line-number="6">                        <span class="dt">cluster_labels =</span> labels, </a>
 <a class="sourceLine" id="cb24-7" data-line-number="7">                        <span class="dt">markers =</span> gene_list)</a></code></pre></div>
-<p><img src="QC_SSC_files/figure-html/unnamed-chunk-22-1.png" width="100%" height="100%"></p>
+<p><img src="QC_SSC_files/figure-html/unnamed-chunk-23-1.png" width="700"></p>
 </div>
 </div>
   </div>
@@ -877,7 +879,7 @@ down
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#load-and-preprocess-data">Load and Preprocess Data</a></li>
+<li><a href="#load-and-preprocess-data-download-from-ncbi-via-geo-api">Load and Preprocess Data (Download from NCBI via GEO API)</a></li>
       <li><a href="#compute-the-similarity-matrix">Compute the Similarity Matrix</a></li>
       <li><a href="#cluster-the-cells">Cluster the Cells</a></li>
       <li><a href="#find-cluster-marker-genes-">Find cluster marker genes.</a></li>

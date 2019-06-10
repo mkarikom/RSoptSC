@@ -177,7 +177,7 @@ FeatureScatterPlot <- function(flat_embedding,
 #' @param use_z use z-score per gene instead of raw expression
 #' @param spacing the number of lines between grids
 #' 
-#' @return a ggplot2 plot object
+#' @return as heatmap
 #'
 #' @import dplyr
 #' @importFrom reshape2 melt
@@ -259,7 +259,6 @@ PlotTopN_Grid <- function(data,
           panel.grid.minor = element_blank(),
           panel.background = element_blank(), 
           axis.line = element_line(colour = "black"))
-  plot(p)
   return(p)
 }
 
@@ -277,7 +276,7 @@ PlotTopN_Grid <- function(data,
 #' @param x_tsize x axis title size
 #' @param use_z use z-score per gene instead of raw expression
 #' 
-#' @return a ggplot2 plot object
+#' @return a heatmap
 #'
 #' @import dplyr
 #' @importFrom reshape2 melt
@@ -350,7 +349,6 @@ PlotTopN <- function(data,
           axis.title.y = element_text(size = y_tsize),
           axis.text.x = element_text(size = x_lsize),
           axis.text.y = element_text(size = y_lsize))
-  plot(p)
   return(p)
   
 }
@@ -370,7 +368,7 @@ PlotTopN <- function(data,
 #' @param markers a vector of markers
 #' @param use_z use z-score per gene instead of raw expression
 #' 
-#' @return nothing
+#' @return a grid plot
 #'
 #' @importFrom reshape2 melt
 #' @import ggplot2
@@ -436,7 +434,6 @@ PlotClusterExpression <- function(data,
           panel.border = element_blank(), 
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank())
-  plot(p)
   return(p)
 }
 
@@ -481,6 +478,7 @@ ViolinPlotExpression <- function(data,
     geom_jitter(shape=16, position=position_jitter(jitsize)) +
     scale_fill_manual(values = colors) + 
     theme_minimal()
+  return(p)
 }
 
 #' Circos plot of signaling score
