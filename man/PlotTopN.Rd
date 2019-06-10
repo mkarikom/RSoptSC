@@ -4,12 +4,15 @@
 \alias{PlotTopN}
 \title{Heatmap of the top n markers}
 \usage{
-PlotTopN(data, gene_names, cluster_labels, markers, n_features, ...)
+PlotTopN(data, cluster_labels, markers, n_features,
+  y_lsize = ((length(unique(cluster_labels)) * n_features)/120) * 5,
+  y_tsize = ((length(unique(cluster_labels)) * n_features)/120) * 15,
+  x_lsize = ((length(unique(cluster_labels)) * n_features)/120) * 14,
+  x_tsize = ((length(unique(cluster_labels)) * n_features)/120) * 15,
+  use_z = TRUE)
 }
 \arguments{
 \item{data}{expression data with genes x cells}
-
-\item{gene_names}{a vector of symbolic gene names corresponding to the rows in the data matrix}
 
 \item{cluster_labels}{a vector of cluster labels corresponding to the columns in the data matrix}
 
@@ -17,10 +20,18 @@ PlotTopN(data, gene_names, cluster_labels, markers, n_features, ...)
 
 \item{n_features}{the top n features to plot}
 
-\item{...}{extra args to heatmap.2}
+\item{y_lsize}{y axis label size}
+
+\item{y_tsize}{y axis title size}
+
+\item{x_lsize}{x axis label size}
+
+\item{x_tsize}{x axis title size}
+
+\item{use_z}{use z-score per gene instead of raw expression}
 }
 \value{
-nothing
+a heatmap
 }
 \description{
 Plot the heatmap of the top n inferred markers for each cluster.

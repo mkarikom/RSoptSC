@@ -26,6 +26,7 @@ GetSignalingPartners <- function(M,
   receptor = ligand = direction = NULL   # r cmd check pass
   n_cells <- ncol(as.matrix(M))
   n_genes <- nrow(as.matrix(M))
+  cellnames <- colnames(M)
   
   # fix the names
   ids <- tolower(ids)
@@ -43,6 +44,9 @@ GetSignalingPartners <- function(M,
   P <- list()
   for(pair in 1:nrow(LR_pairs)){
     P[[pair]] <- matrix(0, nrow = n_cells, ncol = n_cells)
+    rownames(P[[pair]]) <- cellnames
+    colnames(P[[pair]]) <- cellnames
+    
     rec_index <- which(ids == LR_pairs[pair, 1])
     lig_index <- which(ids == LR_pairs[pair, 2])
     ldata <- NormalizeGene(M[lig_index,])
@@ -198,6 +202,8 @@ GetSignalingPartners <- function(M,
   }else{
     P_agg <- Reduce('+', P)/length(P)
   }
+  rownames(P_agg) <- cellnames
+  colnames(P_agg) <- cellnames
   return(list(P = P, P_agg = P_agg))
 }
 

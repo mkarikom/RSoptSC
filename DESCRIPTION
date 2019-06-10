@@ -11,8 +11,12 @@ Maintainer: Matt Karikomi <mattkarikomi@gmail.com>
 Description: Clustering based on single-cell data. 
     Population signaling profiles based on expression pathway
     knowledge.
-Depends: R (>= 2.10)
+Depends: R (>= 3.6)
 License: MIT + file LICENSE
+URL: https://mkarikom.github.io/RSoptSC
+BugReports: https://github.com/mkarikom/RSoptSC/issues
+Remotes: 
+	renozao/NMF@devel
 Encoding: UTF-8
 LazyData: true
 Imports:
@@ -20,7 +24,7 @@ Imports:
     ggplot2 (>= 3.0.0),
     Matrix (>= 1.2-12),
     Rtsne (>= 0.13),
-    NMF (>= 0.21.0),
+    NMF (>= 0.23),
     reshape2 (>= 1.4.3),
     dplyr (>= 0.7.6),
     gplots (>= 3.0.1),
@@ -32,8 +36,15 @@ Imports:
     expm (>= 0.999-3),
     cluster (>= 2.0.7-1),
     magrittr (>= 1.5),
-    cowplot (>= 0.9.3)
+    cowplot (>= 0.9.3),
+    SingleCellExperiment,
+    scater,
+    scran,
+    GEOquery,
+    SummarizedExperiment,
+    AnnotationDbi
 Suggests: testthat,
-    rmarkdown, knitr, kableExtra
+    rmarkdown, knitr, kableExtra, org.Mm.eg.db
+biocViews: RNASeq
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr

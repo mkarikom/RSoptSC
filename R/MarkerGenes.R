@@ -2,15 +2,13 @@
 #' 
 #' Get the marker genes for each cluster and report their 1-normalized expression value.
 #'
-#' @param counts_data a matrix of expression values for each cell (rows) and gene (columns) which will be normalized and 
+#' @param counts_data a matrix of expression values for each cell (rows) and gene (columns) 
 #' @param cluster_labels a vector of cluster labels
 #' @param H a nonnegative matrix such that W = H*t(H), H_{i,j} is the cells_weight
 #'     by which cell i belongs to the jth cluster
 #' @param n_sorted the number of markers to report in the n_sorted table
-#' @param gene_names gene symbols corresponding to rows in counts_data (this should match rows of M, if provided)
 #' @param gene_expression_threshold for n cells, for \code{gene_expression_threshold} = m, dont consider genes
 #'     expressed in more than n-m cells or genes expressed in less than m cells
-#' @param n_features number of marker genes per cluster to retrieve
 #' @param use_H whether to use H as loading, default is false, instead using cumulative absolute difference to sort max-mean assigned labels
 #' @param lognorm perform log transform, normalization, and scaling on the data before the computing the markers
 #'
@@ -28,20 +26,18 @@ GetMarkerTable <- function(counts_data,
                            cluster_labels,
                            H = NULL,
                            n_sorted = 50,
-                           gene_names,
                            gene_expression_threshold = NULL,
-                           n_features = NULL,
                            use_H = FALSE,
                            lognorm = FALSE){
   # filter the data according to desired samples (cells) and features (genes)
   clusterId = geneScore = NULL # get r cmd check to pass
-  
+  genes <- matrix(rownames(counts_data), ncol = 1)
+  cells <- colnames(counts_data)
   if(use_H){
-    M <- counts_data
     if(lognorm){
-      Mnorm <- LogNormalize(M$M_variable)
+      Mnorm <- LogNormalize(counts_data)
     }else{
-      Mnorm <- M$M_variable
+      Mnorm <- counts_data
     }
     
     # for each gene (rows), for each cluster (columns)
@@ -49,31 +45,23 @@ GetMarkerTable <- function(counts_data,
     gene_cluster_scores <- Mnorm %*% H
     
     # select max cluster score
-    gene_assignments <- apply(gene_cluster_scores, 1, function(x){
-      c(which(x == max(x)), max(x))
-    })
+    gene_assignments <- matrix(apply(gene_cluster_scores, 2, max, 
+                                     simplify = TRUE), ncol = 1)
     
-    # prevent cbind issues because of the wrong matrix format
-    if(class(gene_assignments) == 'list'){
-      gene_assignments <- Reduce(rbind, gene_assignments)
-      marker_table <- cbind(M$gene_use, gene_assignments)
-    }else{
-      marker_table <- cbind(M$gene_use, t(gene_assignments))
-    }
-    
+    marker_table <- cbind(genes, gene_assignments)
+
     colnames(marker_table) <- c('geneID', 'clusterId', 'geneScore')
-    
+
     sorted_table <- arrange(as.data.frame(marker_table), clusterId, desc(geneScore))
-    sorted_table <- as_tibble(sorted_table) %>% group_by(clusterId) %>% top_n(n_sorted, geneScore)
-    sorted_table$geneSymbol <- gene_names[sorted_table$geneID]
+    sorted_table <- sorted_table %>% group_by(clusterId) %>% top_n(n_sorted, geneScore)
+    sorted_table$geneSymbol <- genes[sorted_table$geneID]
     
     output <- list()
     output$all <- marker_table
     output$n_sorted <- sorted_table
   } else {
-    M <- counts_data
-    gene_names <- gene_names[counts_data$gene_use]
-    counts_data <- counts_data$M_variable
+    # number of clusters
+    # mean expression of each cluster
     n_clusters <- length(unique(cluster_labels))
     mean_exp <- matrix(0, nrow = nrow(counts_data), ncol = n_clusters)
     for (clust in 1:n_clusters){
@@ -81,41 +69,45 @@ GetMarkerTable <- function(counts_data,
       mean_exp[,clust] <- rowMeans(counts_data[,idx])
     }
     
+    # find the cluster with the hightest mean expression of each gene
     cluster_assign <- apply(mean_exp, 1, function(x){
       sorted <- order(x, decreasing = TRUE)                  
       sorted[1]
     })
     cluster_assign <- unlist(cluster_assign)
     
+    # for each gene x cluster
+    # get difference betwen expression in the cluster and expression in all cells
     DE_exp <- matrix(0, nrow = nrow(counts_data), ncol = n_clusters)
     for (clust in 1:n_clusters){
       col_wise <- replicate(n_clusters, mean_exp[,clust])
       col_wise <- abs(col_wise - mean_exp)
       DE_exp[,clust] <- rowSums(col_wise)
     }
+    
+    # for each cluster, order the genes whose mean expression 
+    # is max in that cluster by differential expression
     ccol <- c()
     scorecol <- c()
     genecol <- c()
     idxcol <- c()
     for (clust in 1:n_clusters){
-      idx <- which(cluster_assign == clust)
-      scores <- DE_exp[idx, clust]
-      ordering <- order(scores, decreasing = TRUE)
-      idx <- idx[ordering]
+      idx <- which(cluster_assign == clust) # find genes
+      scores <- DE_exp[idx, clust] # get their scores
+      ordering <- order(scores, decreasing = TRUE) # order the scores
+      idx <- idx[ordering] # order the genes
       
-      idxcol <- c(idxcol, M$gene_use[idx])
+      idxcol <- c(idxcol, idx)
       scorecol <- c(scorecol, DE_exp[idx, clust])
       ccol <- c(ccol, rep(clust, length(idx)))
-      genecol <- c(genecol, gene_names[idx])
+      genecol <- c(genecol, genes[idx])
     }
-    allmarkers <- cbind(geneID = idxcol, clusterId = ccol, geneScore = scorecol)
-    rownames(allmarkers) <- genecol
     
-    topsorted <- data.frame(geneID = idxcol, clusterId = ccol, geneScore = scorecol, geneSymbol = genecol)
-    topsorted <- as_tibble(topsorted) %>% group_by(clusterId) %>% top_n(n_sorted, geneScore)
-    output <- list()
-    output$all <- allmarkers
-    output$n_sorted <- topsorted
+    df <- data.frame(geneID = idxcol, clusterId = ccol, 
+                            geneScore = scorecol, geneSymbol = genecol)
+    top_n <- df %>% group_by(clusterId) %>% top_n(n_sorted, geneScore)
+    allmarkers <- df %>% group_by(clusterId) %>% top_n(Inf, geneScore)
+    output <- list(all = allmarkers, top_n =  top_n)
   }
   return(output)
 }

@@ -35,7 +35,6 @@ SelectData <- function(M, gene_expression_threshold, n_features){
   genes_pca <- prcomp(t(M_variable))
   eigengaps <-  abs(genes_pca$sdev[-c(1,length(genes_pca$sdev))] - genes_pca$sdev[-(1:2)])
   max_component <- which(eigengaps == max(eigengaps), arr.ind = TRUE) + 1
-
   # select most variable genes based on the max coefficient
   eigenvector_order <- order(genes_pca$sdev, decreasing = TRUE)
   eigenvectors <- genes_pca$rotation[,eigenvector_order]

@@ -4,19 +4,38 @@
 \alias{PlotClusterExpression}
 \title{Heatmap of specific genes}
 \usage{
-PlotClusterExpression(data, gene_names, cluster_labels, markers)
+PlotClusterExpression(data, cluster_labels,
+  y_lsize = (length(unique(cluster_labels))/8) * 7,
+  y_tsize = (length(unique(cluster_labels))/8) * 7,
+  x_lsize = (length(unique(cluster_labels))/8) * 7,
+  x_tsize = (length(unique(cluster_labels))/8) * 7,
+  lti_size = (length(unique(cluster_labels))/8) * 7,
+  lt_size = (length(unique(cluster_labels))/8) * 7, markers,
+  use_z = TRUE)
 }
 \arguments{
 \item{data}{expression data with genes x cells}
 
-\item{gene_names}{a vector of symbolic gene names corresponding to the rows in the data matrix}
-
 \item{cluster_labels}{a vector of cluster labels corresponding to the columns in the data matrix}
 
+\item{y_lsize}{y axis label size}
+
+\item{y_tsize}{y axis title size}
+
+\item{x_lsize}{x axis label size}
+
+\item{x_tsize}{x axis title size}
+
+\item{lti_size}{size of legend title}
+
+\item{lt_size}{size of legend text}
+
 \item{markers}{a vector of markers}
+
+\item{use_z}{use z-score per gene instead of raw expression}
 }
 \value{
-nothing
+a grid plot
 }
 \description{
 Given a set of markers, plot their expression across clusters on a heatmap.

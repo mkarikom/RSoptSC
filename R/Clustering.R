@@ -1,3 +1,46 @@
+#' Cluster the Cells
+#' 
+#' Use NMF to cluster the cells.  Currently, the Lee and Seung algorithm is implemented via a call to renozao/NMF.  If cluster-number is inferred then output relevent diagnostics (eg the eigenvalue spaceing of the ensemble method). 
+#'
+#' @param similarityMatrix a symmetric nonnegative similarity matrix
+#' @param n_clusters default is NULL, ensemble method will be called
+#' @param n_comp the number of similarity components to use for ensemble clustering
+#' @param ... additional parameters for NMF
+#'
+#' @return a list containing 
+#'     \item{H}{the cluster weight matrix, the factorization of the similarity matrix}
+#'     \item{labels}{the cluster labels}
+#'     \item{ensemble}{results of model selection}
+#'
+#' @importFrom NMF basis nmf seed
+#' @importFrom Matrix as.matrix
+#'
+#' @export
+#'
+ClusterCells <- function(similarityMatrix = NULL, 
+                         n_clusters = NULL,
+                         n_comp = 3,
+                         ...){
+  if(is.null(n_clusters)){
+    clusters <- CountClusters(data = similarityMatrix, n_comp = n_comp)
+    n_clusters <- clusters$upper_bound
+  }
+  
+  output_NMF <- nmf(x = as.matrix(similarityMatrix),
+                   rank = n_clusters,
+                   method = 'lee',
+                   seed = 'nndsvd',
+                   ...)
+  H <- basis(output_NMF)
+  
+  labels <- apply(H, 1, function(x){
+    which(x == max(x))})
+  
+  return(list(H = H, 
+              labels = labels,
+              ensemble = clusters))
+}
+
 #' Use clustering consensus to infer cluster number
 #' 
 #' Use clustering consensus to infer cluster number.
@@ -15,7 +58,7 @@
 #'
 #' @export
 #'
-CountClusters <- function(data, tol = 0.01, range = 2:20, eigengap = TRUE, n_comp = 3){
+CountClusters <- function(data, tol = 0.01, range = 2:20, eigengap = TRUE, n_comp){
   # compute the drop tolerance, enforcing parsimony of components
   solo_count <- GetComponents(data, tol = tol)$n_eigs # without consensus get a pre-estimate
   if(solo_count <= 5){
@@ -33,6 +76,7 @@ CountClusters <- function(data, tol = 0.01, range = 2:20, eigengap = TRUE, n_com
   
   # compute the number of zero eigenvalues
   lower_bound <- length(eigs$val[which(eigs$val <= tol)])
+  
   return(list(upper_bound = upper_bound, 
               lower_bound = lower_bound,
               eigs = eigs))
