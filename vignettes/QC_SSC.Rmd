@@ -26,7 +26,6 @@ This is an example of clustering, marker identification and pseudotime inference
 A matrix of counts with rows as genes and columns as cells must be provided.  Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files.  Here we load example data (GSE67602) originally published in Joost et al 2016.  This is an experimental feature built on top of the excellent GEOquery package by Sean Davis.
 
 ```{r, results='asis',message=FALSE, warning=FALSE}
-library(SingleCellExperiment)
 library(org.Mm.eg.db)
 library(RSoptSC)
 
@@ -39,8 +38,8 @@ cache <- ReadAnnotateCountsSCE(series_accession = 'GSE67602', GEOfilecache = '/t
                                feature_annotation_key = "SYMBOL",
                                pre_clust = TRUE,
                                rescale = TRUE)
-all_data <- logcounts(cache$qc)
-similarity_data <- logcounts(cache$qc[cache$vargenes$ind[1:upper],])
+all_data <- SingleCellExperiment::logcounts(cache$qc)
+similarity_data <- SingleCellExperiment::logcounts(cache$qc[cache$vargenes$ind[1:upper],])
 gene_names <- rownames(similarity_data)
 
 ```
