@@ -134,7 +134,7 @@ FeatureScatterPlot(flat_embedding = low_dim_mapping$flat_embedding,
 
 Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters.  We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters.  The top six markers selected as described in Wang et. al.  As expected, markers Krt14, Krt10, and Lor are inferred for clusters overlapping with IHC-based Basal, Differentiated (IFE-DI, IFE-DII), and Keratinized (IFE-KI, IFE-KII) cell annotations.   
 
-```{r}
+```{r, fig.width=7, fig.height=9}
 markers <- GetMarkerTable(counts_data = logdata,
                             cluster_labels = labels,
                             H = H,

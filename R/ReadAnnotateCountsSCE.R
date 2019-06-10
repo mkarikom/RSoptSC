@@ -29,7 +29,6 @@
 #'
 #' @importFrom SingleCellExperiment isSpike isSpike<- colData rowData SingleCellExperiment logcounts
 #' @importFrom SummarizedExperiment rowData<- colData<- assay assay<-
-#' @importFrom BiocSingular IrlbaParam
 #' @importFrom AnnotationDbi mapIds
 #' @importFrom GEOquery getGEO getGEOSuppFiles
 #' @importFrom grDevices cairo_ps
@@ -140,7 +139,7 @@ ReadAnnotateCountsSCE <- function(filepath = NULL,
   
   # spike in based normalization
   if(pre_clust){
-    clusters <- quickCluster(sce, use.ranks=FALSE, BSPARAM=IrlbaParam())
+    clusters <- quickCluster(sce, use.ranks=FALSE)
   }else{
     clusters <- NULL
   }

@@ -42,7 +42,6 @@ Imports:
     scran (>= 1.12.0),
     org.Mm.eg.db (>= 3.8.2),
     GEOquery (>= 2.52.0),
-    BiocSingular (>= 1.1.3),
     SummarizedExperiment (>= 1.14.0),
     AnnotationDbi (>= 1.46.0)
 Suggests: testthat,
