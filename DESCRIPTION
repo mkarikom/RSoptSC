@@ -16,7 +16,8 @@ License: MIT + file LICENSE
 URL: https://mkarikom.github.io/RSoptSC
 BugReports: https://github.com/mkarikom/RSoptSC/issues
 Remotes: 
-	renozao/NMF@devel
+	renozao/NMF@devel,
+	LTLA/BiocSingular
 Encoding: UTF-8
 LazyData: true
 Imports:
