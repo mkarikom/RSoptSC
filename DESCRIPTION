@@ -13,7 +13,7 @@ Description: Clustering based on single-cell data.
     knowledge.
 Depends: R (>= 3.6)
 License: MIT + file LICENSE
-URL: https://mkarikom.github.io/RSoptSC
+URL: https://github.com/mkarikom/RSoptSC
 BugReports: https://github.com/mkarikom/RSoptSC/issues
 Remotes: 
 	renozao/NMF@devel
