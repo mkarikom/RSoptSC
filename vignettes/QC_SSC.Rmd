@@ -23,7 +23,7 @@ This is an example of clustering, marker identification and pseudotime inference
 
 ## Load and Preprocess Data (Download from NCBI via GEO API)
 
-A matrix of counts with rows as genes and columns as cells must be provided.  Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files.  Here we load example data (GSE67602) originally published in Joost et al 2016.  This is an experimental feature built on top of the excellent GEOquery package by Sean Davis.
+A matrix of counts with rows as genes and columns as cells must be provided.  Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files.  Here we load example data (GSE67602) originally published in Joost et al 2016.  This is an experimental feature built on top of the excellent GEOquery package by Sean Davis.  Note that prior investigation of the GSE metadata has revealed "characteristics_ch1" to be the location of the phenotype classification, which we specify in the "metad_title" parameter.
 
 ```{r, results='asis',message=FALSE, warning=FALSE}
 library(org.Mm.eg.db)
@@ -36,6 +36,7 @@ cache <- ReadAnnotateCountsSCE(series_accession = 'GSE67602', GEOfilecache = '/t
                                pheno_filter = pheno,
                                annotation_db = 'org.Mm.eg.db',
                                feature_annotation_key = "SYMBOL",
+                               metad_title = 'characteristics_ch1',
                                pre_clust = TRUE,
                                rescale = TRUE)
 all_data <- SingleCellExperiment::logcounts(cache$qc)

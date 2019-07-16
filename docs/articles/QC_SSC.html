@@ -84,7 +84,7 @@
       <h1>Direct Download from GEO with Annotation for Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2019-06-10</h4>
+            <h4 class="date">2019-07-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mkarikom/RSoptSC/blob/master/vignettes/QC_SSC.Rmd"><code>vignettes/QC_SSC.Rmd</code></a></small>
       <div class="hidden name"><code>QC_SSC.Rmd</code></div>
@@ -97,7 +97,7 @@
 <div id="load-and-preprocess-data-download-from-ncbi-via-geo-api" class="section level2">
 <h2 class="hasAnchor">
 <a href="#load-and-preprocess-data-download-from-ncbi-via-geo-api" class="anchor"></a>Load and Preprocess Data (Download from NCBI via GEO API)</h2>
-<p>A matrix of counts with rows as genes and columns as cells must be provided. Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files. Here we load example data (GSE67602) originally published in Joost et al 2016. This is an experimental feature built on top of the excellent GEOquery package by Sean Davis.</p>
+<p>A matrix of counts with rows as genes and columns as cells must be provided. Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files. Here we load example data (GSE67602) originally published in Joost et al 2016. This is an experimental feature built on top of the excellent GEOquery package by Sean Davis. Note that prior investigation of the GSE metadata has revealed “characteristics_ch1” to be the location of the phenotype classification, which we specify in the “metad_title” parameter.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(org.Mm.eg.db)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(RSoptSC)</a>
 <a class="sourceLine" id="cb1-3" data-line-number="3"></a>
@@ -108,8 +108,9 @@
 <a class="sourceLine" id="cb1-8" data-line-number="8">                               <span class="dt">pheno_filter =</span> pheno,</a>
 <a class="sourceLine" id="cb1-9" data-line-number="9">                               <span class="dt">annotation_db =</span> <span class="st">'org.Mm.eg.db'</span>,</a>
 <a class="sourceLine" id="cb1-10" data-line-number="10">                               <span class="dt">feature_annotation_key =</span> <span class="st">"SYMBOL"</span>,</a>
-<a class="sourceLine" id="cb1-11" data-line-number="11">                               <span class="dt">pre_clust =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12">                               <span class="dt">rescale =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-11" data-line-number="11">                               <span class="dt">metad_title =</span> <span class="st">'characteristics_ch1'</span>,</a>
+<a class="sourceLine" id="cb1-12" data-line-number="12">                               <span class="dt">pre_clust =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb1-13" data-line-number="13">                               <span class="dt">rescale =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p><img src="QC_SSC_files/figure-html/unnamed-chunk-1-1.png" width="700"></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">all_data &lt;-<span class="st"> </span>SingleCellExperiment<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/SingleCellExperiment/topics/SCE-assays">logcounts</a></span>(cache<span class="op">$</span>qc)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2">similarity_data &lt;-<span class="st"> </span>SingleCellExperiment<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/SingleCellExperiment/topics/SCE-assays">logcounts</a></span>(cache<span class="op">$</span>qc[cache<span class="op">$</span>vargenes<span class="op">$</span>ind[<span class="dv">1</span><span class="op">:</span>upper],])</a>
@@ -198,7 +199,10 @@
 <a class="sourceLine" id="cb8-10" data-line-number="10">              <span class="dt">n_features =</span> <span class="dv">15</span>)</a>
 <a class="sourceLine" id="cb8-11" data-line-number="11"><span class="co">#&gt; Joining, by = "geneSymbol"</span></a>
 <a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt; Warning: Column `geneSymbol` joining factors with different levels,</span></a>
-<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt; coercing to character vector</span></a></code></pre></div>
+<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt; coercing to character vector</span></a>
+<a class="sourceLine" id="cb8-14" data-line-number="14"><span class="co">#&gt; Joining, by = "fac_barcode"</span></a>
+<a class="sourceLine" id="cb8-15" data-line-number="15"><span class="co">#&gt; Warning: Column `fac_barcode` joining factors with different levels,</span></a>
+<a class="sourceLine" id="cb8-16" data-line-number="16"><span class="co">#&gt; coercing to character vector</span></a></code></pre></div>
 <p><img src="QC_SSC_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
 </div>
 <div id="pseudotime-inference" class="section level2">

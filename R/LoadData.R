@@ -22,15 +22,14 @@ LoadData <- function(d_f,
                      gene_f, 
                      cell_f,
                      annotation_f){
-  datas <- read.csv(d_f)
-  genes <- read.csv(gene_f)
-  cells <- read.csv(cell_f)
-  annotations <- read.csv(annotation_f)
-  rownames(datas) <- genes$x
-  colnames(datas) <- cells$x
-    
-  list(cell_names = as.vector(cells[,2]),
-       gene_names = as.vector(genes[,2]),
-       annotation = as.vector(annotations[,2]),
-       data = Matrix(data = as.matrix(datas)[,-c(1)], sparse = TRUE))
+  datas <- read.csv(d_f, row.names = 1)
+  genes <- read.csv(gene_f,row.names = 1)
+  cells <- read.csv(cell_f,row.names = 1)
+  annotations <- read.csv(annotation_f,row.names = 1)
+  rownames(datas) <- genes[,1]
+  colnames(datas) <- cells[,1]
+  list(cell_names = as.vector(cells[,1]),
+       gene_names = as.vector(genes[,1]),
+       annotation = as.vector(annotations[,1]),
+       data = Matrix(data = as.matrix(datas), sparse = TRUE))
 }

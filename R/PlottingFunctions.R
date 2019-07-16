@@ -223,6 +223,8 @@ PlotTopN_Grid <- function(data,
   full_melted$fac_barcode <- factor(full_melted$barcode, levels=barcode_order)
   full_melted$fac_symbol <- factor(full_melted$geneSymbol, levels=markers$geneSymbol)
   
+  labelstab <- data.frame(fac_barcode = names((cluster_labels)), cluster_label = cluster_labels)
+  full_melted <- inner_join(labelstab, full_melted) # get the cell cluster labels
   # get x axis cluster ticks
   counts <- unname(table(cluster_labels))
   names <- c()
@@ -245,7 +247,8 @@ PlotTopN_Grid <- function(data,
                           high = 'yellow',
                           midpoint = 0,
                           name = eval(expr_label)) +
-    facet_grid(clusterId~., scales = "free", space = "free") + #facet by group
+    facet_grid(rows = vars(clusterId), cols = vars(cluster_label), scales = "free", space = "free") + #facet by group
+    xlab("Cell Cluster") +
     ylab("Gene Symbol") +
     theme(strip.text.y = element_text(angle = 0),
           panel.border = element_rect(colour = "black", fill = NA), #add black border
@@ -350,7 +353,6 @@ PlotTopN <- function(data,
           axis.text.x = element_text(size = x_lsize),
           axis.text.y = element_text(size = y_lsize))
   return(p)
-  
 }
 
 #' Heatmap of specific genes
@@ -376,15 +378,15 @@ PlotTopN <- function(data,
 #' @export
 #'
 PlotClusterExpression <- function(data,
-                                   cluster_labels,
-                                   y_lsize = (length(unique(cluster_labels))/8)*7,
-                                   y_tsize = (length(unique(cluster_labels))/8)*7,
-                                   x_lsize = (length(unique(cluster_labels))/8)*7,
-                                   x_tsize = (length(unique(cluster_labels))/8)*7,
-                                   lti_size = (length(unique(cluster_labels))/8)*7,
-                                   lt_size = (length(unique(cluster_labels))/8)*7,
-                                   markers,
-                                   use_z = TRUE){
+                                  cluster_labels,
+                                  y_lsize = (length(unique(cluster_labels))/8)*7,
+                                  y_tsize = (length(unique(cluster_labels))/8)*7,
+                                  x_lsize = (length(unique(cluster_labels))/8)*7,
+                                  x_tsize = (length(unique(cluster_labels))/8)*7,
+                                  lti_size = (length(unique(cluster_labels))/8)*7,
+                                  lt_size = (length(unique(cluster_labels))/8)*7,
+                                  markers,
+                                  use_z = TRUE){
   cluster = symbol = NULL
   n_clusters <- length(unique(cluster_labels))
   sorted_cell <- sort.int(cluster_labels, index.return = TRUE)

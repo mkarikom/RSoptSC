@@ -84,7 +84,7 @@
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2019-06-10</h4>
+            <h4 class="date">2019-07-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mkarikom/RSoptSC/blob/master/vignettes/RSoptSC.Rmd"><code>vignettes/RSoptSC.Rmd</code></a></small>
       <div class="hidden name"><code>RSoptSC.Rmd</code></div>
@@ -99,19 +99,14 @@
 <a href="#load-and-preprocess-data" class="anchor"></a>Load and Preprocess Data</h2>
 <p>A matrix of counts with rows as genes and columns as cells must be provided. Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files. Here we load example data from NCBI GEO (GSE67602) originally published in Joost et al 2016.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(RSoptSC)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="co">#&gt; Registered S3 methods overwritten by 'ggplot2':</span></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt;   method         from </span></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt;   [.quosures     rlang</span></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt;   c.quosures     rlang</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt;   print.quosures rlang</span></a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt; Setting options('download.file.method.GEOquery'='auto')</span></a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt; Setting options('GEOquery.inmemory.gpl'=FALSE)</span></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostData.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb1-10" data-line-number="10">gf &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostGenes.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb1-11" data-line-number="11">cf &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostCells.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12">af &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostAnnotation.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb1-14" data-line-number="14">GSE67602_Joost &lt;-<span class="st"> </span><span class="kw"><a href="../reference/LoadData.html">LoadData</a></span>(df, gf, cf, af)</a></code></pre></div>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="co">#&gt; Setting options('download.file.method.GEOquery'='auto')</span></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt; Setting options('GEOquery.inmemory.gpl'=FALSE)</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostData.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">gf &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostGenes.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">cf &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostCells.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">af &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostAnnotation.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb1-9" data-line-number="9">GSE67602_Joost &lt;-<span class="st"> </span><span class="kw"><a href="../reference/LoadData.html">LoadData</a></span>(df, gf, cf, af)</a></code></pre></div>
 <div id="remove-spike-in-rna" class="section level3">
 <h3 class="hasAnchor">
 <a href="#remove-spike-in-rna" class="anchor"></a>Remove Spike-in RNA</h3>
@@ -203,7 +198,10 @@
 <a class="sourceLine" id="cb8-9" data-line-number="9">              <span class="dt">n_features =</span> <span class="dv">15</span>)</a>
 <a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co">#&gt; Joining, by = "geneSymbol"</span></a>
 <a class="sourceLine" id="cb8-11" data-line-number="11"><span class="co">#&gt; Warning: Column `geneSymbol` joining factors with different levels,</span></a>
-<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt; coercing to character vector</span></a></code></pre></div>
+<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt; coercing to character vector</span></a>
+<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt; Joining, by = "fac_barcode"</span></a>
+<a class="sourceLine" id="cb8-14" data-line-number="14"><span class="co">#&gt; Warning: Column `fac_barcode` joining factors with different levels,</span></a>
+<a class="sourceLine" id="cb8-15" data-line-number="15"><span class="co">#&gt; coercing to character vector</span></a></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-9-1.png" width="672"></p>
 </div>
 <div id="pseudotime-inference" class="section level2">
