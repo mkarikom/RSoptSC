@@ -36,7 +36,7 @@ GSE67602_Joost <- LoadData(df, gf, cf, af)
 ```
 
 ### Remove Spike-in RNA
-```{r, include=FALSE}
+```{r, results='asis'}
 gene_names <- GSE67602_Joost$gene_names
 spikein <- grep('ERCC', gene_names)
 gene_names <- gene_names[-spikein]
