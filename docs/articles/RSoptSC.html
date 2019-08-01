@@ -98,15 +98,12 @@
 <h2 class="hasAnchor">
 <a href="#load-and-preprocess-data" class="anchor"></a>Load and Preprocess Data</h2>
 <p>A matrix of counts with rows as genes and columns as cells must be provided. Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files. Here we load example data from NCBI GEO (GSE67602) originally published in Joost et al 2016.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(RSoptSC)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="co">#&gt; Setting options('download.file.method.GEOquery'='auto')</span></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt; Setting options('GEOquery.inmemory.gpl'=FALSE)</span></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostData.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5">gf &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostGenes.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">cf &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostCells.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">af &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostAnnotation.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9">GSE67602_Joost &lt;-<span class="st"> </span><span class="kw"><a href="../reference/LoadData.html">LoadData</a></span>(df, gf, cf, af)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostData.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">gf &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostGenes.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">cf &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostCells.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">af &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostAnnotation.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">GSE67602_Joost &lt;-<span class="st"> </span><span class="kw"><a href="../reference/LoadData.html">LoadData</a></span>(df, gf, cf, af)</a></code></pre></div>
 <div id="remove-spike-in-rna" class="section level3">
 <h3 class="hasAnchor">
 <a href="#remove-spike-in-rna" class="anchor"></a>Remove Spike-in RNA</h3>
@@ -159,7 +156,7 @@
 <a class="sourceLine" id="cb6-8" data-line-number="8">     <span class="dt">xlab =</span> <span class="ot">NA</span>,</a>
 <a class="sourceLine" id="cb6-9" data-line-number="9">     <span class="dt">ylab =</span> <span class="st">'eigenvalues'</span>,</a>
 <a class="sourceLine" id="cb6-10" data-line-number="10">     <span class="dt">main =</span> <span class="st">'Eigenvalues of the Graph Laplacian'</span>)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <div id="visualize-the-clusters" class="section level3">
 <h3 class="hasAnchor">
 <a href="#visualize-the-clusters" class="anchor"></a>Visualize the Clusters</h3>
@@ -175,7 +172,7 @@
 <a class="sourceLine" id="cb7-9" data-line-number="9">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb7-10" data-line-number="10">                         <span class="dt">featurename =</span> <span class="st">"Cluster ID"</span>,</a>
 <a class="sourceLine" id="cb7-11" data-line-number="11">                         <span class="dt">colorscale =</span> colorscale)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 <p>As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-DII, IFE-KI, IFE-KII were identified by standard techniques.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">true_labels &lt;-<span class="st"> </span>GSE67602_Joost<span class="op">$</span>annotation</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co"># plot clusters</span></a>
@@ -184,7 +181,7 @@
 <a class="sourceLine" id="cb8-5" data-line-number="5">                         <span class="dt">title =</span> <span class="st">"True Labeling"</span>,</a>
 <a class="sourceLine" id="cb8-6" data-line-number="6">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb8-7" data-line-number="7">                         <span class="dt">featurename =</span> <span class="st">"Annotated Cell Types"</span>)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 </div>
 </div>
 <div id="find-cluster-marker-genes-" class="section level2">
@@ -206,7 +203,7 @@
 <a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; Joining, by = "fac_barcode"</span></a>
 <a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co">#&gt; Warning: Column `fac_barcode` joining factors with different levels,</span></a>
 <a class="sourceLine" id="cb9-15" data-line-number="15"><span class="co">#&gt; coercing to character vector</span></a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-9-1.png" width="672"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
 </div>
 <div id="pseudotime-inference" class="section level2">
 <h2 class="hasAnchor">
@@ -234,7 +231,7 @@
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">cluster_predecessors &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetPredecessors.html">GetPredecessors</a></span>(cluster_ptime<span class="op">$</span>cluster_mst, cluster_ptime<span class="op">$</span>root_cluster)</a>
 <a class="sourceLine" id="cb12-2" data-line-number="2">cluster_dtree &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetDominatorTree.html">GetDominatorTree</a></span>(cluster_predecessors, cluster_ptime<span class="op">$</span>graph_cluster)</a>
 <a class="sourceLine" id="cb12-3" data-line-number="3"><span class="kw"><a href="../reference/PlotLineage.html">PlotLineage</a></span>(cluster_dtree)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 <p>Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">pseudotime &lt;-<span class="st"> </span>low_dim_mapping<span class="op">$</span>dist_graph[root_cell,]</a>
 <a class="sourceLine" id="cb13-2" data-line-number="2"></a>
@@ -244,7 +241,7 @@
 <a class="sourceLine" id="cb13-6" data-line-number="6">                         <span class="dt">title =</span> <span class="st">"Pseudotime Labeling"</span>,</a>
 <a class="sourceLine" id="cb13-7" data-line-number="7">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb13-8" data-line-number="8">                         <span class="dt">featurename =</span> <span class="st">"Pseudotime Distance"</span>)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 </div>
 <div id="plot-gene-expression-on-the-flat-embedding" class="section level2">
 <h2 class="hasAnchor">
@@ -259,7 +256,7 @@
 <a class="sourceLine" id="cb14-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Krt14 Expression"</span>,</a>
 <a class="sourceLine" id="cb14-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb14-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Krt10'</span>)</a>
 <a class="sourceLine" id="cb15-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>logdata[gene_index,]</a>
 <a class="sourceLine" id="cb15-3" data-line-number="3"></a>
@@ -269,7 +266,7 @@
 <a class="sourceLine" id="cb15-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Krt10 Expression"</span>,</a>
 <a class="sourceLine" id="cb15-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb15-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Lor'</span>)</a>
 <a class="sourceLine" id="cb16-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>logdata[gene_index,]</a>
 <a class="sourceLine" id="cb16-3" data-line-number="3"></a>
@@ -279,7 +276,7 @@
 <a class="sourceLine" id="cb16-7" data-line-number="7">                    <span class="dt">title =</span> <span class="st">"Lor Expression"</span>,</a>
 <a class="sourceLine" id="cb16-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb16-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
 </div>
 <div id="plot-gene-expression-levels-in-cells-grouped-by-cluster" class="section level2">
 <h2 class="hasAnchor">
@@ -289,17 +286,17 @@
 <a class="sourceLine" id="cb17-2" data-line-number="2">                       <span class="dt">gene_names =</span> gene_names,</a>
 <a class="sourceLine" id="cb17-3" data-line-number="3">                       <span class="dt">labels =</span> labels,</a>
 <a class="sourceLine" id="cb17-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Krt14"</span>)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-17-1.png" width="700"> Violin Plot of Krt10 expression. Note uniformly high expression in the IFE-DI/DII compartments:</p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-18-1.png" width="700"> Violin Plot of Krt10 expression. Note uniformly high expression in the IFE-DI/DII compartments:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
 <a class="sourceLine" id="cb18-2" data-line-number="2">                       <span class="dt">gene_names =</span> gene_names,</a>
 <a class="sourceLine" id="cb18-3" data-line-number="3">                       <span class="dt">labels =</span> labels,</a>
 <a class="sourceLine" id="cb18-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Krt10"</span>)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-18-1.png" width="700"> Violin Plot of Lor expression. Note strong expression in the terminally differentiated IFE-KI/KII compartments:</p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-19-1.png" width="700"> Violin Plot of Lor expression. Note strong expression in the terminally differentiated IFE-KI/KII compartments:</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">  <span class="kw"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span>(<span class="dt">data =</span> logdata,</a>
 <a class="sourceLine" id="cb19-2" data-line-number="2">                       <span class="dt">gene_names =</span> gene_names,</a>
 <a class="sourceLine" id="cb19-3" data-line-number="3">                       <span class="dt">labels =</span> labels,</a>
 <a class="sourceLine" id="cb19-4" data-line-number="4">                       <span class="dt">gene_name =</span> <span class="st">"Lor"</span>)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-19-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
 </div>
 <div id="analyze-signaling-mediated-by-a-ligand-receptor-family" class="section level2">
 <h2 class="hasAnchor">
@@ -857,7 +854,7 @@ down
 <a class="sourceLine" id="cb23-4" data-line-number="4">        <span class="dt">rec_cells_per_cluster =</span> <span class="dv">5</span>,</a>
 <a class="sourceLine" id="cb23-5" data-line-number="5">        <span class="dt">rgb_gap =</span> <span class="fl">0.06</span>,</a>
 <a class="sourceLine" id="cb23-6" data-line-number="6">        <span class="dt">title_text =</span> <span class="st">"Signaling Between Cells"</span>)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-23-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-24-1.png" width="700"></p>
 </div>
 <div id="circos-plot-of-intercluster-network" class="section level3">
 <h3 class="hasAnchor">
@@ -869,7 +866,7 @@ down
 <a class="sourceLine" id="cb24-4" data-line-number="4">          <span class="dt">cluster_labels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span><span class="op">:</span>n_clusters),</a>
 <a class="sourceLine" id="cb24-5" data-line-number="5">          <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>,</a>
 <a class="sourceLine" id="cb24-6" data-line-number="6">          <span class="dt">title_text =</span> <span class="st">"Signaling Between Clusters"</span>)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-24-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
 </div>
 <div id="heatmap-of-signaling-marker-expression" class="section level3">
 <h3 class="hasAnchor">
@@ -882,7 +879,7 @@ down
 <a class="sourceLine" id="cb25-5" data-line-number="5">  <span class="kw"><a href="../reference/PlotClusterExpression.html">PlotClusterExpression</a></span>(<span class="dt">data =</span> logdata,</a>
 <a class="sourceLine" id="cb25-6" data-line-number="6">                        <span class="dt">cluster_labels =</span> labels, </a>
 <a class="sourceLine" id="cb25-7" data-line-number="7">                        <span class="dt">markers =</span> gene_list)</a></code></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
 </div>
 </div>
   </div>

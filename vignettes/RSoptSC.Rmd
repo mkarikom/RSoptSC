@@ -10,12 +10,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
-rm(list = ls())
+```{r, echo = FALSE, message=FALSE}
+library(knitr)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library("RSoptSC")
 set.seed(13)
 ```
 
@@ -26,7 +27,6 @@ This is an example of clustering, marker identification and pseudotime inference
 A matrix of counts with rows as genes and columns as cells must be provided.  Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files.  Here we load example data from NCBI GEO (GSE67602) originally published in Joost et al 2016.
 
 ```{r, results='asis'}
-library(RSoptSC)
 df <- system.file("extdata", "GSE67602_JoostData.csv.bz2", package = "RSoptSC")
 gf <- system.file("extdata", "GSE67602_JoostGenes.csv.bz2", package = "RSoptSC")
 cf <- system.file("extdata", "GSE67602_JoostCells.csv.bz2", package = "RSoptSC")
