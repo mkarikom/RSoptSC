@@ -196,7 +196,7 @@ PlotTopN_Grid <- function(data,
                           x_tsize = ((length(unique(cluster_labels))*n_features)/120)*15,
                           use_z = TRUE,
                           spacing = 0.1){
-  clusterId = geneScore = fac_barcode = fac_symbol = NULL
+  clusterId = geneScore = fac_barcode = fac_symbol = cluster_label = NULL
   names(cluster_labels) <- colnames(data)
   ind <- order(cluster_labels)
   barcode_order <- colnames(data)[ind]

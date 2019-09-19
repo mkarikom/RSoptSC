@@ -49,7 +49,7 @@ gene_names <- rownames(similarity_data)
 
 Run L2R2 on the processed data, outputting the number of iterations and value of the objective.
 
-```{r, results='asis'}
+```{r,results='hide',fig.keep='all'}
 S <- SimilarityM(lambda = 0.05, 
                  data = similarity_data,
                  dims = 3,

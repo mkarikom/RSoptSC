@@ -6,9 +6,16 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clustering Pseudotime Inference on Skin Cell scRNA-seq • RSoptSC</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Clustering Pseudotime Inference on Skin Cell scRNA-seq">
 <meta property="og:description" content="">
 <meta property="og:image" content="/logo.png">
@@ -39,7 +46,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -57,6 +64,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/PBMC_10X.html">Import PBMC 10X Data (Cell Ranger 3.1.0 Output)</a>
+    </li>
+    <li>
       <a href="../articles/QC_SSC.html">Direct Download from GEO with Annotation for Skin Cell scRNA-seq</a>
     </li>
   </ul>
@@ -65,7 +75,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/mkarikom/RSoptSC">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -78,13 +88,14 @@
 <!--/.navbar -->
 
       
+
       </header><script src="RSoptSC_files/kePrint-0.0.1/kePrint.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2019-07-31</h4>
+            <h4 class="date">2019-09-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mkarikom/RSoptSC/blob/master/vignettes/RSoptSC.Rmd"><code>vignettes/RSoptSC.Rmd</code></a></small>
       <div class="hidden name"><code>RSoptSC.Rmd</code></div>
@@ -98,21 +109,21 @@
 <h2 class="hasAnchor">
 <a href="#load-and-preprocess-data" class="anchor"></a>Load and Preprocess Data</h2>
 <p>A matrix of counts with rows as genes and columns as cells must be provided. Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files. Here we load example data from NCBI GEO (GSE67602) originally published in Joost et al 2016.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostData.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">gf &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostGenes.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3">cf &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostCells.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4">af &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostAnnotation.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostData.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">gf &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostGenes.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">cf &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostCells.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">af &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostAnnotation.csv.bz2"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
 <a class="sourceLine" id="cb1-5" data-line-number="5"></a>
 <a class="sourceLine" id="cb1-6" data-line-number="6">GSE67602_Joost &lt;-<span class="st"> </span><span class="kw"><a href="../reference/LoadData.html">LoadData</a></span>(df, gf, cf, af)</a></code></pre></div>
 <div id="remove-spike-in-rna" class="section level3">
 <h3 class="hasAnchor">
 <a href="#remove-spike-in-rna" class="anchor"></a>Remove Spike-in RNA</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">gene_names &lt;-<span class="st"> </span>GSE67602_Joost<span class="op">$</span>gene_names</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">spikein &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grep</a></span>(<span class="st">'ERCC'</span>, gene_names)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">spikein &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="st">'ERCC'</span>, gene_names)</a>
 <a class="sourceLine" id="cb2-3" data-line-number="3">gene_names &lt;-<span class="st"> </span>gene_names[<span class="op">-</span>spikein]</a>
 <a class="sourceLine" id="cb2-4" data-line-number="4">data &lt;-<span class="st"> </span>GSE67602_Joost<span class="op">$</span>data[<span class="op">-</span>spikein,]</a></code></pre></div>
 <p>Apply number of features and exclusion threshold</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">logdata &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log10</a></span>(data <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)</a>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">logdata &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">log10</a></span>(data <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">gene_expression_threshold &lt;-<span class="st"> </span><span class="fl">0.03</span></a>
 <a class="sourceLine" id="cb3-3" data-line-number="3">n_features &lt;-<span class="st"> </span><span class="dv">3000</span></a>
 <a class="sourceLine" id="cb3-4" data-line-number="4">filtered_data &lt;-<span class="st"> </span><span class="kw"><a href="../reference/SelectData.html">SelectData</a></span>(logdata, gene_expression_threshold, n_features)</a></code></pre></div>
@@ -149,9 +160,9 @@
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">clusters &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ClusterCells.html">ClusterCells</a></span>(<span class="dt">similarityMatrix =</span> S<span class="op">$</span>W, <span class="dt">n_comp =</span> <span class="dv">15</span>, <span class="dt">.options=</span><span class="st">'p'</span>)</a>
 <a class="sourceLine" id="cb6-2" data-line-number="2">H &lt;-<span class="st"> </span>clusters<span class="op">$</span>H</a>
 <a class="sourceLine" id="cb6-3" data-line-number="3">labels &lt;-<span class="st"> </span>clusters<span class="op">$</span>labels</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">n_clusters &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(clusters<span class="op">$</span>labels))</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">n_clusters &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(clusters<span class="op">$</span>labels))</a>
 <a class="sourceLine" id="cb6-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>), </a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>), </a>
 <a class="sourceLine" id="cb6-7" data-line-number="7">     clusters<span class="op">$</span>ensemble<span class="op">$</span>eigs<span class="op">$</span>val[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>],</a>
 <a class="sourceLine" id="cb6-8" data-line-number="8">     <span class="dt">xlab =</span> <span class="ot">NA</span>,</a>
 <a class="sourceLine" id="cb6-9" data-line-number="9">     <span class="dt">ylab =</span> <span class="st">'eigenvalues'</span>,</a>
@@ -162,12 +173,12 @@
 <a href="#visualize-the-clusters" class="anchor"></a>Visualize the Clusters</h3>
 <p>Cells are labeled by cluster membership and plotted on low-dimensional embedding (t-SNE) of the similarity matrix.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># define a scheme for the coloring.  This is a required parameter for plotting discrete (factor) data</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">colorscale &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ColorHue.html">ColorHue</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>(labels)))</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">colorscale &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ColorHue.html">ColorHue</a></span>(<span class="dt">n =</span> <span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(labels)))</a>
 <a class="sourceLine" id="cb7-3" data-line-number="3">colorscale &lt;-<span class="st"> </span>colorscale<span class="op">$</span>hex.<span class="fl">1.</span>n.</a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co"># plot clusters</span></a>
 <a class="sourceLine" id="cb7-6" data-line-number="6"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb7-7" data-line-number="7">                         <span class="dt">feature =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">as.factor</a></span>(labels),</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">                         <span class="dt">feature =</span> <span class="kw"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(labels),</a>
 <a class="sourceLine" id="cb7-8" data-line-number="8">                         <span class="dt">title =</span> <span class="st">"NMF Cluster Labeling"</span>,</a>
 <a class="sourceLine" id="cb7-9" data-line-number="9">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb7-10" data-line-number="10">                         <span class="dt">featurename =</span> <span class="st">"Cluster ID"</span>,</a>
@@ -177,7 +188,7 @@
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">true_labels &lt;-<span class="st"> </span>GSE67602_Joost<span class="op">$</span>annotation</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co"># plot clusters</span></a>
 <a class="sourceLine" id="cb8-3" data-line-number="3"><span class="kw"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span>(<span class="dt">flat_embedding =</span> low_dim_mapping<span class="op">$</span>flat_embedding,</a>
-<a class="sourceLine" id="cb8-4" data-line-number="4">                         <span class="dt">feature =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">as.factor</a></span>(true_labels),</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">                         <span class="dt">feature =</span> <span class="kw"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span>(true_labels),</a>
 <a class="sourceLine" id="cb8-5" data-line-number="5">                         <span class="dt">title =</span> <span class="st">"True Labeling"</span>,</a>
 <a class="sourceLine" id="cb8-6" data-line-number="6">                         <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb8-7" data-line-number="7">                         <span class="dt">featurename =</span> <span class="st">"Annotated Cell Types"</span>)</a></code></pre></div>
@@ -247,7 +258,7 @@
 <h2 class="hasAnchor">
 <a href="#plot-gene-expression-on-the-flat-embedding" class="anchor"></a>Plot Gene Expression on the Flat Embedding</h2>
 <p>Plot Expression of Krt14, Krt10, and Lor in t-SNE Space:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Krt14'</span>)</a>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Krt14'</span>)</a>
 <a class="sourceLine" id="cb14-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>logdata[gene_index,]</a>
 <a class="sourceLine" id="cb14-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb14-4" data-line-number="4"><span class="co"># plot features</span></a>
@@ -257,7 +268,7 @@
 <a class="sourceLine" id="cb14-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb14-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Krt10'</span>)</a>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Krt10'</span>)</a>
 <a class="sourceLine" id="cb15-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>logdata[gene_index,]</a>
 <a class="sourceLine" id="cb15-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb15-4" data-line-number="4"><span class="co"># plot features</span></a>
@@ -267,7 +278,7 @@
 <a class="sourceLine" id="cb15-8" data-line-number="8">                    <span class="dt">subtitle =</span> <span class="st">"t-SNE Embedding"</span>,</a>
 <a class="sourceLine" id="cb15-9" data-line-number="9">                    <span class="dt">featurename =</span> <span class="st">"Log Expression"</span>)</a></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Lor'</span>)</a>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">gene_index &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(gene_names <span class="op">==</span><span class="st"> 'Lor'</span>)</a>
 <a class="sourceLine" id="cb16-2" data-line-number="2">data_gene &lt;-<span class="st"> </span>logdata[gene_index,]</a>
 <a class="sourceLine" id="cb16-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb16-4" data-line-number="4"><span class="co"># plot features</span></a>
@@ -302,11 +313,11 @@
 <h2 class="hasAnchor">
 <a href="#analyze-signaling-mediated-by-a-ligand-receptor-family" class="anchor"></a>Analyze Signaling Mediated by a Ligand-Receptor Family</h2>
 <p>In order to analyze signaling, we can load in tables which describe a pathay in detail. There are two tables needed, one that specifies all unique ligand receptor combinations and another that specifies receptor/target/up|down combinations. Example tables for the TgfB pathway are provided in extdata/ and loaded here for the current skin data set. Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples. We then compute the probability of intercellular interaction based on this pathway.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(knitr)</a>
-<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(kableExtra)</a>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(knitr)</a>
+<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(kableExtra)</a>
 <a class="sourceLine" id="cb20-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb20-4" data-line-number="4">lig_rec_path &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"tgfb_lig_rec.tsv"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
-<a class="sourceLine" id="cb20-5" data-line-number="5">rec_target_path &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"tgfb_rec_target_both.tsv"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb20-4" data-line-number="4">lig_rec_path &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"tgfb_lig_rec.tsv"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
+<a class="sourceLine" id="cb20-5" data-line-number="5">rec_target_path &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"tgfb_rec_target_both.tsv"</span>, <span class="dt">package =</span> <span class="st">"RSoptSC"</span>)</a>
 <a class="sourceLine" id="cb20-6" data-line-number="6">pathway &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ImportPathway.html">ImportPathway</a></span>(<span class="dt">lig_table_path =</span> lig_rec_path,</a>
 <a class="sourceLine" id="cb20-7" data-line-number="7">                         <span class="dt">rec_table_path =</span> rec_target_path,</a>
 <a class="sourceLine" id="cb20-8" data-line-number="8">                         <span class="dt">data =</span> logdata,</a>
@@ -314,12 +325,12 @@
 <a class="sourceLine" id="cb20-10" data-line-number="10"></a>
 <a class="sourceLine" id="cb20-11" data-line-number="11"></a>
 <a class="sourceLine" id="cb20-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb20-13" data-line-number="13">k =<span class="st"> </span>pathway<span class="op">$</span>pathway <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/knitr/topics/kable">kable</a></span>()</a></code></pre></div>
+<a class="sourceLine" id="cb20-13" data-line-number="13">k =<span class="st"> </span>pathway<span class="op">$</span>pathway <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>()</a></code></pre></div>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">  </a>
 <a class="sourceLine" id="cb21-2" data-line-number="2">  Pmats &lt;-<span class="st"> </span><span class="kw"><a href="../reference/GetSignalingPartners.html">GetSignalingPartners</a></span>(logdata,</a>
 <a class="sourceLine" id="cb21-3" data-line-number="3">                                gene_names,</a>
 <a class="sourceLine" id="cb21-4" data-line-number="4">                                pathway<span class="op">$</span>pathway_removed)</a></code></pre></div>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/kableExtra/topics/kable_styling">kable_styling</a></span>(<span class="dt">kable_input =</span> k) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/kableExtra/topics/scroll_box">scroll_box</a></span>(<span class="dt">height =</span> <span class="st">"500px"</span>, <span class="dt">width =</span> <span class="st">"300px"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html">kable_styling</a></span>(<span class="dt">kable_input =</span> k) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/kableExtra/man/scroll_box.html">scroll_box</a></span>(<span class="dt">height =</span> <span class="st">"500px"</span>, <span class="dt">width =</span> <span class="st">"300px"</span>)</a></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:300px; ">
 <table class="table table">
 <thead><tr>
@@ -863,7 +874,7 @@ down
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">  cluster_P &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ClusterSig.html">ClusterSig</a></span>(Pmats<span class="op">$</span>P_agg,</a>
 <a class="sourceLine" id="cb24-2" data-line-number="2">                          <span class="dt">cluster_labels =</span> labels)</a>
 <a class="sourceLine" id="cb24-3" data-line-number="3">  <span class="kw"><a href="../reference/SigPlot.html">SigPlot</a></span>(<span class="dt">P =</span> cluster_P,</a>
-<a class="sourceLine" id="cb24-4" data-line-number="4">          <span class="dt">cluster_labels =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span><span class="op">:</span>n_clusters),</a>
+<a class="sourceLine" id="cb24-4" data-line-number="4">          <span class="dt">cluster_labels =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span><span class="op">:</span>n_clusters),</a>
 <a class="sourceLine" id="cb24-5" data-line-number="5">          <span class="dt">rgb_gap =</span> <span class="fl">0.60</span>,</a>
 <a class="sourceLine" id="cb24-6" data-line-number="6">          <span class="dt">title_text =</span> <span class="st">"Signaling Between Clusters"</span>)</a></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
@@ -872,7 +883,7 @@ down
 <h3 class="hasAnchor">
 <a href="#heatmap-of-signaling-marker-expression" class="anchor"></a>Heatmap of Signaling Marker Expression</h3>
 <p>Visualize the expression of ligand/receptor and up/down target expression across clusters</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">  gene_list =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'Tgfb1'</span>, <span class="st">'Tgfb2'</span>, </a>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">  gene_list =<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'Tgfb1'</span>, <span class="st">'Tgfb2'</span>, </a>
 <a class="sourceLine" id="cb25-2" data-line-number="2">                <span class="st">'Tgfbr1'</span>, <span class="st">'Tgfbr2'</span>,</a>
 <a class="sourceLine" id="cb25-3" data-line-number="3">                <span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span>)</a>
 <a class="sourceLine" id="cb25-4" data-line-number="4"></a>
@@ -885,6 +896,7 @@ down
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -905,17 +917,20 @@ down
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by Matt Karikomi, Shuxiong Wang, Adam MacLean.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>
