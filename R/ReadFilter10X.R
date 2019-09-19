@@ -23,7 +23,7 @@
 #' @importFrom AnnotationDbi mapIds
 #' @importFrom grDevices cairo_ps
 #' @importFrom scater calculateQCMetrics isOutlier calcAverage nexprs normalize
-#' @importFrom scran computeSumFactors computeSpikeFactors trendVar decomposeVar quickCluster
+#' @importFrom scran computeSumFactors computeSpikeFactors trendVar decomposeVar quickCluster makeTechTrend
 #' @importFrom DropletUtils read10xCounts 
 #'  
 #' @export
@@ -133,9 +133,15 @@ ReadFilter10X <- function(filepath = NULL,
     assay(sce, 'logcounts') <- log2(counts(sce) + 1)
   }
 
-  var.fit <- trendVar(sce, parametric=TRUE,loess.args=list(span=0.3),use.spikes=FALSE)
-  var.out <- decomposeVar(sce, var.fit)
-  dec.bio <- order(var.out$bio, decreasing=TRUE)
+  pois <- makeTechTrend(x=sce)
+  
+  fit.orig <- trendVar(sce,loess.args=list(span=0.05),use.spikes=FALSE)
+  fit <- fit.orig
+  fit$trend <- pois
+  
+  dec <- decomposeVar(fit=fit) # use per-gene variance estimates in 'fit'.
+
+  dec.bio <- order(dec$bio, decreasing=TRUE)
   dec.bio.genes <- rownames(sce)[dec.bio]
 
   # remove spike ins prior to downstream analysis
@@ -152,9 +158,13 @@ ReadFilter10X <- function(filepath = NULL,
     chosen.genes.ind <- match(dec.bio.genes, rownames(sce))
     chosen.genes.ind <- chosen.genes.ind[!is.na(chosen.genes.ind)]
     chosen.genes <- list(names = chosen.genes.names, ind = chosen.genes.ind)
-    plot(var.out$mean, var.out$total, pch=16, cex=0.6, xlab="Mean log-expression", 
+    
+    plot(fit.orig$mean, fit.orig$var, pch=16, cex=0.6, xlab="Mean log-expression", 
          ylab="Variance of log-expression")
-    curve(var.fit$trend(x), col="dodgerblue", lwd=2, add=TRUE)
+    curve(fit.orig$trend(x), col="dodgerblue", add=TRUE)
+    curve(pois(x), col="red", add=TRUE)
+    legend(5, 12, legend=c("Uncorrected", "Experimental Noise"),
+           col=c("blue", "red"), lty=1:1, cex=0.8)
   }else if(var_gene_method == 'varimax'){
     pr <- prcomp(t(logcounts(sce)))
     coef <- pr$rotation[,1:5]

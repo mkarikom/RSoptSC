@@ -28,7 +28,7 @@ This is an example of clustering, marker identification and pseudotime inference
 
 ## Load and Preprocess Data (Download from 10X Genomics)
 
-RSoptSC::ReadFilter10X is a wrapper for [scran](https://www.google.com), [scater](https://www.google.com), [DropletUtils](https://www.google.com), whose documentation is a must-read for experimentalists.
+RSoptSC::ReadFilter10X is a wrapper for [scran](https://bioconductor.org/packages/release/bioc/html/scran.html), [scater](http://bioconductor.org/packages/release/bioc/html/scater.html), [DropletUtils](https://bioconductor.org/packages/release/bioc/html/DropletUtils.html), whose documentation is a must-read for experimentalists.
 
 ```{r,results='hide',message=FALSE, warning=FALSE}
 
@@ -50,7 +50,7 @@ cache <- ReadFilter10X(filepath = paste0(extdir, "/filtered_feature_bc_matrix"),
                        pre_clust = TRUE,
                        rescale = TRUE,
                        filtercells = FALSE,
-                       subsample = 700)
+                       subsample = 1000)
 all_data <- SingleCellExperiment::logcounts(cache$qc)
 similarity_data <- SingleCellExperiment::logcounts(cache$qc[cache$vargenes$ind[1:upper],])
 gene_names <- rownames(similarity_data)
