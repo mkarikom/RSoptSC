@@ -1,0 +1,5 @@
+ligand,receptor
+lig1,rec1
+lig2,rec1
+lig2,rec2
+lig3,rec2

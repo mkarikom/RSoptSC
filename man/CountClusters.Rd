@@ -4,8 +4,7 @@
 \alias{CountClusters}
 \title{Use clustering consensus to infer cluster number}
 \usage{
-CountClusters(data, tol = 0.01, range = 2:20, eigengap = TRUE,
-  n_comp)
+CountClusters(data, tol = 0.01, range = 2:20, eigengap = TRUE, n_comp)
 }
 \arguments{
 \item{data}{a symmetric nonnegative similarity matrix}

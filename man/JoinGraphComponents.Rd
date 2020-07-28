@@ -4,8 +4,13 @@
 \alias{JoinGraphComponents}
 \title{Join Graph Components}
 \usage{
-JoinGraphComponents(root_cell, adjacency_matrix, flat_distances,
-  n_components, component_members)
+JoinGraphComponents(
+  root_cell,
+  adjacency_matrix,
+  flat_distances,
+  n_components,
+  component_members
+)
 }
 \arguments{
 \item{root_cell}{the root cell of the lineage tree}

@@ -4,8 +4,7 @@
 \alias{ClusterCells}
 \title{Cluster the Cells}
 \usage{
-ClusterCells(similarityMatrix = NULL, n_clusters = NULL, n_comp = 3,
-  ...)
+ClusterCells(similarityMatrix = NULL, n_clusters = NULL, n_comp = 3, ...)
 }
 \arguments{
 \item{similarityMatrix}{a symmetric nonnegative similarity matrix}

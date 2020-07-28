@@ -4,12 +4,18 @@
 \alias{PlotTopN_Grid}
 \title{Factor Grid heatmap of the top n markers}
 \usage{
-PlotTopN_Grid(data, cluster_labels, markers, n_features,
+PlotTopN_Grid(
+  data,
+  cluster_labels,
+  markers,
+  n_features,
   y_lsize = ((length(unique(cluster_labels)) * n_features)/120) * 5,
   y_tsize = ((length(unique(cluster_labels)) * n_features)/120) * 15,
   x_lsize = ((length(unique(cluster_labels)) * n_features)/120) * 14,
   x_tsize = ((length(unique(cluster_labels)) * n_features)/120) * 15,
-  use_z = TRUE, spacing = 0.1)
+  use_z = TRUE,
+  spacing = 0.1
+)
 }
 \arguments{
 \item{data}{expression data with genes x cells}

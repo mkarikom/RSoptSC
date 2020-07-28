@@ -4,8 +4,13 @@
 \alias{FindRootCluster}
 \title{Find the root cluster}
 \usage{
-FindRootCluster(cluster_labels, flat_embedding, dist_graph, dist_flat,
-  reverse = FALSE)
+FindRootCluster(
+  cluster_labels,
+  flat_embedding,
+  dist_graph,
+  dist_flat,
+  reverse = FALSE
+)
 }
 \arguments{
 \item{cluster_labels}{the cluster label for each cell}

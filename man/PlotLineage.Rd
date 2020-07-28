@@ -4,8 +4,14 @@
 \alias{PlotLineage}
 \title{Plot the pseudotime ordering of clusters}
 \usage{
-PlotLineage(network, node_color = NULL, alpha_color = 1,
-  exaggerate = TRUE, weight_scaler = 0.2, arrow_scaler = 0.8)
+PlotLineage(
+  network,
+  node_color = NULL,
+  alpha_color = 1,
+  exaggerate = TRUE,
+  weight_scaler = 0.2,
+  arrow_scaler = 0.8
+)
 }
 \arguments{
 \item{network}{an igraph network with weighted edges corresponding to the pseudotime distance}

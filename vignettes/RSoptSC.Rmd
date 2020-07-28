@@ -281,37 +281,36 @@ pathway <- ImportPathway(lig_table_path = lig_rec_path,
 
 k = pathway$pathway %>% kable()
 ```
-```{r, results='hide', message=FALSE}
+```{r, results='hide', echo=FALSE,warning=FALSE,message=FALSE,error=FALSE,}
+  datamat = as.matrix(logdata); rownames(datamat) = tolower(rownames(datamat)); colnames(datamat) = tolower(colnames(datamat))
+  pathway$pathway_removed$receptor = tolower(pathway$pathway_removed$receptor)
+  pathway$pathway_removed$ligand = tolower(pathway$pathway_removed$ligand)
+  pathway$pathway_removed$target = tolower(pathway$pathway_removed$target)
+  names(labels) = tolower(names(labels))
   
-  Pmats <- GetSignalingPartners(logdata,
-                                gene_names,
-                                pathway$pathway_removed)
+  Pmats <- GetSignalingPartners(datamat,labels,pathway)
+  
+
+
 ```
 ```{r}
 kable_styling(kable_input = k) %>% scroll_box(height = "500px", width = "300px")
 ```
-### Circos Plot of Intercellular Network
+### Plot of Intercellular Network
 Now plot the previous result as a circos plot on the top five ligand-producing and top five receptor-bearing cells from every cluster.  The upper hemisphere of the plot shows receptor-bearing cells.  The chords of the plot are colored by the ligand-producing cells in the lower hemisphere.
 
 ```{r}
-SigPlot(P = Pmats$P_agg,
-        cluster_labels = labels,
-        lig_cells_per_cluster = 5,
-        rec_cells_per_cluster = 5,
-        rgb_gap = 0.06,
-        title_text = "Signaling Between Cells")
+SigPlot(Pmats$P_tot,labels)
 ```
 
-### Circos Plot of Intercluster Network
+### Plot of Intercluster Network
 Directional plot of cluster-to-cluster signaling.  The root of the directional chord is raised.
 
 ```{r}
-  cluster_P <- ClusterSig(Pmats$P_agg,
+  cluster_P <- ClusterSig(Pmats,
                           cluster_labels = labels)
-  SigPlot(P = cluster_P,
-          cluster_labels = c(1:n_clusters),
-          rgb_gap = 0.60,
-          title_text = "Signaling Between Clusters")
+  SigPlot_Cluster(cluster_P$P_tot,
+          c(1:n_clusters))
 ```
 
 ### Heatmap of Signaling Marker Expression

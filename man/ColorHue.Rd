@@ -4,8 +4,7 @@
 \alias{ColorHue}
 \title{Get a vector of n equally spaced rgb colors}
 \usage{
-ColorHue(n, starthue = 15, endhue = 360, luminance = 65,
-  chroma = 100)
+ColorHue(n, starthue = 15, endhue = 360, luminance = 65, chroma = 100)
 }
 \arguments{
 \item{n}{integer number of hex codes to return}

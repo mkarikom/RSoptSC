@@ -4,10 +4,10 @@
 \alias{GetSignalingPartners}
 \title{Compute Cell-cell interaction probability}
 \usage{
-GetSignalingPartners(M, ids, pathway, normalize_aggregate = TRUE)
+GetSignalingPartners(data, ids, pathway, normalize_aggregate = TRUE)
 }
 \arguments{
-\item{M}{a matrix of expression values for each cell (rows) and gene (columns)}
+\item{data}{a matrix of expression values for each cell (rows) and gene (columns)}
 
 \item{ids}{a vector of gene ids}
 

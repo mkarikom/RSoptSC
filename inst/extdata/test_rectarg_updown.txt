@@ -1,0 +1,5 @@
+receptor,target,direction
+rec1,targ_rec1_1,up
+rec1,targ_rec1_2,up
+rec1,targ_rec1_3,down
+rec2,targ_rec2_1,down

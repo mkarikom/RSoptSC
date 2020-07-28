@@ -4,14 +4,18 @@
 \alias{PlotClusterExpression}
 \title{Heatmap of specific genes}
 \usage{
-PlotClusterExpression(data, cluster_labels,
+PlotClusterExpression(
+  data,
+  cluster_labels,
   y_lsize = (length(unique(cluster_labels))/8) * 7,
   y_tsize = (length(unique(cluster_labels))/8) * 7,
   x_lsize = (length(unique(cluster_labels))/8) * 7,
   x_tsize = (length(unique(cluster_labels))/8) * 7,
   lti_size = (length(unique(cluster_labels))/8) * 7,
-  lt_size = (length(unique(cluster_labels))/8) * 7, markers,
-  use_z = TRUE)
+  lt_size = (length(unique(cluster_labels))/8) * 7,
+  markers,
+  use_z = TRUE
+)
 }
 \arguments{
 \item{data}{expression data with genes x cells}

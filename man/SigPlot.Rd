@@ -2,37 +2,20 @@
 % Please edit documentation in R/PlottingFunctions.R
 \name{SigPlot}
 \alias{SigPlot}
-\title{Circos plot of signaling score}
+\title{Heatmap plot of cell signaling}
 \usage{
-SigPlot(P, rgb_gap = 0.2, cluster_labels, lig_cells_per_cluster = 10,
-  rec_cells_per_cluster = 10, zero_threshold = 0, cD_reduce = 0,
-  highlight_clusters = TRUE, title_text = NULL, n_clusters = NULL,
-  n_cluster_cols = NULL, receptor_chord_color = FALSE)
+SigPlot(p, labels, textsize = 10, plottitle = NULL, plotsubtitle = NULL)
 }
 \arguments{
-\item{P}{signaling probabilities cells x cells}
+\item{p}{signaling probabilities cells x cells}
 
-\item{rgb_gap}{real percent of the inter-cluster spectrum gap to encompass cluster highlighting}
+\item{labels}{labels of cells ordered from 1 to n}
 
-\item{cluster_labels}{labels of cells ordered from 1 to n}
+\item{textsize}{the ggplot text size}
 
-\item{lig_cells_per_cluster}{int 0 to keep all}
+\item{plottitle}{the plot title}
 
-\item{rec_cells_per_cluster}{int 0 to keep all}
-
-\item{zero_threshold}{real value for zero cutoff (0 to keep all edges)}
-
-\item{cD_reduce}{ratio of the circlos plot grid element (cell or cluster) to the whole circle is less than this value, the item is omitted from the plot.  Default is zero, don't change unless you are inspecting an unhighlighted chord diagram, since it breaks highlighting if one or more pairs above the zero_threshold happen to have a low grid/circle ratio.}
-
-\item{highlight_clusters}{whether to label the plot with clusters.  Default is true.}
-
-\item{title_text}{the title of the plot}
-
-\item{n_clusters}{if n is higher than the number of unique labels (colorscale can be used for meta plotting)}
-
-\item{n_cluster_cols}{for plots with different subpopulations, use this to reserve dropout clusters in individual plots.  WARNING: this is strongly recommended if there are dropouts, ie unique(labels) != 1:length(labels)}
-
-\item{receptor_chord_color}{color the chords according to the receptor-bearing cell they point to.  default is false}
+\item{plotsubtitle}{the plot sub title}
 }
 \description{
 Produce a plot of a cell signaling network according to the cell-normalized expression score.

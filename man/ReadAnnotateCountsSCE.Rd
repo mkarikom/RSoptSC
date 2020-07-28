@@ -4,13 +4,25 @@
 \alias{ReadAnnotateCountsSCE}
 \title{Read Counts Data}
 \usage{
-ReadAnnotateCountsSCE(filepath = NULL, inf_exp_rate = 0,
-  inf_gene_count = 0, inf_cell_count = 0, series_accession,
-  metad_title = "characteristics_ch1", cell_id = "title",
-  pheno_filter = NULL, plot_title = NULL, GEOfilecache = getwd(),
-  annotation_db, feature_annotation_key, remove_spike_ERCC = FALSE,
-  pre_clust = FALSE, rescale = TRUE, var_gene_method = "mean_var",
-  ...)
+ReadAnnotateCountsSCE(
+  filepath = NULL,
+  inf_exp_rate = 0,
+  inf_gene_count = 0,
+  inf_cell_count = 0,
+  series_accession,
+  metad_title = "characteristics_ch1",
+  cell_id = "title",
+  pheno_filter = NULL,
+  plot_title = NULL,
+  GEOfilecache = getwd(),
+  annotation_db,
+  feature_annotation_key,
+  remove_spike_ERCC = FALSE,
+  pre_clust = FALSE,
+  rescale = TRUE,
+  var_gene_method = "mean_var",
+  ...
+)
 }
 \arguments{
 \item{filepath}{the full or relative (to the workspace) path of the data file}

@@ -4,9 +4,14 @@
 \alias{RepresentationMap}
 \title{Generate multiple representations}
 \usage{
-RepresentationMap(flat_embedding = NULL, similarity_matrix,
-  join_components = TRUE, normalize_S = TRUE,
-  flat_embedding_method = "umap", ...)
+RepresentationMap(
+  flat_embedding = NULL,
+  similarity_matrix,
+  join_components = TRUE,
+  normalize_S = TRUE,
+  flat_embedding_method = "umap",
+  ...
+)
 }
 \arguments{
 \item{flat_embedding}{optionally provided low dim embedding, if not then 2d tsne will be used}

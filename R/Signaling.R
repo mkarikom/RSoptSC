@@ -1,10 +1,183 @@
+getK <- function(a,b){
+  if(a == 0 && b == 0){
+    return(0)
+  }else{
+    return(a/(a+b))
+  }
+}
+
+getD <- function(a,g){
+  if(a == 0 && g == 0){
+    return(0)
+  }else{
+    return(a/(a+g))
+  }
+}
+
+
+#' compute lig and rec
+#'
+#' @param i the ligand
+#' @param j the receptor
+#'                                          
+#' @return a vector of probs
+#' 
+#' @import Rmpfr     
+getAlpha <- function(i,j){
+  if(i == 0 || j == 0){
+    return(0)
+  }else{
+    return(exp(-1/(i*j)))
+  }
+}
+
+#' compute uptargets
+#'
+#' @param Yv the target expression
+#'                                          
+#' @return a vector of probs
+#' 
+#' @import Rmpfr                                                       
+getBetaj <- function(Yv){
+  vsum = sum(Yv)
+  if(vsum == 0){
+    return(0)
+  }else{
+    return(exp(-length(Yv)/vsum))
+  }
+}
+
+#' compute downtargets
+#'
+#' @param Ystarv the target expression
+#'                                          
+#' @return a vector of probs
+#' 
+#' @import Rmpfr                                                       
+getGammaj <- function(Ystarv){
+  vsum = sum(Ystarv)
+  if(vsum == 0){
+    return(0)
+  }else{
+    return(exp(-vsum/length(Ystarv)))
+  }
+}
+
+
+
+#' compute the unnormalized probability
+#'
+#' @param ligname the ligand
+#' @param recname the receptor
+#' @param beta the up targets
+#' @param gamma the down targets
+#' @param flat the flattened p matrix
+#' @param data the expression
+#' 
+#'                                          
+#' @return a vector of probs
+#' 
+#' @import doParallel foreach                                           
+updateFlatBoth <- function(ligname,recname,beta,gamma,flat,data){
+  cat("\n using parallel update")
+  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha","getK","getD","mpfr"),  .combine = 'c') %dopar% {
+    ligcelli = data[tolower(ligname),flat[v,1]]
+    reccellj = data[tolower(recname),flat[v,2]]
+    a = getAlpha(ligcelli,reccellj)
+    b = beta[flat[v,2]]
+    g = gamma[flat[v,2]]
+    kappa = getK(a,b)
+    delta = getD(a,g)
+    a * kappa * delta * b * g
+  }
+  return(flatval)
+}
+
+
+#' compute the unnormalized probability
+#'
+#' @param ligname the ligand
+#' @param recname the receptor
+#' @param beta the up targets
+#' @param flat the flattened p matrix
+#' @param data the expression
+#'                                          
+#' @return a vector of probs
+#' 
+#' @import doParallel foreach                                           
+updateFlatUp <- function(ligname,recname,beta,flat,data){
+  cat("\n using parallel update")
+  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha","getK","mpfr"),  .combine = 'c') %dopar% {
+    
+    ligcelli = data[tolower(ligname),flat[v,1]]
+    reccellj = data[tolower(recname),flat[v,2]]
+    
+    a = getAlpha(ligcelli,reccellj)
+    b = beta[flat[v,2]]
+    kappa = getK(a,b)
+    a * kappa * b
+  }
+  return(flatval)
+}
+
+
+
+#' compute the unnormalized probability
+#'
+#' @param ligname the ligand
+#' @param recname the receptor
+#' @param gamma the down targets
+#' @param flat the flattened p matrix
+#' @param data the expression
+#'                                          
+#' @return a vector of probs
+#' 
+#' @import doParallel foreach                                           
+updateFlatDown <- function(ligname,recname,gamma,flat,data){
+  cat("\n using parallel update")
+  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha","getD","mpfr"),  .combine = 'c') %dopar% {
+    
+    ligcelli = data[tolower(ligname),flat[v,1]]
+    reccellj = data[tolower(recname),flat[v,2]]
+    
+    a = getAlpha(ligcelli,reccellj)
+    g = gamma[flat[v,2]]
+    delta = getD(a,g)
+    a * delta * g
+  }
+  return(flatval)
+}
+
+#' compute the unnormalized probability
+#'
+#' @param ligname the ligand
+#' @param recname the receptor
+#' @param flat the flattened p matrix
+#' @param data the expression
+#'                                          
+#' @return a vector of probs
+#' 
+#' @import doParallel foreach                                   
+updateFlatNone <- function(ligname,recname,flat,data){
+  cat("\n using parallel update")
+  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha","mpfr"),  .combine = 'c') %dopar% {
+    
+    ligcelli = data[tolower(ligname),flat[v,1]]
+    reccellj = data[tolower(recname),flat[v,2]]
+    
+    a = getAlpha(ligcelli,reccellj)
+    a
+  }
+  return(flatval)
+}
+
 #' Compute Cell-cell interaction probability
 #'
 #' We can have a situation where ligand/receptor expression is low, but target genes (repressors and activators) are highly expressed.  In this case we will get a false positive for \eqn{P_{i,j}}.  In order to correct for this, we introduce normalizing coefficients for the relationship between \eqn{\alpha_{i,j}} and \eqn{\beta / \gamma}.  When \eqn{\alpha} is low, then K and D will decrease rapidly with increasing \eqn{\beta} and \eqn{\gamma}, penalizing the resulting increase in P (which is increasingly likely to be a false positive, given the disparity between \eqn{\alpha} and \eqn{\beta},\eqn{\gamma})
 #' \eqn{K_{i,j} = \frac{\alpha_{i,j}}{\alpha_{i,j} + \beta_{i,j}}}
 #' Note that activated genes are required under this model.
 #'
-#' @param M a matrix of expression values for each cell (rows) and gene (columns)
+#' @param data a matrix of expression values for each cell (rows) and gene (columns)
 #' @param ids a vector of gene ids
 #' @param pathway a data frame with "ligands", "receptors", "direction", and "targets"
 #' @param normalize_aggregate whether or not to normalize the P_agg matrix by dividing each row by its sum default is true
@@ -12,223 +185,145 @@
 #' @return a list containing:
 #'     \item{P}{a list of the cell-cell signaling probabilities for all ligand/receptor pairs}
 #'     \item{P_agg}{the aggregate matrix of all ligand/receptor pairs}
-#'                                          
+#'                          
+#' @import doParallel                                              
+#' @importFrom bigstatsr nb_cores
 #' @importFrom reshape2 melt
 #' @importFrom dplyr filter mutate_all
 #' @importFrom Matrix as.matrix rowSums colMeans
 #' 
 #' @export
 #'
-GetSignalingPartners <- function(M,
+GetSignalingPartners <- function(data,
                                  ids,
                                  pathway,
                                  normalize_aggregate = TRUE){
-  receptor = ligand = direction = NULL   # r cmd check pass
-  n_cells <- ncol(as.matrix(M))
-  n_genes <- nrow(as.matrix(M))
-  cellnames <- colnames(M)
+  colnames(data) = tolower(colnames(data))
+  rownames(data) = tolower(rownames(data))
+  doMC::registerDoMC()
+  RCpairs = dplyr::distinct(pathway$pathway_removed, receptor, ligand)
+  P = list()
   
-  # fix the names
-  ids <- tolower(ids)
-  pathway <- mutate_all(pathway, .funs = tolower)
+  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
   
-  # ligand-receptor pairs
-  LR_pairs <- unique(pathway[c("receptor", "ligand")])
-  
-  # version of model
-  target <- FALSE
-  if('target' %in% colnames(pathway)){
-    target <- TRUE
+  if (nzchar(chk) && chk == "TRUE") {
+    # use 2 cores in CRAN/Travis/AppVeyor
+    ncores <- 2L
+  } else {
+    # use all cores in devtools::test()
+    ncores <- nb_cores() - 1
   }
   
-  P <- list()
-  for(pair in 1:nrow(LR_pairs)){
-    P[[pair]] <- matrix(0, nrow = n_cells, ncol = n_cells)
-    rownames(P[[pair]]) <- cellnames
-    colnames(P[[pair]]) <- cellnames
-    
-    rec_index <- which(ids == LR_pairs[pair, 1])
-    lig_index <- which(ids == LR_pairs[pair, 2])
-    ldata <- NormalizeGene(M[lig_index,])
-    rdata <- NormalizeGene(M[rec_index,])
-    
-    alpha <- matrix(0, nrow = n_cells, ncol = n_cells)
-    for(i in 1:n_cells){
-      for(j in 1:n_cells){
-        alpha[i,j] <- exp(-1/(ldata[i] * rdata[j]))
+  cl <- parallel::makeCluster(ncores)
+  doParallel::registerDoParallel(cl)
+  
+  
+  
+  # loop over the RCpairs list
+  for(u in 1:dim(RCpairs)[1]){
+    # add if/else to switch between these
+    ligname = RCpairs$ligand[u]
+    recname = RCpairs$receptor[u]
+    dirs = dplyr::select(pathway$pathway_removed,receptor,ligand,target,direction) %>% 
+      dplyr::filter(receptor==recname,ligand==ligname) %>% 
+      .$direction %>% 
+      unique() 
+    ################################################
+    # there are no targets
+    ################################################
+    if(length(dirs)==0){
+      cat("\n no targets detected, directions = ", dirs, ", all(dirs=='up')=", all(dirs == "up"))
+      flat = reshape2::melt(matrix(0,ncol(data),ncol(data)))
+      flat = flat[,-3]
+      flat$value = updateFlatNone(ligname,recname,flat,data)
+    }else if(all(dirs=="up")){
+      cat("\n only up-targets detected, directions = ", dirs, ", all(dirs=='up')=", all(dirs == "up"))
+      ################################################
+      # there are only up targets
+      ################################################
+      flat = reshape2::melt(matrix(0,ncol(data),ncol(data)))
+      flat = flat[,-3]
+      
+      uptargs = dplyr::select(pathway$pathway_removed,receptor,target,direction) %>% 
+        dplyr::filter(receptor == recname,direction=="up") %>% 
+        dplyr::select(target) %>% 
+        .$target %>% unique()
+      
+      bvec = rep(0,ncol(data))
+      for(b in 1:length(bvec)){
+        bvec[b] = getBetaj(data[tolower(uptargs),b]) 
       }
+      flat$value = updateFlatUp(ligname,recname,bvec,flat,data)
+      
+    }else if(all(dirs == "down")){
+      cat("\n only down-targets detected, directions = ", dirs, ", all(dirs=='up')=", all(dirs == "up"))
+      ################################################
+      # there are only down targets
+      ################################################
+      flat = reshape2::melt(matrix(0,ncol(data),ncol(data)))
+      flat = flat[,-3]
+      
+      downtargs = dplyr::select(pathway$pathway_removed,receptor,target,direction) %>% 
+        dplyr::filter(receptor == recname,direction=="down") %>% 
+        dplyr::select(target) %>% 
+        .$target %>% unique()
+      
+      gvec = rep(0,ncol(data))
+      
+      for(g in 1:length(gvec)){
+        gvec[g] = getGammaj(data[tolower(downtargs),g]) 
+      }
+      flat$value = updateFlatDown(ligname,recname,gvec,flat,data)
+    }else{
+      cat("\n up and down targets detected, directions = ", dirs, ", all(dirs=='up')=", all(dirs == "up"))
+      ################################################
+      # there are uptargets and downtargets
+      ################################################
+      flat = reshape2::melt(matrix(0,ncol(data),ncol(data)))
+      flat = flat[,-3]
+      
+      uptargs = dplyr::select(pathway$pathway_removed,receptor,target,direction) %>% 
+        dplyr::filter(receptor == recname,direction=="up") %>% 
+        dplyr::select(target) %>% 
+        .$target %>% unique()
+      
+      bvec = rep(0,ncol(data))
+      for(b in 1:length(bvec)){
+        bvec[b] = getBetaj(data[tolower(uptargs),b]) 
+      }
+      
+      downtargs = dplyr::select(pathway$pathway_removed,receptor,target,direction) %>% 
+        dplyr::filter(receptor == recname,direction=="down") %>% 
+        dplyr::select(target) %>% 
+        .$target %>% unique()
+      
+      gvec = rep(0,ncol(data))
+      for(g in 1:length(gvec)){
+        gvec[g] = getGammaj(data[tolower(downtargs),g]) 
+      }
+      flat$value = updateFlatBoth(ligname,recname,bvec,gvec,flat,data)
     }
-    if(target){
-      # note the following may require at least 2 targets of up/down, up, or down
-      pathsubset <- pathway %>% filter(receptor == LR_pairs[pair, 1] &
-                                         ligand == LR_pairs[pair, 2])
-      targupdown <- targdown <- targup <- FALSE
-      if('up' %in% pathsubset$direction & 'down' %in% pathsubset$direction){
-        targupdown <- TRUE
-      } else if('up' %in% pathsubset$direction){
-        targup <- TRUE
-      } else {
-        targdown <- TRUE
-      }
-      targets <- pathsubset$target 
-      if(targupdown){
-        upsubset <- pathsubset %>% filter(direction == 'up')
-        updata <- M[drop=FALSE,match(upsubset$target,ids),]
-        for(targind in 1:nrow(as.matrix(updata))){
-          updata[targind,] <- NormalizeGene(updata[targind,])
-        }
-        updata <- colMeans(updata)          
-        beta <- exp(-1/updata)
-        
-        downsubset <- pathsubset %>% filter(direction == 'down')
-        downdata <- M[drop=FALSE,match(downsubset$target,ids),]
-        for(targind in 1:nrow(as.matrix(downdata))){
-          downdata[targind,] <- NormalizeGene(downdata[targind,])
-        }
-        downdata <- colMeans(downdata)          
-        gamma <- exp(-downdata)
-        K <- D <- alpha
-        for(i in 1:n_cells){
-          for(j in 1:n_cells){
-            if(beta[j] <= 0){
-              K[i,j] <- 0
-            } else {
-              K[i,j] <- alpha[i,j] / (alpha[i,j] + beta[j])
-            }
-            if(gamma[j] <= 0){
-              D[i,j] <- 0
-            } else {
-              D[i,j] <- alpha[i,j] / (alpha[i,j] + gamma[j])
-            }
-          }
-        }
-        for(ii in 1:n_cells){
-          b <- sum(alpha[ii,] * beta * K[ii,] * gamma * D[ii,])
-          for(kk in 1:n_cells){
-            a <- alpha[ii,kk] * beta[kk] * K[ii,kk] * gamma[kk] * D[ii,kk]
-            if(b == 0){
-              P[[pair]][ii,kk] <- 0
-            }else{
-              P[[pair]][ii,kk] <- a/b
-            }
-          }
-        }
-      } else if(targup){
-        upsubset <- pathsubset %>% filter(direction == 'up')
-        updata <- M[drop=FALSE,match(upsubset$target,ids),]
-        for(targind in 1:nrow(as.matrix(updata))){
-          updata[targind,] <- NormalizeGene(updata[targind,])
-        }
-        updata <- base::colMeans(updata)          
-        beta <- exp(-1/updata)
-        K <- alpha
-        for(i in 1:n_cells){
-          for(j in 1:n_cells){
-            if(beta[j] <= 0){
-              K[i,j] <- 0
-            } else {
-              K[i,j] <- alpha[i,j] / (alpha[i,j] + beta[j])
-            }
-          }
-        }
-        for(ii in 1:n_cells){
-          b <- sum(alpha[ii,] * beta * K[ii,])
-          for(kk in 1:n_cells){
-            a <- alpha[ii,kk] * beta[kk] * K[ii,kk]
-            if(b == 0){
-              P[[pair]][ii,kk] <- 0
-            }else{
-              P[[pair]][ii,kk] <- a/b
-            }
-          }
-        }
-      } else {
-        downsubset <- pathsubset %>% filter(direction == 'down')
-        downdata <- M[drop=FALSE,match(downsubset$target,ids),]
-        for(targind in 1:nrow(as.matrix(downdata))){
-          downdata[targind,] <- NormalizeGene(downdata[targind,])
-        }
-        downdata <- colMeans(downdata)          
-        gamma <- exp(-downdata)
-        D <- alpha
-        for(i in 1:n_cells){
-          for(j in 1:n_cells){
-            if(gamma[j] <= 0){
-              D[i,j] <- 0
-            } else {
-              D[i,j] <- alpha[i,j] / (alpha[i,j] + gamma[j])
-            }
-          }
-        }
-        for(ii in 1:n_cells){
-          b <- sum(alpha[ii,] * gamma * K[ii,])
-          for(kk in 1:n_cells){
-            a <- alpha[ii,kk] * gamma[kk] * K[ii,kk]
-            if(b == 0){
-              P[[pair]][ii,kk] <- 0
-            }else{
-              P[[pair]][ii,kk] <- a/b
-            }
-          }
-        }      
-      }
-    } else {
-      # no targets were provided
-      for(ii in 1:n_cells){
-        b <- sum(alpha[ii,])
-        for(kk in 1:n_cells){
-          a <- alpha[ii,kk]
-          if(b == 0){
-            P[[pair]][ii,kk] <- 0
-          }else{
-            P[[pair]][ii,kk] <- a/b
-          }
-        }
-      }      
-    }
-    P[[pair]][P[[pair]] <= 1e-6] <- 0
+    
+    # normalize and store the values
+    P[[u]] = flat %>% dplyr::group_by(Var1) %>% dplyr::mutate(value = value/sum(value))
+    P[[u]]$value[is.nan(P[[u]]$value)] = 0
+    P[[u]]$value = as.numeric(P[[u]]$value) # convert the normalized values to lower precision
   }
-  
-  if(normalize_aggregate){
-    P_agg <- Reduce('+', P)
-    nnorm <- apply(P_agg, 1, function(x){
-      if(max(x) > 0){
-        x/sum(x)
-      }else{
-        x
-      }
-    })
-    P_agg <- t(nnorm)
-  }else{
-    P_agg <- Reduce('+', P)/length(P)
+  parallel::stopCluster(cl)
+  P_tot = P[[1]]
+  P_tot$value = rep(0,length(P_tot$value))
+  for(i in 1:length(P)){
+    P_tot$value = P_tot$value + P[[i]]$value
   }
-  rownames(P_agg) <- cellnames
-  colnames(P_agg) <- cellnames
-  return(list(P = P, P_agg = P_agg))
+  P_tot = P_tot %>% dplyr::group_by(Var1) %>% dplyr::mutate(value = value/sum(value))
+  P_tot$value[is.nan(P_tot$value)] = 0
+  return(list("P"=P,"P_tot"=P_tot))
 }
 
-#' Normalize signal across cells
-#'
-#' Normalize signal across cells
-#'
-#' @param M a matrix of expression values for each cell (columns) and gene (rows)
-#'
-#' @return a normalized vector of expression values
-#'
-NormalizeGene <- function(M){
-  # normalize expression values by max cell expression
-  M_norm <- M
-  if(max(M_norm) > 0){
-    M_norm <- M_norm/max(M_norm)
-  }
-  return(M_norm)
-}
 
-#' Average cluster to cluster signaling
-#'
 #' Average cluster to cluster signaling.
 #'
-#' @param P signaling probabilities cells x cells
+#' @param Pcell signaling probabilities cells x cells
 #' @param cluster_labels labels of cells 1:n
 #' @param normalize_rows normalize the rows of the output matrix so that the rows sum to 1, default true
 #'
@@ -236,86 +331,79 @@ NormalizeGene <- function(M){
 #'
 #' @export
 #'
-ClusterSig <- function(P,
+ClusterSig <- function(Pcell,
                        cluster_labels,
-                       normalize_rows = TRUE){
-  sorted_cell <- sort.int(cluster_labels, index.return = TRUE)
-  cell_order <- sorted_cell$ix
-  cell_labels <- sorted_cell$x
-  
-  n_clusters <- length(unique(cell_labels))
-  n_cells <- length(cell_labels) 
-  # for each cluster, get the location of the first and the last cell in the permutation of labels
-  counts <- as.matrix(table(cell_labels))
-  accumulator <- matrix(1, n_clusters, n_clusters)*lower.tri(matrix(1, n_clusters, n_clusters), diag = TRUE)
-  last_cells <- accumulator %*% counts
-  first_cells <- last_cells - counts + 1
-  
-  # matrix to sum all the cells into clusters by column
-  summing_matrix <- NULL
-  for(i in 1:n_clusters){
-    if(is.null(summing_matrix)){
-      summing_matrix <- c(rep(0, n_cells))
-      summing_matrix[first_cells[i]:last_cells[i]] <- 1
-    } else {
-      new_col <- c(rep(0, n_cells))
-      new_col[first_cells[i]:last_cells[i]] <- 1
-      summing_matrix <- cbind(summing_matrix, new_col)
+                       normalize_rows = FALSE){
+  PClust = list()
+  P = Pcell$P
+  for(i in 1:length(P)){
+
+    P_i = dplyr::inner_join(P[[i]],
+                            data.frame(id=1:length(cluster_labels),
+                                       cluster=cluster_labels), 
+                            by = c("Var1" = "id")) %>% dplyr::rename(cluster.Var1 = cluster)
+    P_i = dplyr::inner_join(P_i,
+                            data.frame(id=1:length(cluster_labels),
+                                       cluster=cluster_labels), 
+                            by = c("Var2" = "id")) %>% dplyr::rename(cluster.Var2 = cluster)
+    P_i = P_i %>% filter(value > 0)
+    if(!normalize_rows){
+      PClust[[i]] = dplyr::group_by(P_i,cluster.Var1, cluster.Var2) %>% dplyr::summarize(value = sum(value))
+    }else{
+      PClust[[i]] = dplyr::group_by(P_i,cluster.Var1, cluster.Var2) %>% dplyr::summarize(value = sum(value)/dplyr::n_distinct(Var1))
     }
+    PClust[[i]]$cluster.Var1 = as.factor(PClust[[i]]$cluster.Var1)
+    PClust[[i]]$cluster.Var2 = as.factor(PClust[[i]]$cluster.Var2)
   }
-  # collapse the colums by summing, note that because each row is normalized,
-  # the following procedure will give normalized rows
-  
-  nzrow <- which(rowSums(P[cell_order, cell_order]) > 0)
-  nzlabel_row <- cell_labels[nzrow]
-  nzcounts_row <- matrix(0, nrow = n_clusters, ncol = 1)
-  rownames(nzcounts_row) <- rownames(counts)  
-  cnums_row <- sort(as.integer(rownames(counts)))
-  for(c in 1:n_clusters){
-    clust <- cnums_row[c]
-    nzcounts_row[c,1] <- length(which(nzlabel_row == clust))
+  P_tot = PClust[[1]]
+  colnames(P_tot) = c("cluster.Var1","cluster.Var2","RC1")
+  for(i in 2:length(PClust)){
+    colnames(PClust[[i]]) = c("cluster.Var1","cluster.Var2",paste0("RC",i))
+    P_tot = full_join(P_tot, PClust[[i]])
   }
+  tmp = as.matrix(P_tot[3:dim(P_tot)[2]])
+  ind = which(is.na(tmp))
+  tmp[ind] = 0
+  P_tot$value = rowSums(tmp)
+  P_tot = P_tot[,c("cluster.Var1","cluster.Var2","value")]
   
-  nzcol <- which(colSums(P[cell_order,cell_order]) > 0)
-  nzlabel_col <- cell_labels[nzcol]
-  nzcounts_col <- matrix(0, nrow = n_clusters, ncol = 1)
-  rownames(nzcounts_col) <- rownames(counts)  
-  cnums_col <- sort(as.integer(rownames(counts)))
-  for(c in 1:n_clusters){
-    clust <- cnums_col[c]
-    nzcounts_col[c,1] <- length(which(nzlabel_col == clust))
-  }
-  
-  sums <- P[cell_order, cell_order] %*% summing_matrix
-  sums <- t(sums) %*% summing_matrix
-  sums <- t(sums)
-  
-  for(col in 1:ncol(sums)){
-    for(row in 1:nrow(sums)){
-      if(nzcounts_row[row,1] > 0 & nzcounts_col[col,1] > 0){
-        sums[row,col] <- sums[row,col]/nzcounts_row[row,1]/nzcounts_col[col,1]
-      }else{
-        sums[row,col] <- 0
-      }
-    }
-  }
-  
-  if(normalize_rows){
-    normsums <- apply(sums, 1, function(x){
-      if(max(x) > 0){
-        x / sum(x)
-      }else{
-        x
-      }
-    })
-    sums <- t(normsums)
-  }
-  
-  arclabs <- paste0("C", c(1:n_clusters))
-  rownames(sums) <- rownames(counts)
-  colnames(sums) <- rownames(counts)
-  return(sums)
+  P_tot = P_tot %>% dplyr::group_by(cluster.Var1) %>% dplyr::mutate(value = value/sum(value))
+  return(list("P"=PClust,"P_tot"=P_tot))
 }
+
+#' Average cluster to cluster signaling.
+#'
+#' @param Pcell signaling probabilities cells x cells
+#' @param cluster_labels labels of cells 1:n
+#' @param normalize_rows normalize the rows of the output matrix so that the rows sum to 1, default true
+#'
+#' @return a matrix of cluster to cluster signaling
+#'
+#' @export
+#'
+ClusterSig_single <- function(Pcell,
+                       cluster_labels,
+                       normalize_rows = FALSE){
+
+    P_i = dplyr::inner_join(Pcell,
+                            data.frame(id=1:length(cluster_labels),
+                                       cluster=cluster_labels), 
+                            by = c("Var1" = "id")) %>% dplyr::rename(cluster.Var1 = cluster)
+    P_i = dplyr::inner_join(P_i,
+                            data.frame(id=1:length(cluster_labels),
+                                       cluster=cluster_labels), 
+                            by = c("Var2" = "id")) %>% dplyr::rename(cluster.Var2 = cluster)
+    P_i = P_i %>% filter(value > 0)
+    if(!normalize_rows){
+      P_i = dplyr::group_by(P_i,cluster.Var1, cluster.Var2) %>% dplyr::summarize(value = sum(value))
+    }else{
+      P_i = dplyr::group_by(P_i,cluster.Var1, cluster.Var2) %>% dplyr::summarize(value = sum(value)/dplyr::n_distinct(Var1))
+    }
+    P_i$cluster.Var1 = as.factor(P_i$cluster.Var1)
+    P_i$cluster.Var2 = as.factor(P_i$cluster.Var2)
+  return(P_i)
+}
+
 
 #' Create a heatmap with signaling markers over clusters
 #' 

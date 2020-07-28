@@ -4,10 +4,16 @@
 \alias{FindRootCell}
 \title{Find the root cell}
 \usage{
-FindRootCell(use_flat_dist = TRUE, cluster_order_by = "distance",
-  cell_order_by = "distance", graph_cluster_mst = NULL,
-  dist_graph = NULL, dist_flat, cluster_labels = NULL,
-  root_cluster = NULL)
+FindRootCell(
+  use_flat_dist = TRUE,
+  cluster_order_by = "distance",
+  cell_order_by = "distance",
+  graph_cluster_mst = NULL,
+  dist_graph = NULL,
+  dist_flat,
+  cluster_labels = NULL,
+  root_cluster = NULL
+)
 }
 \arguments{
 \item{use_flat_dist}{use max path length heuristic on flat embedding}

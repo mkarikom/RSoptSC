@@ -4,8 +4,15 @@
 \alias{GetMarkerTable}
 \title{Get the marker genes for each cluster}
 \usage{
-GetMarkerTable(counts_data, cluster_labels, H = NULL, n_sorted = 50,
-  gene_expression_threshold = NULL, use_H = FALSE, lognorm = FALSE)
+GetMarkerTable(
+  counts_data,
+  cluster_labels,
+  H = NULL,
+  n_sorted = 50,
+  gene_expression_threshold = NULL,
+  use_H = FALSE,
+  lognorm = FALSE
+)
 }
 \arguments{
 \item{counts_data}{a matrix of expression values for each cell (rows) and gene (columns)}

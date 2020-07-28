@@ -4,8 +4,7 @@
 \alias{GetCorrelation}
 \title{Get rank correlation}
 \usage{
-GetCorrelation(cluster_order_by, cell_metric, graph_cluster_mst,
-  root_cluster)
+GetCorrelation(cluster_order_by, cell_metric, graph_cluster_mst, root_cluster)
 }
 \arguments{
 \item{cluster_order_by}{cluster rank parameter for measuring cluster/cell rank correlation}

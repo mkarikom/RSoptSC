@@ -4,8 +4,7 @@
 \alias{GetCellMetric}
 \title{Get metric of pseudotime}
 \usage{
-GetCellMetric(cell_order_by, cell_id, cluster_id, cluster_labels,
-  dist_graph)
+GetCellMetric(cell_order_by, cell_id, cluster_id, cluster_labels, dist_graph)
 }
 \arguments{
 \item{cell_order_by}{cell-wise pseudotime parameter for measuring cluster/cell rank correlation}

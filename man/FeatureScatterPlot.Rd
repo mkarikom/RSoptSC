@@ -4,10 +4,22 @@
 \alias{FeatureScatterPlot}
 \title{Produce a scatter plot of the cells}
 \usage{
-FeatureScatterPlot(flat_embedding, feature, title, subtitle, featurename,
-  colorscale = NULL, pointsize = 1, hide_legend = FALSE,
-  legsize = 5, legt = 5, legtxt = 5, grad_lim = NULL,
-  autoscale_dropout = FALSE, dropout_NA = TRUE)
+FeatureScatterPlot(
+  flat_embedding,
+  feature,
+  title,
+  subtitle,
+  featurename,
+  colorscale = NULL,
+  pointsize = 1,
+  hide_legend = FALSE,
+  legsize = 5,
+  legt = 5,
+  legtxt = 5,
+  grad_lim = NULL,
+  autoscale_dropout = FALSE,
+  dropout_NA = TRUE
+)
 }
 \arguments{
 \item{flat_embedding}{a low dim embedding of cells}

@@ -4,12 +4,17 @@
 \alias{PlotTopN}
 \title{Heatmap of the top n markers}
 \usage{
-PlotTopN(data, cluster_labels, markers, n_features,
+PlotTopN(
+  data,
+  cluster_labels,
+  markers,
+  n_features,
   y_lsize = ((length(unique(cluster_labels)) * n_features)/120) * 5,
   y_tsize = ((length(unique(cluster_labels)) * n_features)/120) * 15,
   x_lsize = ((length(unique(cluster_labels)) * n_features)/120) * 14,
   x_tsize = ((length(unique(cluster_labels)) * n_features)/120) * 15,
-  use_z = TRUE)
+  use_z = TRUE
+)
 }
 \arguments{
 \item{data}{expression data with genes x cells}

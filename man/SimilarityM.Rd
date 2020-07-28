@@ -4,8 +4,14 @@
 \alias{SimilarityM}
 \title{Compute the similarity matrix}
 \usage{
-SimilarityM(lambda = 0.5, data, comps_knn = NULL,
-  use_umap_indices = FALSE, pre_embed_method = "umap", ...)
+SimilarityM(
+  lambda = 0.5,
+  data,
+  comps_knn = NULL,
+  use_umap_indices = FALSE,
+  pre_embed_method = "umap",
+  ...
+)
 }
 \arguments{
 \item{lambda}{the balance term between the rank of Z and the error, default is 0.5}

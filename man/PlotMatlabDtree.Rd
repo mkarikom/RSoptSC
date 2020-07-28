@@ -4,8 +4,7 @@
 \alias{PlotMatlabDtree}
 \title{Produce a plot of matlab DTree data and return the object}
 \usage{
-PlotMatlabDtree(edge_table, predecessors, outputdir = NULL,
-  outputfile = NULL)
+PlotMatlabDtree(edge_table, predecessors, outputdir = NULL, outputfile = NULL)
 }
 \arguments{
 \item{edge_table}{a numeric matrix whose rows are directed edges of a tree:

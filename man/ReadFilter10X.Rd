@@ -4,11 +4,21 @@
 \alias{ReadFilter10X}
 \title{Read 10X Data}
 \usage{
-ReadFilter10X(filepath = NULL, inf_exp_rate = 0, inf_gene_count = 0,
-  inf_cell_count = 0, annotation_db, feature_annotation_key,
-  remove_spike_ERCC = TRUE, pre_clust = FALSE, rescale = TRUE,
-  subsample = NULL, filtercells = TRUE, var_gene_method = "mean_var",
-  ...)
+ReadFilter10X(
+  filepath = NULL,
+  inf_exp_rate = 0,
+  inf_gene_count = 0,
+  inf_cell_count = 0,
+  annotation_db,
+  feature_annotation_key,
+  remove_spike_ERCC = TRUE,
+  pre_clust = FALSE,
+  rescale = TRUE,
+  subsample = NULL,
+  filtercells = TRUE,
+  var_gene_method = "mean_var",
+  ...
+)
 }
 \arguments{
 \item{filepath}{full path of the data directory}
