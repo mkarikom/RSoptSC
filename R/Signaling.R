@@ -14,7 +14,6 @@ getD <- function(a,g){
   }
 }
 
-
 #' compute lig and rec
 #'
 #' @param i the ligand
@@ -63,8 +62,6 @@ getGammaj <- function(Ystarv){
   }
 }
 
-
-
 #' compute the unnormalized probability
 #'
 #' @param ligname the ligand
@@ -93,7 +90,6 @@ updateFlatBoth <- function(ligname,recname,beta,gamma,flat,data){
   return(flatval)
 }
 
-
 #' compute the unnormalized probability
 #'
 #' @param ligname the ligand
@@ -119,8 +115,6 @@ updateFlatUp <- function(ligname,recname,beta,flat,data){
   }
   return(flatval)
 }
-
-
 
 #' compute the unnormalized probability
 #'
@@ -203,6 +197,7 @@ GetSignalingPartners <- function(data,
   doMC::registerDoMC()
   RCpairs = dplyr::distinct(pathway$pathway_removed, receptor, ligand)
   P = list()
+  LR = list()
   
   chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
   
@@ -305,6 +300,7 @@ GetSignalingPartners <- function(data,
     }
     
     # normalize and store the values
+    LR[[u]] = list("lig"=ligname,"rec"=recname)
     P[[u]] = flat %>% dplyr::group_by(Var1) %>% dplyr::mutate(value = value/sum(value))
     P[[u]]$value[is.nan(P[[u]]$value)] = 0
     P[[u]]$value = as.numeric(P[[u]]$value) # convert the normalized values to lower precision
@@ -317,7 +313,7 @@ GetSignalingPartners <- function(data,
   }
   P_tot = P_tot %>% dplyr::group_by(Var1) %>% dplyr::mutate(value = value/sum(value))
   P_tot$value[is.nan(P_tot$value)] = 0
-  return(list("P"=P,"P_tot"=P_tot))
+  return(list("P"=P,"P_tot"=P_tot,"LR"=LR))
 }
 
 
