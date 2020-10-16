@@ -21,7 +21,6 @@ getD <- function(a,g){
 #'                                          
 #' @return a vector of probs
 #' 
-#' @import Rmpfr     
 getAlpha <- function(i,j){
   if(i == 0 || j == 0){
     return(0)
@@ -36,7 +35,6 @@ getAlpha <- function(i,j){
 #'                                          
 #' @return a vector of probs
 #' 
-#' @import Rmpfr                                                       
 getBetaj <- function(Yv){
   vsum = sum(Yv)
   if(vsum == 0){
@@ -52,7 +50,6 @@ getBetaj <- function(Yv){
 #'                                          
 #' @return a vector of probs
 #' 
-#' @import Rmpfr                                                       
 getGammaj <- function(Ystarv){
   vsum = sum(Ystarv)
   if(vsum == 0){
@@ -77,7 +74,7 @@ getGammaj <- function(Ystarv){
 #' @import doParallel foreach                                           
 updateFlatBoth <- function(ligname,recname,beta,gamma,flat,data){
   cat("\n using parallel update")
-  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha","getK","getD","mpfr"),  .combine = 'c') %dopar% {
+  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha","getK","getD"),  .combine = 'c') %dopar% {
     ligcelli = data[tolower(ligname),flat[v,1]]
     reccellj = data[tolower(recname),flat[v,2]]
     a = getAlpha(ligcelli,reccellj)
@@ -103,7 +100,7 @@ updateFlatBoth <- function(ligname,recname,beta,gamma,flat,data){
 #' @import doParallel foreach                                           
 updateFlatUp <- function(ligname,recname,beta,flat,data){
   cat("\n using parallel update")
-  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha","getK","mpfr"),  .combine = 'c') %dopar% {
+  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha","getK"),  .combine = 'c') %dopar% {
     
     ligcelli = data[tolower(ligname),flat[v,1]]
     reccellj = data[tolower(recname),flat[v,2]]
@@ -129,7 +126,7 @@ updateFlatUp <- function(ligname,recname,beta,flat,data){
 #' @import doParallel foreach                                           
 updateFlatDown <- function(ligname,recname,gamma,flat,data){
   cat("\n using parallel update")
-  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha","getD","mpfr"),  .combine = 'c') %dopar% {
+  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha","getD"),  .combine = 'c') %dopar% {
     
     ligcelli = data[tolower(ligname),flat[v,1]]
     reccellj = data[tolower(recname),flat[v,2]]
@@ -154,7 +151,7 @@ updateFlatDown <- function(ligname,recname,gamma,flat,data){
 #' @import doParallel foreach                                   
 updateFlatNone <- function(ligname,recname,flat,data){
   cat("\n using parallel update")
-  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha","mpfr"),  .combine = 'c') %dopar% {
+  flatval = foreach(v=1:dim(flat)[1], .export=c("getAlpha"),  .combine = 'c') %dopar% {
     
     ligcelli = data[tolower(ligname),flat[v,1]]
     reccellj = data[tolower(recname),flat[v,2]]
