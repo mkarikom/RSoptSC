@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Heatmap of the top n markers — PlotTopN • RSoptSC</title>
+<title>compute the unnormalized probability — updateFlatBoth • RSoptSC</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Heatmap of the top n markers — PlotTopN" />
-<meta property="og:description" content="Plot the heatmap of the top n inferred markers for each cluster." />
+<meta property="og:title" content="compute the unnormalized probability — updateFlatBoth" />
+<meta property="og:description" content="compute the unnormalized probability" />
 <meta property="og:image" content="/logo.svg" />
 
 
@@ -119,71 +119,49 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Heatmap of the top n markers</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mkarikom/RSoptSC/blob/master/R/PlottingFunctions.R'><code>R/PlottingFunctions.R</code></a></small>
-    <div class="hidden name"><code>PlotTopN.Rd</code></div>
+    <h1>compute the unnormalized probability</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mkarikom/RSoptSC/blob/master/R/Signaling.R'><code>R/Signaling.R</code></a></small>
+    <div class="hidden name"><code>updateFlatBoth.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plot the heatmap of the top n inferred markers for each cluster.</p>
+    <p>compute the unnormalized probability</p>
     </div>
 
-    <pre class="usage"><span class='fu'>PlotTopN</span><span class='op'>(</span>
-  <span class='va'>data</span>,
-  <span class='va'>cluster_labels</span>,
-  <span class='va'>markers</span>,
-  <span class='va'>n_features</span>,
-  y_lsize <span class='op'>=</span> <span class='op'>(</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>cluster_labels</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>*</span> <span class='va'>n_features</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>120</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>5</span>,
-  y_tsize <span class='op'>=</span> <span class='op'>(</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>cluster_labels</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>*</span> <span class='va'>n_features</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>120</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>15</span>,
-  x_lsize <span class='op'>=</span> <span class='op'>(</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>cluster_labels</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>*</span> <span class='va'>n_features</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>120</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>14</span>,
-  x_tsize <span class='op'>=</span> <span class='op'>(</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>cluster_labels</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>*</span> <span class='va'>n_features</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>120</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>15</span>,
-  use_z <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>updateFlatBoth</span><span class='op'>(</span><span class='va'>ligname</span>, <span class='va'>recname</span>, <span class='va'>beta</span>, <span class='va'>gamma</span>, <span class='va'>flat</span>, <span class='va'>data</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>ligname</th>
+      <td><p>the ligand</p></td>
+    </tr>
+    <tr>
+      <th>recname</th>
+      <td><p>the receptor</p></td>
+    </tr>
+    <tr>
+      <th>beta</th>
+      <td><p>the up targets</p></td>
+    </tr>
+    <tr>
+      <th>gamma</th>
+      <td><p>the down targets</p></td>
+    </tr>
+    <tr>
+      <th>flat</th>
+      <td><p>the flattened p matrix</p></td>
+    </tr>
+    <tr>
       <th>data</th>
-      <td><p>expression data with genes x cells</p></td>
-    </tr>
-    <tr>
-      <th>cluster_labels</th>
-      <td><p>a vector of cluster labels corresponding to the columns in the data matrix</p></td>
-    </tr>
-    <tr>
-      <th>markers</th>
-      <td><p>a table of markers</p></td>
-    </tr>
-    <tr>
-      <th>n_features</th>
-      <td><p>the top n features to plot</p></td>
-    </tr>
-    <tr>
-      <th>y_lsize</th>
-      <td><p>y axis label size</p></td>
-    </tr>
-    <tr>
-      <th>y_tsize</th>
-      <td><p>y axis title size</p></td>
-    </tr>
-    <tr>
-      <th>x_lsize</th>
-      <td><p>x axis label size</p></td>
-    </tr>
-    <tr>
-      <th>x_tsize</th>
-      <td><p>x axis title size</p></td>
-    </tr>
-    <tr>
-      <th>use_z</th>
-      <td><p>use z-score per gene instead of raw expression</p></td>
+      <td><p>the expression</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a heatmap</p>
+    <p>a vector of probs</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
