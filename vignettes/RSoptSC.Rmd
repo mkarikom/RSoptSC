@@ -264,7 +264,31 @@ Violin Plot of Lor expression.  Note strong expression in the terminally differe
 
 ## Analyze Signaling Mediated by a Ligand-Receptor Family
 
-In order to analyze signaling, we can load in tables which describe a pathay in detail.  There are two tables needed, one that specifies all unique ligand receptor combinations and another that specifies receptor/target/up|down combinations.  Example tables for the TgfB pathway are provided in extdata/ and loaded here for the current skin data set.  Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples.  We then compute the probability of intercellular interaction based on this pathway.
+There are two tables needed to specify prior knowledge of the pathway: 
+
+* ligand-receptor interactions, eg. [`RSoptSC/inst/extdata/tgfb_lig_rec.tsv`](https://github.com/mkarikom/RSoptSC/blob/master/inst/extdata/tgfb_lig_rec.tsv)
+
+* receptor-target interactions, eg. [`RSoptSC/inst/extdata/tgfb_rec_target.tsv`](https://github.com/mkarikom/RSoptSC/blob/master/inst/extdata/tgfb_rec_target.tsv)
+
+SoptSC requires the paths of these two files to be passed to `ImportPathway()` as shown below:
+
+```{r, warning=FALSE}
+library(knitr)
+library(kableExtra)
+
+lig_rec_path <- system.file("extdata", "tgfb_lig_rec.tsv", package = "RSoptSC")
+rec_target_path <- system.file("extdata", "tgfb_rec_target_both.tsv", package = "RSoptSC")
+pathway <- ImportPathway(lig_table_path = lig_rec_path,
+                         rec_table_path = rec_target_path,
+                         data = logdata,
+                         gene_names = gene_names)
+
+
+
+k = pathway$pathway %>% kable()
+```
+
+Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples.  We then compute the probability of intercellular interaction based on this pathway.
 
 ```{r, warning=FALSE}
 library(knitr)

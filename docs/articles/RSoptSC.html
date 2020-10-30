@@ -81,7 +81,7 @@
       <h1 data-toc-skip>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2020-10-16</h4>
+            <h4 class="date">2020-10-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mkarikom/RSoptSC/blob/master/vignettes/RSoptSC.Rmd"><code>vignettes/RSoptSC.Rmd</code></a></small>
       <div class="hidden name"><code>RSoptSC.Rmd</code></div>
@@ -313,7 +313,12 @@
 <div id="analyze-signaling-mediated-by-a-ligand-receptor-family" class="section level2">
 <h2 class="hasAnchor">
 <a href="#analyze-signaling-mediated-by-a-ligand-receptor-family" class="anchor"></a>Analyze Signaling Mediated by a Ligand-Receptor Family</h2>
-<p>In order to analyze signaling, we can load in tables which describe a pathay in detail. There are two tables needed, one that specifies all unique ligand receptor combinations and another that specifies receptor/target/up|down combinations. Example tables for the TgfB pathway are provided in extdata/ and loaded here for the current skin data set. Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples. We then compute the probability of intercellular interaction based on this pathway.</p>
+<p>There are two tables needed to specify prior knowledge of the pathway:</p>
+<ul>
+<li><p>ligand-receptor interactions, eg. <a href="https://github.com/mkarikom/RSoptSC/blob/master/inst/extdata/tgfb_lig_rec.tsv"><code>RSoptSC/inst/extdata/tgfb_lig_rec.tsv</code></a></p></li>
+<li><p>receptor-target interactions, eg. <a href="https://github.com/mkarikom/RSoptSC/blob/master/inst/extdata/tgfb_rec_target.tsv"><code>RSoptSC/inst/extdata/tgfb_rec_target.tsv</code></a></p></li>
+</ul>
+<p>SoptSC requires the paths of these two files to be passed to <code><a href="../reference/ImportPathway.html">ImportPathway()</a></code> as shown below:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit">
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/">kableExtra</a></span><span class="op">)</span>
@@ -328,7 +333,22 @@
 
 
 <span class="va">k</span> <span class="op">=</span> <span class="va">pathway</span><span class="op">$</span><span class="va">pathway</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
+<p>Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples. We then compute the probability of intercellular interaction based on this pathway.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit">
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/">kableExtra</a></span><span class="op">)</span>
+
+<span class="va">lig_rec_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"tgfb_lig_rec.tsv"</span>, package <span class="op">=</span> <span class="st">"RSoptSC"</span><span class="op">)</span>
+<span class="va">rec_target_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"tgfb_rec_target_both.tsv"</span>, package <span class="op">=</span> <span class="st">"RSoptSC"</span><span class="op">)</span>
+<span class="va">pathway</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ImportPathway.html">ImportPathway</a></span><span class="op">(</span>lig_table_path <span class="op">=</span> <span class="va">lig_rec_path</span>,
+                         rec_table_path <span class="op">=</span> <span class="va">rec_target_path</span>,
+                         data <span class="op">=</span> <span class="va">logdata</span>,
+                         gene_names <span class="op">=</span> <span class="va">gene_names</span><span class="op">)</span>
+
+
+
+<span class="va">k</span> <span class="op">=</span> <span class="va">pathway</span><span class="op">$</span><span class="va">pathway</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb22"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html">kable_styling</a></span><span class="op">(</span>kable_input <span class="op">=</span> <span class="va">k</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/scroll_box.html">scroll_box</a></span><span class="op">(</span>height <span class="op">=</span> <span class="st">"500px"</span>, width <span class="op">=</span> <span class="st">"300px"</span><span class="op">)</span></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:300px; ">
 <table class="table table">
@@ -858,19 +878,19 @@ down
 <h3 class="hasAnchor">
 <a href="#plot-of-intercellular-network" class="anchor"></a>Plot of Intercellular Network</h3>
 <p>Now plot the previous result as a circos plot on the top five ligand-producing and top five receptor-bearing cells from every cluster. The upper hemisphere of the plot shows receptor-bearing cells. The chords of the plot are colored by the ligand-producing cells in the lower hemisphere.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit">
+<div class="sourceCode" id="cb23"><pre class="downlit">
 <span class="fu"><a href="../reference/SigPlot.html">SigPlot</a></span><span class="op">(</span><span class="va">Pmats</span><span class="op">$</span><span class="va">P_tot</span>,<span class="va">labels</span><span class="op">)</span>
 <span class="co">#&gt; Joining, by = "Var2"</span>
 <span class="co">#&gt; Joining, by = "Var1"</span>
 <span class="co">#&gt; Joining, by = "Var1"</span>
 <span class="co">#&gt; Joining, by = "Var2"</span></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-24-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
 </div>
 <div id="plot-of-intercluster-network" class="section level3">
 <h3 class="hasAnchor">
 <a href="#plot-of-intercluster-network" class="anchor"></a>Plot of Intercluster Network</h3>
 <p>Directional plot of cluster-to-cluster signaling. The root of the directional chord is raised.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit">
+<div class="sourceCode" id="cb24"><pre class="downlit">
   <span class="va">cluster_P</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ClusterSig.html">ClusterSig</a></span><span class="op">(</span><span class="va">Pmats</span>,
                           cluster_labels <span class="op">=</span> <span class="va">labels</span><span class="op">)</span>
 <span class="co">#&gt; Joining, by = c("cluster.Var1", "cluster.Var2")</span>
@@ -878,13 +898,13 @@ down
 <span class="co">#&gt; Joining, by = c("cluster.Var1", "cluster.Var2")</span>
   <span class="fu"><a href="../reference/SigPlot_Cluster.html">SigPlot_Cluster</a></span><span class="op">(</span><span class="va">cluster_P</span><span class="op">$</span><span class="va">P_tot</span>,
           <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_clusters</span><span class="op">)</span><span class="op">)</span></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
 </div>
 <div id="heatmap-of-signaling-marker-expression" class="section level3">
 <h3 class="hasAnchor">
 <a href="#heatmap-of-signaling-marker-expression" class="anchor"></a>Heatmap of Signaling Marker Expression</h3>
 <p>Visualize the expression of ligand/receptor and up/down target expression across clusters</p>
-<div class="sourceCode" id="cb24"><pre class="downlit">
+<div class="sourceCode" id="cb25"><pre class="downlit">
   <span class="va">gene_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'Tgfb1'</span>, <span class="st">'Tgfb2'</span>, 
                 <span class="st">'Tgfbr1'</span>, <span class="st">'Tgfbr2'</span>,
                 <span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span><span class="op">)</span>
@@ -892,7 +912,7 @@ down
   <span class="fu"><a href="../reference/PlotClusterExpression.html">PlotClusterExpression</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">logdata</span>,
                         cluster_labels <span class="op">=</span> <span class="va">labels</span>, 
                         markers <span class="op">=</span> <span class="va">gene_list</span><span class="op">)</span></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-27-1.png" width="700"></p>
 </div>
 </div>
   </div>

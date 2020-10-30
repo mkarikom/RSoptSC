@@ -191,7 +191,6 @@ GetSignalingPartners <- function(data,
                                  normalize_aggregate = TRUE){
   colnames(data) = tolower(colnames(data))
   rownames(data) = tolower(rownames(data))
-  doMC::registerDoMC()
   RCpairs = dplyr::distinct(pathway$pathway_removed, receptor, ligand)
   P = list()
   LR = list()
