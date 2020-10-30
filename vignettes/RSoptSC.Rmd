@@ -3,6 +3,7 @@ title: "Clustering Pseudotime Inference on Skin Cell scRNA-seq"
 author: "Matt Karikomi"
 date: "`r Sys.Date()`"
 fig_width: 4
+urlcolor: blue
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Clustering Pseudotime Inference on Skin Cell scRNA-seq}
@@ -266,9 +267,9 @@ Violin Plot of Lor expression.  Note strong expression in the terminally differe
 
 There are two tables needed to specify prior knowledge of the pathway: 
 
-* ligand-receptor interactions, eg. [`RSoptSC/inst/extdata/tgfb_lig_rec.tsv`](https://github.com/mkarikom/RSoptSC/blob/master/inst/extdata/tgfb_lig_rec.tsv)
+* ligand-receptor interactions. link: [`RSoptSC/inst/extdata/tgfb_lig_rec.tsv`](https://github.com/mkarikom/RSoptSC/blob/master/inst/extdata/tgfb_lig_rec.tsv)
 
-* receptor-target interactions, eg. [`RSoptSC/inst/extdata/tgfb_rec_target.tsv`](https://github.com/mkarikom/RSoptSC/blob/master/inst/extdata/tgfb_rec_target.tsv)
+* receptor-target interactions. link: [`RSoptSC/inst/extdata/tgfb_rec_target.tsv`](https://github.com/mkarikom/RSoptSC/blob/master/inst/extdata/tgfb_rec_target.tsv)
 
 SoptSC requires the paths of these two files to be passed to `ImportPathway()` as shown below:
 
@@ -305,7 +306,7 @@ pathway <- ImportPathway(lig_table_path = lig_rec_path,
 
 k = pathway$pathway %>% kable()
 ```
-```{r, results='hide', echo=FALSE,warning=FALSE,message=FALSE,error=FALSE,}
+```{r, results='hide', echo=FALSE,warning=FALSE,message=FALSE,error=FALSE}
   datamat = as.matrix(logdata); rownames(datamat) = tolower(rownames(datamat)); colnames(datamat) = tolower(colnames(datamat))
   pathway$pathway_removed$receptor = tolower(pathway$pathway_removed$receptor)
   pathway$pathway_removed$ligand = tolower(pathway$pathway_removed$ligand)
