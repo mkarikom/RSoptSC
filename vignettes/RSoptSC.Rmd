@@ -9,6 +9,11 @@ vignette: >
   %\VignetteIndexEntry{Clustering Pseudotime Inference on Skin Cell scRNA-seq}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+resource_files:
+ - inst/extdata/GSE67602_JoostData.csv.bz2
+ - inst/extdata/GSE67602_JoostGenes.csv.bz2
+ - inst/extdata/GSE67602_JoostCells.csv.bz2
+ - inst/extdata/GSE67602_JoostAnnotation.csv.bz2
 ---
 
 ```{r, echo = FALSE, message=FALSE}
@@ -289,7 +294,7 @@ pathway <- ImportPathway(lig_table_path = lig_rec_path,
 k = pathway$pathway %>% kable()
 ```
 
-Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples.  We then compute the probability of intercellular interaction based on this pathway.
+Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples.  
 
 ```{r, warning=FALSE}
 library(knitr)
@@ -305,8 +310,11 @@ pathway <- ImportPathway(lig_table_path = lig_rec_path,
 
 
 k = pathway$pathway %>% kable()
+kable_styling(kable_input = k) %>% scroll_box(height = "500px", width = "300px")
 ```
-```{r, results='hide', echo=FALSE,warning=FALSE,message=FALSE,error=FALSE}
+
+We then compute the probability of intercellular interaction based on this pathway.
+```{r, results='hide', warning=FALSE,message=FALSE,error=FALSE}
   datamat = as.matrix(logdata); rownames(datamat) = tolower(rownames(datamat)); colnames(datamat) = tolower(colnames(datamat))
   pathway$pathway_removed$receptor = tolower(pathway$pathway_removed$receptor)
   pathway$pathway_removed$ligand = tolower(pathway$pathway_removed$ligand)
@@ -314,12 +322,6 @@ k = pathway$pathway %>% kable()
   names(labels) = tolower(names(labels))
   
   Pmats <- GetSignalingPartners(datamat,labels,pathway)
-  
-
-
-```
-```{r}
-kable_styling(kable_input = k) %>% scroll_box(height = "500px", width = "300px")
 ```
 ### Plot of Intercellular Network
 Now plot the previous result as a circos plot on the top five ligand-producing and top five receptor-bearing cells from every cluster.  The upper hemisphere of the plot shows receptor-bearing cells.  The chords of the plot are colored by the ligand-producing cells in the lower hemisphere.

@@ -9,3 +9,4 @@ doc
 inst/doc
 .DS_Store
 *.class
+packrat/lib*/

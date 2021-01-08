@@ -10,3 +10,5 @@
 ^.pdf
 ^.html
 \.Rproj$
+^packrat/
+^\.Rprofile$

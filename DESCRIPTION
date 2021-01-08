@@ -40,7 +40,7 @@ Imports:
     foreach,
     doParallel
 Suggests: testthat,
-    rmarkdown, knitr, kableExtra, org.Mm.eg.db, org.Hs.eg.db, RCurl
+    rmarkdown, knitr, kableExtra, RCurl
 biocViews: RNASeq
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr

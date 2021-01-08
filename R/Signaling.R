@@ -298,7 +298,6 @@ GetSignalingPartners <- function(data,
     P[[u]]$value[is.nan(P[[u]]$value)] = 0
     P[[u]]$value = as.numeric(P[[u]]$value) # convert the normalized values to lower precision
   }
-  parallel::stopCluster(cl)
   P_tot = P[[1]]
   P_tot$value = rep(0,length(P_tot$value))
   for(i in 1:length(P)){

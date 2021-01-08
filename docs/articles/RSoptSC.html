@@ -46,7 +46,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -60,7 +60,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/mkarikom/RSoptSC/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -81,7 +81,7 @@
       <h1 data-toc-skip>Clustering Pseudotime Inference on Skin Cell scRNA-seq</h1>
                         <h4 class="author">Matt Karikomi</h4>
             
-            <h4 class="date">2020-10-30</h4>
+            <h4 class="date">2021-01-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mkarikom/RSoptSC/blob/master/vignettes/RSoptSC.Rmd"><code>vignettes/RSoptSC.Rmd</code></a></small>
       <div class="hidden name"><code>RSoptSC.Rmd</code></div>
@@ -95,44 +95,44 @@
 <h2 class="hasAnchor">
 <a href="#load-and-preprocess-data" class="anchor"></a>Load and Preprocess Data</h2>
 <p>A matrix of counts with rows as genes and columns as cells must be provided. Gene and cell ids, and [optionally] a vector of labels e.g. cell types are provided in separate text files. Here we load example data from NCBI GEO (GSE67602) originally published in Joost et al 2016.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostData.csv.bz2"</span>, package <span class="op">=</span> <span class="st">"RSoptSC"</span><span class="op">)</span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostData.csv.bz2"</span>, package <span class="op">=</span> <span class="st">"RSoptSC"</span><span class="op">)</span>
 <span class="va">gf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostGenes.csv.bz2"</span>, package <span class="op">=</span> <span class="st">"RSoptSC"</span><span class="op">)</span>
 <span class="va">cf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostCells.csv.bz2"</span>, package <span class="op">=</span> <span class="st">"RSoptSC"</span><span class="op">)</span>
 <span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"GSE67602_JoostAnnotation.csv.bz2"</span>, package <span class="op">=</span> <span class="st">"RSoptSC"</span><span class="op">)</span>
 
-<span class="va">GSE67602_Joost</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LoadData.html">LoadData</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">gf</span>, <span class="va">cf</span>, <span class="va">af</span><span class="op">)</span></pre></div>
+<span class="va">GSE67602_Joost</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/LoadData.html">LoadData</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">gf</span>, <span class="va">cf</span>, <span class="va">af</span><span class="op">)</span></code></pre></div>
 <div id="remove-spike-in-rna" class="section level3">
 <h3 class="hasAnchor">
 <a href="#remove-spike-in-rna" class="anchor"></a>Remove Spike-in RNA</h3>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="va">gene_names</span> <span class="op">&lt;-</span> <span class="va">GSE67602_Joost</span><span class="op">$</span><span class="va">gene_names</span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gene_names</span> <span class="op">&lt;-</span> <span class="va">GSE67602_Joost</span><span class="op">$</span><span class="va">gene_names</span>
 <span class="va">spikein</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span><span class="op">(</span><span class="st">'ERCC'</span>, <span class="va">gene_names</span><span class="op">)</span>
 <span class="va">gene_names</span> <span class="op">&lt;-</span> <span class="va">gene_names</span><span class="op">[</span><span class="op">-</span><span class="va">spikein</span><span class="op">]</span>
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="va">GSE67602_Joost</span><span class="op">$</span><span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">spikein</span>,<span class="op">]</span></pre></div>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="va">GSE67602_Joost</span><span class="op">$</span><span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">spikein</span>,<span class="op">]</span></code></pre></div>
 <p>Apply number of features and exclusion threshold</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="va">logdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">data</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">logdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">data</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">gene_expression_threshold</span> <span class="op">&lt;-</span> <span class="fl">0.03</span>
 <span class="va">n_features</span> <span class="op">&lt;-</span> <span class="fl">3000</span>
-<span class="va">filtered_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SelectData.html">SelectData</a></span><span class="op">(</span><span class="va">logdata</span>, <span class="va">gene_expression_threshold</span>, <span class="va">n_features</span><span class="op">)</span></pre></div>
+<span class="va">filtered_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SelectData.html">SelectData</a></span><span class="op">(</span><span class="va">logdata</span>, <span class="va">gene_expression_threshold</span>, <span class="va">n_features</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
 <div id="compute-the-similarity-matrix" class="section level2">
 <h2 class="hasAnchor">
 <a href="#compute-the-similarity-matrix" class="anchor"></a>Compute the Similarity Matrix</h2>
 <p>Run L2R2 on the processed data, outputting the number of iterations and value of the objective.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SimilarityM.html">SimilarityM</a></span><span class="op">(</span>lambda <span class="op">=</span> <span class="fl">0.05</span>, 
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SimilarityM.html">SimilarityM</a></span><span class="op">(</span>lambda <span class="op">=</span> <span class="fl">0.05</span>, 
                  data <span class="op">=</span> <span class="va">filtered_data</span><span class="op">$</span><span class="va">M_variable</span>,
                  dims <span class="op">=</span> <span class="fl">3</span>,
                  pre_embed_method <span class="op">=</span> <span class="st">'tsne'</span>,
                  perplexity <span class="op">=</span> <span class="fl">20</span>, 
                  pca_center <span class="op">=</span> <span class="cn">TRUE</span>, 
-                 pca_scale <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+                 pca_scale <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>Compute distances on the similarity matrix. If the truncated graph has multiple components, join them to allow inter-cluster distance estimation.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="va">low_dim_mapping</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/RepresentationMap.html">RepresentationMap</a></span><span class="op">(</span>similarity_matrix <span class="op">=</span> <span class="va">S</span><span class="op">$</span><span class="va">W</span>,
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">low_dim_mapping</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/RepresentationMap.html">RepresentationMap</a></span><span class="op">(</span>similarity_matrix <span class="op">=</span> <span class="va">S</span><span class="op">$</span><span class="va">W</span>,
                                       flat_embedding_method <span class="op">=</span> <span class="st">'tsne'</span>,
                                       join_components <span class="op">=</span> <span class="cn">TRUE</span>,
                                       perplexity <span class="op">=</span> <span class="fl">35</span>,
@@ -142,30 +142,30 @@
                                       pca_center <span class="op">=</span> <span class="cn">TRUE</span>,
                                       pca_scale <span class="op">=</span> <span class="cn">TRUE</span>,
                                       dims <span class="op">=</span> <span class="fl">2</span>,
-                                      initial_dims <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></pre></div>
+                                      initial_dims <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="cluster-the-cells" class="section level2">
 <h2 class="hasAnchor">
 <a href="#cluster-the-cells" class="anchor"></a>Cluster the Cells</h2>
 <p>Cluster the cells by factoring the similarity matrix. Infer cluster number using spectra of the ensemble Laplacian. In this analysis, we obtain bounds on the number of clusters, where the lower bound is equal to the number of zero eigenvalues and the upper bound is the index of the eigenvalue preceding the largest eigengap. We take this value as the cluster number.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="va">clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ClusterCells.html">ClusterCells</a></span><span class="op">(</span>similarityMatrix <span class="op">=</span> <span class="va">S</span><span class="op">$</span><span class="va">W</span>, n_comp <span class="op">=</span> <span class="fl">15</span>, .options<span class="op">=</span><span class="st">'p'</span><span class="op">)</span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ClusterCells.html">ClusterCells</a></span><span class="op">(</span>similarityMatrix <span class="op">=</span> <span class="va">S</span><span class="op">$</span><span class="va">W</span>, n_comp <span class="op">=</span> <span class="fl">15</span>, .options<span class="op">=</span><span class="st">'p'</span><span class="op">)</span>
 <span class="va">H</span> <span class="op">&lt;-</span> <span class="va">clusters</span><span class="op">$</span><span class="va">H</span>
 <span class="va">labels</span> <span class="op">&lt;-</span> <span class="va">clusters</span><span class="op">$</span><span class="va">labels</span>
 <span class="va">n_clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">clusters</span><span class="op">$</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, 
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>, 
      <span class="va">clusters</span><span class="op">$</span><span class="va">ensemble</span><span class="op">$</span><span class="va">eigs</span><span class="op">$</span><span class="va">val</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">]</span>,
      xlab <span class="op">=</span> <span class="cn">NA</span>,
      ylab <span class="op">=</span> <span class="st">'eigenvalues'</span>,
-     main <span class="op">=</span> <span class="st">'Eigenvalues of the Graph Laplacian'</span><span class="op">)</span></pre></div>
+     main <span class="op">=</span> <span class="st">'Eigenvalues of the Graph Laplacian'</span><span class="op">)</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <div id="visualize-the-clusters" class="section level3">
 <h3 class="hasAnchor">
 <a href="#visualize-the-clusters" class="anchor"></a>Visualize the Clusters</h3>
 <p>Cells are labeled by cluster membership and plotted on low-dimensional embedding (t-SNE) of the similarity matrix.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="co"># define a scheme for the coloring.  This is a required parameter for plotting discrete (factor) data</span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># define a scheme for the coloring.  This is a required parameter for plotting discrete (factor) data</span>
 <span class="va">colorscale</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ColorHue.html">ColorHue</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">colorscale</span> <span class="op">&lt;-</span> <span class="va">colorscale</span><span class="op">$</span><span class="va">hex.1.n.</span>
 
@@ -175,17 +175,17 @@
                          title <span class="op">=</span> <span class="st">"NMF Cluster Labeling"</span>,
                          subtitle <span class="op">=</span> <span class="st">"t-SNE Embedding"</span>,
                          featurename <span class="op">=</span> <span class="st">"Cluster ID"</span>,
-                         colorscale <span class="op">=</span> <span class="va">colorscale</span><span class="op">)</span></pre></div>
+                         colorscale <span class="op">=</span> <span class="va">colorscale</span><span class="op">)</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 <p>As described in Joost et al (2016), Subpopulations including Basal, IFE-DI, IFE-DII, IFE-KI, IFE-KII were identified by standard techniques.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="va">true_labels</span> <span class="op">&lt;-</span> <span class="va">GSE67602_Joost</span><span class="op">$</span><span class="va">annotation</span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">true_labels</span> <span class="op">&lt;-</span> <span class="va">GSE67602_Joost</span><span class="op">$</span><span class="va">annotation</span>
 <span class="co"># plot clusters</span>
 <span class="fu"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span><span class="op">(</span>flat_embedding <span class="op">=</span> <span class="va">low_dim_mapping</span><span class="op">$</span><span class="va">flat_embedding</span>,
                          feature <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">true_labels</span><span class="op">)</span>,
                          title <span class="op">=</span> <span class="st">"True Labeling"</span>,
                          subtitle <span class="op">=</span> <span class="st">"t-SNE Embedding"</span>,
-                         featurename <span class="op">=</span> <span class="st">"Annotated Cell Types"</span><span class="op">)</span></pre></div>
+                         featurename <span class="op">=</span> <span class="st">"Annotated Cell Types"</span><span class="op">)</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 </div>
 </div>
@@ -193,8 +193,8 @@
 <h2 class="hasAnchor">
 <a href="#find-cluster-marker-genes-" class="anchor"></a>Find cluster marker genes.</h2>
 <p>Previously, we clustered the cells using L2R2/Sym-NMF, now we analyze the markers of the clusters. We look at the normalized expression values of all genes using pre-selection parameters similar to the pre-clustering selection parameters. The top six markers selected as described in Wang et. al. As expected, markers Krt14, Krt10, and Lor are inferred for clusters overlapping with IHC-based Basal, Differentiated (IFE-DI, IFE-DII), and Keratinized (IFE-KI, IFE-KII) cell annotations.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="va">markers</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GetMarkerTable.html">GetMarkerTable</a></span><span class="op">(</span>counts_data <span class="op">=</span> <span class="va">logdata</span>,
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">markers</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GetMarkerTable.html">GetMarkerTable</a></span><span class="op">(</span>counts_data <span class="op">=</span> <span class="va">logdata</span>,
                             cluster_labels <span class="op">=</span> <span class="va">labels</span>,
                             H <span class="op">=</span> <span class="va">H</span>,
                             n_sorted <span class="op">=</span> <span class="fl">25</span><span class="op">)</span>
@@ -204,57 +204,57 @@
               markers <span class="op">=</span> <span class="va">markers</span><span class="op">$</span><span class="va">all</span>,
               n_features <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>
 <span class="co">#&gt; Joining, by = "geneSymbol"</span>
-<span class="co">#&gt; Joining, by = "fac_barcode"</span></pre></div>
+<span class="co">#&gt; Joining, by = "fac_barcode"</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
 </div>
 <div id="pseudotime-inference" class="section level2">
 <h2 class="hasAnchor">
 <a href="#pseudotime-inference" class="anchor"></a>Pseudotime Inference</h2>
 <p>Compute cluster-cluster graph and find the root cluster.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="va">cluster_ptime</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FindRootCluster.html">FindRootCluster</a></span><span class="op">(</span>cluster_labels <span class="op">=</span> <span class="va">labels</span>,
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">cluster_ptime</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FindRootCluster.html">FindRootCluster</a></span><span class="op">(</span>cluster_labels <span class="op">=</span> <span class="va">labels</span>,
                                  flat_embedding <span class="op">=</span> <span class="va">low_dim_mapping</span><span class="op">$</span><span class="va">flat_embedding</span>,
                                  dist_graph <span class="op">=</span> <span class="va">low_dim_mapping</span><span class="op">$</span><span class="va">dist_graph</span>,
                                  dist_flat <span class="op">=</span> <span class="va">low_dim_mapping</span><span class="op">$</span><span class="va">dist_flat</span>,
-                                 reverse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+                                 reverse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>Compute the cell-cell graph and find the root cell.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="va">root_cell</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FindRootCell.html">FindRootCell</a></span><span class="op">(</span>use_flat_dist <span class="op">=</span> <span class="cn">FALSE</span>,
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">root_cell</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FindRootCell.html">FindRootCell</a></span><span class="op">(</span>use_flat_dist <span class="op">=</span> <span class="cn">FALSE</span>,
                           cluster_order_by <span class="op">=</span> <span class="st">"distance"</span>,
                           cell_order_by <span class="op">=</span> <span class="st">"distance"</span>,
                           graph_cluster_mst <span class="op">=</span> <span class="va">cluster_ptime</span><span class="op">$</span><span class="va">cluster_mst</span>,
                           dist_graph  <span class="op">=</span> <span class="va">low_dim_mapping</span><span class="op">$</span><span class="va">dist_graph</span>,
                           dist_flat <span class="op">=</span> <span class="va">low_dim_mapping</span><span class="op">$</span><span class="va">dist_flat</span>,
                           cluster_labels <span class="op">=</span> <span class="va">labels</span>,
-                          root_cluster <span class="op">=</span> <span class="va">cluster_ptime</span><span class="op">$</span><span class="va">root_cluster</span><span class="op">)</span></pre></div>
+                          root_cluster <span class="op">=</span> <span class="va">cluster_ptime</span><span class="op">$</span><span class="va">root_cluster</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="pseudotime-visualization" class="section level2">
 <h2 class="hasAnchor">
 <a href="#pseudotime-visualization" class="anchor"></a>Pseudotime Visualization</h2>
 <p>Compute the directional minimum spanning tree on the cluster-cluster graph for visualization.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit">
-<span class="va">cluster_predecessors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GetPredecessors.html">GetPredecessors</a></span><span class="op">(</span><span class="va">cluster_ptime</span><span class="op">$</span><span class="va">cluster_mst</span>, <span class="va">cluster_ptime</span><span class="op">$</span><span class="va">root_cluster</span><span class="op">)</span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">cluster_predecessors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GetPredecessors.html">GetPredecessors</a></span><span class="op">(</span><span class="va">cluster_ptime</span><span class="op">$</span><span class="va">cluster_mst</span>, <span class="va">cluster_ptime</span><span class="op">$</span><span class="va">root_cluster</span><span class="op">)</span>
 <span class="va">cluster_dtree</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GetDominatorTree.html">GetDominatorTree</a></span><span class="op">(</span><span class="va">cluster_predecessors</span>, <span class="va">cluster_ptime</span><span class="op">$</span><span class="va">graph_cluster</span><span class="op">)</span>
-<span class="fu"><a href="../reference/PlotLineage.html">PlotLineage</a></span><span class="op">(</span><span class="va">cluster_dtree</span><span class="op">)</span></pre></div>
+<span class="fu"><a href="../reference/PlotLineage.html">PlotLineage</a></span><span class="op">(</span><span class="va">cluster_dtree</span><span class="op">)</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 <p>Compute the path-length vector from root, and plot the cells in the previously computed low-dimensional embedding.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit">
-<span class="va">pseudotime</span> <span class="op">&lt;-</span> <span class="va">low_dim_mapping</span><span class="op">$</span><span class="va">dist_graph</span><span class="op">[</span><span class="va">root_cell</span>,<span class="op">]</span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pseudotime</span> <span class="op">&lt;-</span> <span class="va">low_dim_mapping</span><span class="op">$</span><span class="va">dist_graph</span><span class="op">[</span><span class="va">root_cell</span>,<span class="op">]</span>
 
 <span class="co"># plot pseudotime</span>
 <span class="fu"><a href="../reference/FeatureScatterPlot.html">FeatureScatterPlot</a></span><span class="op">(</span>flat_embedding <span class="op">=</span> <span class="va">low_dim_mapping</span><span class="op">$</span><span class="va">flat_embedding</span>,
                          feature <span class="op">=</span> <span class="va">pseudotime</span>,
                          title <span class="op">=</span> <span class="st">"Pseudotime Labeling"</span>,
                          subtitle <span class="op">=</span> <span class="st">"t-SNE Embedding"</span>,
-                         featurename <span class="op">=</span> <span class="st">"Pseudotime Distance"</span><span class="op">)</span></pre></div>
+                         featurename <span class="op">=</span> <span class="st">"Pseudotime Distance"</span><span class="op">)</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 </div>
 <div id="plot-gene-expression-on-the-flat-embedding" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-gene-expression-on-the-flat-embedding" class="anchor"></a>Plot Gene Expression on the Flat Embedding</h2>
 <p>Plot Expression of Krt14, Krt10, and Lor in t-SNE Space:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit">
-<span class="va">gene_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">gene_names</span> <span class="op">==</span> <span class="st">'Krt14'</span><span class="op">)</span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gene_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">gene_names</span> <span class="op">==</span> <span class="st">'Krt14'</span><span class="op">)</span>
 <span class="va">data_gene</span> <span class="op">&lt;-</span> <span class="va">logdata</span><span class="op">[</span><span class="va">gene_index</span>,<span class="op">]</span>
 
 <span class="co"># plot features</span>
@@ -262,10 +262,10 @@
                     feature <span class="op">=</span> <span class="va">data_gene</span>,
                     title <span class="op">=</span> <span class="st">"Krt14 Expression"</span>,
                     subtitle <span class="op">=</span> <span class="st">"t-SNE Embedding"</span>,
-                    featurename <span class="op">=</span> <span class="st">"Log Expression"</span><span class="op">)</span></pre></div>
+                    featurename <span class="op">=</span> <span class="st">"Log Expression"</span><span class="op">)</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
-<div class="sourceCode" id="cb15"><pre class="downlit">
-<span class="va">gene_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">gene_names</span> <span class="op">==</span> <span class="st">'Krt10'</span><span class="op">)</span>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gene_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">gene_names</span> <span class="op">==</span> <span class="st">'Krt10'</span><span class="op">)</span>
 <span class="va">data_gene</span> <span class="op">&lt;-</span> <span class="va">logdata</span><span class="op">[</span><span class="va">gene_index</span>,<span class="op">]</span>
 
 <span class="co"># plot features</span>
@@ -273,10 +273,10 @@
                     feature <span class="op">=</span> <span class="va">data_gene</span>,
                     title <span class="op">=</span> <span class="st">"Krt10 Expression"</span>,
                     subtitle <span class="op">=</span> <span class="st">"t-SNE Embedding"</span>,
-                    featurename <span class="op">=</span> <span class="st">"Log Expression"</span><span class="op">)</span></pre></div>
+                    featurename <span class="op">=</span> <span class="st">"Log Expression"</span><span class="op">)</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
-<div class="sourceCode" id="cb16"><pre class="downlit">
-<span class="va">gene_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">gene_names</span> <span class="op">==</span> <span class="st">'Lor'</span><span class="op">)</span>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gene_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">gene_names</span> <span class="op">==</span> <span class="st">'Lor'</span><span class="op">)</span>
 <span class="va">data_gene</span> <span class="op">&lt;-</span> <span class="va">logdata</span><span class="op">[</span><span class="va">gene_index</span>,<span class="op">]</span>
 
 <span class="co"># plot features</span>
@@ -284,30 +284,30 @@
                     feature <span class="op">=</span> <span class="va">data_gene</span>,
                     title <span class="op">=</span> <span class="st">"Lor Expression"</span>,
                     subtitle <span class="op">=</span> <span class="st">"t-SNE Embedding"</span>,
-                    featurename <span class="op">=</span> <span class="st">"Log Expression"</span><span class="op">)</span></pre></div>
+                    featurename <span class="op">=</span> <span class="st">"Log Expression"</span><span class="op">)</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
 </div>
 <div id="plot-gene-expression-levels-in-cells-grouped-by-cluster" class="section level2">
 <h2 class="hasAnchor">
 <a href="#plot-gene-expression-levels-in-cells-grouped-by-cluster" class="anchor"></a>Plot Gene Expression Levels in Cells Grouped by Cluster</h2>
 <p>Violin Plot of Krt14 expression. Note strong expression of the basal compartment:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit">
-  <span class="fu"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">logdata</span>,
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R">  <span class="fu"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">logdata</span>,
                        gene_names <span class="op">=</span> <span class="va">gene_names</span>,
                        labels <span class="op">=</span> <span class="va">labels</span>,
-                       gene_name <span class="op">=</span> <span class="st">"Krt14"</span><span class="op">)</span></pre></div>
+                       gene_name <span class="op">=</span> <span class="st">"Krt14"</span><span class="op">)</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-18-1.png" width="700"> Violin Plot of Krt10 expression. Note uniformly high expression in the IFE-DI/DII compartments:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit">
-  <span class="fu"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">logdata</span>,
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R">  <span class="fu"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">logdata</span>,
                        gene_names <span class="op">=</span> <span class="va">gene_names</span>,
                        labels <span class="op">=</span> <span class="va">labels</span>,
-                       gene_name <span class="op">=</span> <span class="st">"Krt10"</span><span class="op">)</span></pre></div>
+                       gene_name <span class="op">=</span> <span class="st">"Krt10"</span><span class="op">)</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-19-1.png" width="700"> Violin Plot of Lor expression. Note strong expression in the terminally differentiated IFE-KI/KII compartments:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit">
-  <span class="fu"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">logdata</span>,
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R">  <span class="fu"><a href="../reference/ViolinPlotExpression.html">ViolinPlotExpression</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">logdata</span>,
                        gene_names <span class="op">=</span> <span class="va">gene_names</span>,
                        labels <span class="op">=</span> <span class="va">labels</span>,
-                       gene_name <span class="op">=</span> <span class="st">"Lor"</span><span class="op">)</span></pre></div>
+                       gene_name <span class="op">=</span> <span class="st">"Lor"</span><span class="op">)</span></code></pre></div>
 <p><img src="RSoptSC_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
 </div>
 <div id="analyze-signaling-mediated-by-a-ligand-receptor-family" class="section level2">
@@ -319,8 +319,8 @@
 <li><p>receptor-target interactions. link: <a href="https://github.com/mkarikom/RSoptSC/blob/master/inst/extdata/tgfb_rec_target.tsv"><code>RSoptSC/inst/extdata/tgfb_rec_target.tsv</code></a></p></li>
 </ul>
 <p>SoptSC requires the paths of these two files to be passed to <code><a href="../reference/ImportPathway.html">ImportPathway()</a></code> as shown below:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/">kableExtra</a></span><span class="op">)</span>
 
 <span class="va">lig_rec_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"tgfb_lig_rec.tsv"</span>, package <span class="op">=</span> <span class="st">"RSoptSC"</span><span class="op">)</span>
@@ -332,10 +332,10 @@
 
 
 
-<span class="va">k</span> <span class="op">=</span> <span class="va">pathway</span><span class="op">$</span><span class="va">pathway</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
-<p>Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples. We then compute the probability of intercellular interaction based on this pathway.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
+<span class="va">k</span> <span class="op">=</span> <span class="va">pathway</span><span class="op">$</span><span class="va">pathway</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p>Using the ImportPathway function, an inner join over the two tables tabulates all ligand/receptor/target/direction 4-tuples.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://haozhu233.github.io/kableExtra/">kableExtra</a></span><span class="op">)</span>
 
 <span class="va">lig_rec_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"tgfb_lig_rec.tsv"</span>, package <span class="op">=</span> <span class="st">"RSoptSC"</span><span class="op">)</span>
@@ -347,9 +347,8 @@
 
 
 
-<span class="va">k</span> <span class="op">=</span> <span class="va">pathway</span><span class="op">$</span><span class="va">pathway</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></pre></div>
-<div class="sourceCode" id="cb22"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html">kable_styling</a></span><span class="op">(</span>kable_input <span class="op">=</span> <span class="va">k</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/scroll_box.html">scroll_box</a></span><span class="op">(</span>height <span class="op">=</span> <span class="st">"500px"</span>, width <span class="op">=</span> <span class="st">"300px"</span><span class="op">)</span></pre></div>
+<span class="va">k</span> <span class="op">=</span> <span class="va">pathway</span><span class="op">$</span><span class="va">pathway</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html">kable_styling</a></span><span class="op">(</span>kable_input <span class="op">=</span> <span class="va">k</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/scroll_box.html">scroll_box</a></span><span class="op">(</span>height <span class="op">=</span> <span class="st">"500px"</span>, width <span class="op">=</span> <span class="st">"300px"</span><span class="op">)</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:300px; ">
 <table class="table table">
 <thead><tr>
@@ -874,45 +873,54 @@ down
 </tbody>
 </table>
 </div>
+<p>We then compute the probability of intercellular interaction based on this pathway.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R">  <span class="va">datamat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">logdata</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">datamat</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/chartr.html">tolower</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">datamat</span><span class="op">)</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">datamat</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/chartr.html">tolower</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">datamat</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">pathway</span><span class="op">$</span><span class="va">pathway_removed</span><span class="op">$</span><span class="va">receptor</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/chartr.html">tolower</a></span><span class="op">(</span><span class="va">pathway</span><span class="op">$</span><span class="va">pathway_removed</span><span class="op">$</span><span class="va">receptor</span><span class="op">)</span>
+  <span class="va">pathway</span><span class="op">$</span><span class="va">pathway_removed</span><span class="op">$</span><span class="va">ligand</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/chartr.html">tolower</a></span><span class="op">(</span><span class="va">pathway</span><span class="op">$</span><span class="va">pathway_removed</span><span class="op">$</span><span class="va">ligand</span><span class="op">)</span>
+  <span class="va">pathway</span><span class="op">$</span><span class="va">pathway_removed</span><span class="op">$</span><span class="va">target</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/chartr.html">tolower</a></span><span class="op">(</span><span class="va">pathway</span><span class="op">$</span><span class="va">pathway_removed</span><span class="op">$</span><span class="va">target</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/chartr.html">tolower</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span><span class="op">)</span>
+  
+  <span class="va">Pmats</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GetSignalingPartners.html">GetSignalingPartners</a></span><span class="op">(</span><span class="va">datamat</span>,<span class="va">labels</span>,<span class="va">pathway</span><span class="op">)</span></code></pre></div>
 <div id="plot-of-intercellular-network" class="section level3">
 <h3 class="hasAnchor">
 <a href="#plot-of-intercellular-network" class="anchor"></a>Plot of Intercellular Network</h3>
 <p>Now plot the previous result as a circos plot on the top five ligand-producing and top five receptor-bearing cells from every cluster. The upper hemisphere of the plot shows receptor-bearing cells. The chords of the plot are colored by the ligand-producing cells in the lower hemisphere.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit">
-<span class="fu"><a href="../reference/SigPlot.html">SigPlot</a></span><span class="op">(</span><span class="va">Pmats</span><span class="op">$</span><span class="va">P_tot</span>,<span class="va">labels</span><span class="op">)</span>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/SigPlot.html">SigPlot</a></span><span class="op">(</span><span class="va">Pmats</span><span class="op">$</span><span class="va">P_tot</span>,<span class="va">labels</span><span class="op">)</span>
 <span class="co">#&gt; Joining, by = "Var2"</span>
 <span class="co">#&gt; Joining, by = "Var1"</span>
 <span class="co">#&gt; Joining, by = "Var1"</span>
-<span class="co">#&gt; Joining, by = "Var2"</span></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
+<span class="co">#&gt; Joining, by = "Var2"</span></code></pre></div>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-24-1.png" width="700"></p>
 </div>
 <div id="plot-of-intercluster-network" class="section level3">
 <h3 class="hasAnchor">
 <a href="#plot-of-intercluster-network" class="anchor"></a>Plot of Intercluster Network</h3>
 <p>Directional plot of cluster-to-cluster signaling. The root of the directional chord is raised.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit">
-  <span class="va">cluster_P</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ClusterSig.html">ClusterSig</a></span><span class="op">(</span><span class="va">Pmats</span>,
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R">  <span class="va">cluster_P</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ClusterSig.html">ClusterSig</a></span><span class="op">(</span><span class="va">Pmats</span>,
                           cluster_labels <span class="op">=</span> <span class="va">labels</span><span class="op">)</span>
 <span class="co">#&gt; Joining, by = c("cluster.Var1", "cluster.Var2")</span>
 <span class="co">#&gt; Joining, by = c("cluster.Var1", "cluster.Var2")</span>
 <span class="co">#&gt; Joining, by = c("cluster.Var1", "cluster.Var2")</span>
   <span class="fu"><a href="../reference/SigPlot_Cluster.html">SigPlot_Cluster</a></span><span class="op">(</span><span class="va">cluster_P</span><span class="op">$</span><span class="va">P_tot</span>,
-          <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_clusters</span><span class="op">)</span><span class="op">)</span></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
+          <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_clusters</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
 </div>
 <div id="heatmap-of-signaling-marker-expression" class="section level3">
 <h3 class="hasAnchor">
 <a href="#heatmap-of-signaling-marker-expression" class="anchor"></a>Heatmap of Signaling Marker Expression</h3>
 <p>Visualize the expression of ligand/receptor and up/down target expression across clusters</p>
-<div class="sourceCode" id="cb25"><pre class="downlit">
-  <span class="va">gene_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'Tgfb1'</span>, <span class="st">'Tgfb2'</span>, 
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R">  <span class="va">gene_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'Tgfb1'</span>, <span class="st">'Tgfb2'</span>, 
                 <span class="st">'Tgfbr1'</span>, <span class="st">'Tgfbr2'</span>,
                 <span class="st">'Zeb2'</span>,<span class="st">'Smad2'</span>,<span class="st">'Wnt4'</span>,<span class="st">'Wnt11'</span>,<span class="st">'Bmp7'</span>,<span class="st">'Sox9'</span>,<span class="st">'Notch1'</span><span class="op">)</span>
 
   <span class="fu"><a href="../reference/PlotClusterExpression.html">PlotClusterExpression</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">logdata</span>,
                         cluster_labels <span class="op">=</span> <span class="va">labels</span>, 
-                        markers <span class="op">=</span> <span class="va">gene_list</span><span class="op">)</span></pre></div>
-<p><img src="RSoptSC_files/figure-html/unnamed-chunk-27-1.png" width="700"></p>
+                        markers <span class="op">=</span> <span class="va">gene_list</span><span class="op">)</span></code></pre></div>
+<p><img src="RSoptSC_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
 </div>
 </div>
   </div>
