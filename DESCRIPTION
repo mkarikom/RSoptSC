@@ -36,9 +36,7 @@ Imports:
     cluster (>= 2.0.7-1),
     magrittr (>= 1.5),
     cowplot (>= 0.9.3),
-    AnnotationDbi,
     parallel,
-    bigstatsr,
     foreach,
     doParallel
 Suggests: testthat,

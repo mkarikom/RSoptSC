@@ -178,7 +178,6 @@ updateFlatNone <- function(ligname,recname,flat,data){
 #'     \item{P_agg}{the aggregate matrix of all ligand/receptor pairs}
 #'                          
 #' @import doParallel                                              
-#' @importFrom bigstatsr nb_cores
 #' @importFrom reshape2 melt
 #' @importFrom dplyr filter mutate_all
 #' @importFrom Matrix as.matrix rowSums colMeans
@@ -199,14 +198,12 @@ GetSignalingPartners <- function(data,
   
   if (nzchar(chk) && chk == "TRUE") {
     # use 2 cores in CRAN/Travis/AppVeyor
-    ncores <- 2L
+    ncores <- 1
   } else {
     # use all cores in devtools::test()
-    ncores <- nb_cores() - 1
+    ncores <- detectCores()
   }
-  
-  cl <- parallel::makeCluster(ncores)
-  doParallel::registerDoParallel(cl)
+  doParallel::registerDoParallel(ncores)
   
   
   
