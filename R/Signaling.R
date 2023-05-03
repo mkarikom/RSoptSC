@@ -201,7 +201,7 @@ GetSignalingPartners <- function(data,
     ncores <- 1
   } else {
     # use all cores in devtools::test()
-    ncores <- detectCores()
+    ncores <- parallel::detectCores()
   }
   doParallel::registerDoParallel(ncores)
   
